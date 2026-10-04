@@ -1,0 +1,6 @@
+{
+  "name": "CODE // High-End Platinenreparatur Neumarkt",
+  "description": "Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
