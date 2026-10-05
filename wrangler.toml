@@ -1,9 +1,6 @@
 name = "code"
 compatibility_date = "2026-10-03"
+pages_build_output_dir = "dist"
 
 [build]
 command = "npm run build"
-
-[assets]
-directory = "./dist"
-not_found_handling = "single-page-application"

@@ -177,8 +177,6 @@ ${part3}
 ${MANDATORY_CLOSING_SENTENCE}`;
 }
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
-
 // Gemini client initialization
 function getGeminiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -195,61 +193,7 @@ function getGeminiClient() {
   });
 }
 
-// Helper: Query Groq Llama/Qwen models with Mustafa's configuration
-async function queryGroq(message: string, history: any[] = []): Promise<string | null> {
-  if (!GROQ_API_KEY) return null;
-
-  try {
-    const messages: any[] = [{ role: 'system', content: SYSTEM_INSTRUCTION }];
-
-    if (Array.isArray(history) && history.length > 0) {
-      for (const h of history.slice(-4)) {
-        messages.push({
-          role: h.role === 'user' ? 'user' : 'assistant',
-          content: h.text || h.content || '',
-        });
-      }
-    }
-
-    messages.push({ role: 'user', content: message });
-
-    // Try high-capacity models in priority order
-    const priorityModels = ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'llama-3.1-70b-versatile'];
-
-    for (const model of priorityModels) {
-      try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${GROQ_API_KEY.trim()}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model,
-            messages,
-            temperature: 0.15,
-            max_tokens: 800,
-          }),
-        });
-
-        if (res.ok) {
-          const data: any = await res.json();
-          const content = data.choices?.[0]?.message?.content;
-          if (content && typeof content === 'string' && content.trim().length > 0) {
-            return content.trim();
-          }
-        }
-      } catch {
-        // try next model
-      }
-    }
-  } catch (err) {
-    console.warn('Groq query error:', err);
-  }
-  return null;
-}
-
-// POST /api/diagnose - Groq Llama + Gemini Multimodal Engine
+// POST /api/diagnose - Google Gemini Meistertechniker Engine (Multimodal Platinen-Diagnose)
 app.post('/api/diagnose', async (req, res) => {
   try {
     const { message, history = [], deviceCategory, image } = req.body;
@@ -259,17 +203,7 @@ app.post('/api/diagnose', async (req, res) => {
 
     let reply = '';
 
-    // 1. If text-only query without image, attempt fast Groq Llama/Qwen worker
-    if (!image) {
-      const promptText = deviceCategory ? `[Gerätekategorie: ${deviceCategory}]\n${message}` : message;
-      const groqReply = await queryGroq(promptText, history);
-      if (groqReply) {
-        reply = validateAndFormatResponse(groqReply, deviceCategory);
-        return res.json({ reply, validated: true, engine: 'groq' });
-      }
-    }
-
-    // 2. Multimodal or fallback with Gemini 2.5 Flash / Gemini 3.1 Pro
+    // Multimodal & Text analysis with Gemini 2.5 Flash / Gemini 3.1 Pro
     try {
       const ai = getGeminiClient();
       const contents: any[] = [];
