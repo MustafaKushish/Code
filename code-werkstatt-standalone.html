@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -7,6 +7,20 @@
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -132,7 +146,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="module">
 var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=Object.getOwnPropertyNames,i=Object.getPrototypeOf,a=Object.prototype.hasOwnProperty,o=(e,t)=>()=>(t||(e((t={exports:{}}).exports,t),e=null),t.exports),s=(e,i,o,s)=>{if(i&&typeof i==`object`||typeof i==`function`)for(var c=r(i),l=0,u=c.length,d;l<u;l++)d=c[l],!a.call(e,d)&&d!==o&&t(e,d,{get:(e=>i[e]).bind(null,d),enumerable:!(s=n(i,d))||s.enumerable});return e},c=(n,r,o)=>(o=n==null?{}:e(i(n)),s(r||!n||!n.__esModule||!a.call(n,`default`)?t(o,`default`,{value:n,enumerable:!0}):o,n));(function(){let e=document.createElement(`link`).relList;if(e&&e.supports&&e.supports(`modulepreload`))return;for(let e of document.querySelectorAll(`link[rel="modulepreload"]`))n(e);new MutationObserver(e=>{for(let t of e)if(t.type===`childList`)for(let e of t.addedNodes)e.tagName===`LINK`&&e.rel===`modulepreload`&&n(e)}).observe(document,{childList:!0,subtree:!0});function t(e){let t={};return e.integrity&&(t.integrity=e.integrity),e.referrerPolicy&&(t.referrerPolicy=e.referrerPolicy),t.credentials=e.crossOrigin===`use-credentials`?`include`:e.crossOrigin===`anonymous`?`omit`:`same-origin`,t}function n(e){if(e.ep)return;e.ep=!0;let n=t(e);fetch(e.href,n)}})();var l=o(((e,t)=>{(function(){function n(e,t){Object.defineProperty(a.prototype,e,{get:function(){console.warn(`%s(...) is deprecated in plain JavaScript React classes. %s`,t[0],t[1])}})}function r(e){return typeof e!=`object`||!e?null:(e=Te&&e[Te]||e[`@@iterator`],typeof e==`function`?e:null)}function i(e,t){e=(e=e.constructor)&&(e.displayName||e.name)||`ReactClass`;var n=e+`.`+t;Ee[n]||(console.error("Can't call %s on a component that is not yet mounted. This is a no-op, but it might indicate a bug in your application. Instead, assign to `this.state` directly or define a `state = {};` class property with the desired state in the %s component.",t,e),Ee[n]=!0)}function a(e,t,n){this.props=e,this.context=t,this.refs=ke,this.updater=n||De}function o(){}function s(e,t,n){this.props=e,this.context=t,this.refs=ke,this.updater=n||De}function c(){}function l(e){return``+e}function u(e){try{l(e);var t=!1}catch{t=!0}if(t){t=console;var n=t.error,r=typeof Symbol==`function`&&Symbol.toStringTag&&e[Symbol.toStringTag]||e.constructor.name||`Object`;return n.call(t,`The provided key is an unsupported type %s. This value must be coerced to a string before using it here.`,r),l(e)}}function d(e){if(e==null)return null;if(typeof e==`function`)return e.$typeof===Me?null:e.displayName||e.name||null;if(typeof e==`string`)return e;switch(e){case he:return`Fragment`;case w:return`Profiler`;case ge:return`StrictMode`;case ye:return`Suspense`;case be:return`SuspenseList`;case Ce:return`Activity`;case we:return`ViewTransition`}if(typeof e==`object`)switch(typeof e.tag==`number`&&console.error(`Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue.`),e.$typeof){case me:return`Portal`;case T:return e.displayName||`Context`;case _e:return(e._context.displayName||`Context`)+`.Consumer`;case ve:var t=e.render;return e=e.displayName,e||=(e=t.displayName||t.name||``,e===``?`ForwardRef`:`ForwardRef(`+e+`)`),e;case xe:return t=e.displayName||null,t===null?d(e.type)||`Memo`:t;case Se:t=e._payload,e=e._init;try{return d(e(t))}catch{}}return null}function f(e){if(e===he)return`<>`;if(typeof e==`object`&&e&&e.$typeof===Se)return`<...>`;try{var t=d(e);return t?`<`+t+`>`:`<...>`}catch{return`<...>`}}function p(){var e=Ne.A;return e===null?null:e.getOwner()}function m(){return Error(`react-stack-top-frame`)}function h(e){if(Pe.call(e,`key`)){var t=Object.getOwnPropertyDescriptor(e,`key`).get;if(t&&t.isReactWarning)return!1}return e.key!==void 0}function g(e,t){function n(){E||(E=!0,console.error("%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",t))}n.isReactWarning=!0,Object.defineProperty(e,"key",{get:n,configurable:!0})}function _(){var e=d(this.type);return Le[e]||(Le[e]=!0,console.error(`Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release.`)),e=this.props.ref,e===void 0?null:e}function v(e,t,n,r,i,a){var o=n.ref;return e={$typeof:pe,type:e,key:t,props:n,_owner:r},(o===void 0?null:o)===null?Object.defineProperty(e,"ref",{enumerable:!1,value:null}):Object.defineProperty(e,"ref",{enumerable:!1,get:_}),e._store={},Object.defineProperty(e._store,"validated",{configurable:!1,enumerable:!1,writable:!0,value:0}),Object.defineProperty(e,"_debugInfo",{configurable:!1,enumerable:!1,writable:!0,value:null}),Object.defineProperty(e,"_debugStack",{configurable:!1,enumerable:!1,writable:!0,value:i}),Object.defineProperty(e,"_debugTask",{configurable:!1,enumerable:!1,writable:!0,value:a}),Object.freeze&&(Object.freeze(e.props),Object.freeze(e)),e}function y(e,t){return t=v(e.type,t,e.props,e._owner,e._debugStack,e._debugTask),e._store&&(t._store.validated=e._store.validated),t}function b(e){x(e)?e._store&&(e._store.validated=1):typeof e==`object`&&e&&e.$typeof===Se&&(e._payload.status===`fulfilled`?x(e._payload.value)&&e._payload.value._store&&(e._payload.value._store.validated=1):e._store&&(e._store.validated=1))}function x(e){return typeof e==`object`&&!!e&&e.$typeof===pe}function S(e){var t={"=":`=0`,":":`=2`};return`<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -140,6 +154,20 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -298,7 +326,7 @@ Error generating stack: `+e.message+`
 `+e.stack}return o}function E(e,t,n,r,i,a,o){var s=rh;Ie(e);try{return e!==null&&e._debugTask?e._debugTask.run(t.bind(null,n,r,i,a,o)):t(n,r,i,a,o)}finally{Ie(s)}throw Error(`runWithFiberInDEV should never be called in production. This is a bug in React.`)}function Ie(e){Z.getCurrentStack=e===null?null:Fe,ih=!1,rh=e}function Le(e){return typeof Symbol==`function`&&Symbol.toStringTag&&e[Symbol.toStringTag]||e.constructor.name||`Object`}function Re(e){try{return ze(e),!1}catch{return!0}}function ze(e){return``+e}function Be(e,t){if(Re(e))return console.error("The provided `%s` attribute is an unsupported type %s. This value must be coerced to a string before using it here.",t,Le(e)),ze(e)}function Ve(e,t){if(Re(e))return console.error("The provided `%s` CSS property is an unsupported type %s. This value must be coerced to a string before using it here.",t,Le(e)),ze(e)}function He(e){if(Re(e))return console.error(`Form field values (value, checked, defaultValue, or defaultChecked props) must be strings, not %s. This value must be coerced to a string before using it here.`,Le(e)),ze(e)}function Ue(e){if(typeof __REACT_DEVTOOLS_GLOBAL_HOOK__>`u`)return!1;var t=__REACT_DEVTOOLS_GLOBAL_HOOK__;if(t.isDisabled)return!0;if(!t.supportsFiber)return console.error(`The installed version of React DevTools is too old and will not work with the current version of React. Please update React DevTools. https://react.dev/link/react-devtools`),!0;try{yh=t.inject(e),bh=t}catch(e){console.error(`React instrumentation encountered an error: %o.`,e)}return!!t.checkDCE}function We(e){if(typeof _h==`function`&&vh(e),bh&&typeof bh.setStrictMode==`function`)try{bh.setStrictMode(yh,e)}catch(e){xh||(xh=!0,console.error(`React instrumentation encountered an error: %o`,e))}}function Ge(e){return e>>>=0,e===0?32:31-(wh(e)/Th|0)|0}function Ke(e){var t=e&42;if(t!==0)return t;switch(e&-e){case 1:return 1;case 2:return 2;case 4:return 4;case 8:return 8;case 16:return 16;case 32:return 32;case 64:return 64;case 128:return 128;case 256:case 512:case 1024:case 2048:case 4096:case 8192:case 16384:case 32768:case 65536:case 131072:return e&-e;case 262144:case 524288:case 1048576:case 2097152:return e&3932160;case 4194304:case 8388608:case 16777216:case 33554432:return e&62914560;case 67108864:return 67108864;case 134217728:return 134217728;case 268435456:return 268435456;case 536870912:return 536870912;case 1073741824:return 0;default:return console.error(`Should have found matching lanes. This is a bug in React.`),e}}function qe(e,t,n){var r=e.pendingLanes;if(r===0)return 0;var i=0,a=e.suspendedLanes,o=e.pingedLanes;e=e.warmLanes;var s=r&134217727;return s===0?(s=r&~a,s===0?o===0?n||(n=r&~e,n!==0&&(i=Ke(n))):i=Ke(o):i=Ke(s)):(r=s&~a,r===0?(o&=s,o===0?n||(n=s&~e,n!==0&&(i=Ke(n))):i=Ke(o)):i=Ke(r)),i===0?0:t!==0&&t!==i&&(t&a)===0&&(a=i&-i,n=t&-t,a>=n||a===32&&n&4194048)?t:i}function Je(e,t){return(e.pendingLanes&~(e.suspendedLanes&~e.pingedLanes)&t)===0}function Ye(e,t){t&8&&(t|=t&32);var n=e.entangledLanes;if(n!==0)for(e=e.entanglements,n&=t;0<n;){var r=31-Ch(n),i=1<<r;t|=e[r],n&=~i}return t}function Xe(e,t){switch(e){case 1:case 2:case 4:case 8:case 64:return t+250;case 16:case 32:case 128:case 256:case 512:case 1024:case 2048:case 4096:case 8192:case 16384:case 32768:case 65536:case 131072:case 262144:case 524288:case 1048576:case 2097152:return t+5e3;case 4194304:case 8388608:case 16777216:case 33554432:return-1;case 67108864:case 134217728:case 268435456:case 536870912:case 1073741824:return-1;default:return console.error(`Should have found matching lanes. This is a bug in React.`),-1}}function Ze(){var e=Oh;return Oh<<=1,!(Oh&62914560)&&(Oh=4194304),e}function Qe(e){for(var t=[],n=0;31>n;n++)t.push(e);return t}function $e(e,t){e.pendingLanes|=t,t!==268435456&&(e.suspendedLanes=0,e.pingedLanes=0,e.warmLanes=0)}function et(e,t,n,r,i,a){var o=e.pendingLanes;e.pendingLanes=n,e.suspendedLanes=0,e.pingedLanes=0,e.warmLanes=0,e.expiredLanes&=n,e.entangledLanes&=n,e.errorRecoveryDisabledLanes&=n,e.shellSuspendCounter=0;var s=e.entanglements,c=e.expirationTimes,l=e.hiddenUpdates;for(n=o&~n;0<n;){var u=31-Ch(n),d=1<<u;s[u]=0,c[u]=-1;var f=l[u];if(f!==null)for(l[u]=null,u=0;u<f.length;u++){var p=f[u];p!==null&&(p.lane&=-536870913)}n&=~d}r!==0&&tt(e,r,0),a!==0&&i===0&&e.tag!==0&&(e.suspendedLanes|=a&~(o&~t))}function tt(e,t,n){e.pendingLanes|=t,e.suspendedLanes&=~t;var r=31-Ch(t);e.entangledLanes|=t,e.entanglements[r]=e.entanglements[r]|1073741824|n&261930}function nt(e,t){var n=e.entangledLanes|=t;for(e=e.entanglements;n;){var r=31-Ch(n),i=1<<r;i&t|e[r]&t&&(e[r]|=t),n&=~i}}function rt(e,t){var n=t&-t;return n=n&42?1:it(n),(n&(e.suspendedLanes|t))===0?n:0}function it(e){switch(e){case 2:e=1;break;case 8:e=4;break;case 32:e=16;break;case 256:case 512:case 1024:case 2048:case 4096:case 8192:case 16384:case 32768:case 65536:case 131072:case 262144:case 524288:case 1048576:case 2097152:case 4194304:case 8388608:case 16777216:case 33554432:e=128;break;case 268435456:e=134217728;break;default:e=0}return e}function at(e,t,n){if(Sh)for(e=e.pendingUpdatersLaneMap;0<n;){var r=31-Ch(n),i=1<<r;e[r].add(t),n&=~i}}function ot(e,t){if(Sh)for(var n=e.pendingUpdatersLaneMap,r=e.memoizedUpdaters;0<t;){var i=31-Ch(t);e=1<<i,i=n[i],0<i.size&&(i.forEach(function(e){var t=e.alternate;t!==null&&r.has(t)||r.add(e)}),i.clear()),t&=~e}}function st(e){return e&=-e,kh!==0&&kh<e?Ah!==0&&Ah<e?e&134217727?jh:Mh:Ah:kh}function ct(){var e=Im.p;return e===0?(e=window.event,e===void 0?jh:Jp(e.type)):e}function lt(e,t){var n=Im.p;try{return Im.p=e,t()}finally{Im.p=n}}function ut(e){delete e[Ph],delete e[Fh],delete e[Rh],delete e[zh]}function dt(e){var t;if(t=e[Ph])return t;for(var n=e.parentNode;n;){if(t=n[Ih]||n[Ph]){if(n=t.alternate,t.child!==null||n!==null&&n.child!==null)for(e=Xf(e);e!==null;){if(n=e[Ph])return n;e=Xf(e)}return t}e=n,n=e.parentNode}return null}function ft(e){if(e=e[Ph]||e[Ih]){var t=e.tag;if(t===5||t===6||t===13||t===31||t===26||t===27||t===3)return e}return null}function pt(e){var t=e.tag;if(t===5||t===26||t===27||t===6)return e.stateNode;throw Error(`getNodeFromInstance: Invalid argument.`)}function mt(e){var t=e[Bh];return t||=e[Bh]={hoistableStyles:new Map,hoistableScripts:new Map},t}function ht(e){e[Vh]=!0}function gt(e){e[Hh]=void 0}function _t(e,t){vt(e,t),vt(e+`Capture`,t)}function vt(e,t){Wh[e]&&console.error("EventRegistry: More than one plugin attempted to publish the same registration name, `%s`.",e),Wh[e]=t;var n=e.toLowerCase();for(Gh[n]=e,e===`onDoubleClick`&&(Gh.ondblclick=e),e=0;e<t.length;e++)Uh.add(t[e])}function yt(e,t){Kh[t.type]||t.onChange||t.onInput||t.readOnly||t.disabled||t.value==null||console.error(e===`select`?"You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set `onChange`.":"You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`."),t.onChange||t.readOnly||t.disabled||t.checked==null||console.error("You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultChecked`. Otherwise, set either `onChange` or `readOnly`.")}function bt(e){return ah.call(Yh,e)?!0:ah.call(Jh,e)?!1:qh.test(e)?Yh[e]=!0:(Jh[e]=!0,console.error("Invalid attribute name: `%s`",e),!1)}function xt(){var e=Xh;return Xh=!1,e}function St(e,t,n){if(bt(t)){if(!e.hasAttribute(t)){switch(typeof n){case`symbol`:case`object`:return n;case`function`:return n;case`boolean`:if(!1===n)return n}return n===void 0?void 0:null}return e=t.toLowerCase()===`nonce`?e.nonce:e.getAttribute(t),e===``&&!0===n||(Be(n,t),e===``+n?n:e)}}function Ct(e,t,n){if(bt(t)){if(n===null)e.removeAttribute(t);else{switch(typeof n){case`undefined`:case`function`:case`symbol`:e.removeAttribute(t);return;case`boolean`:var r=t.toLowerCase().slice(0,5);if(r!==`data-`&&r!==`aria-`){e.removeAttribute(t);return}}Be(n,t),e.setAttribute(t,n)}}}function wt(e,t,n){if(n===null)e.removeAttribute(t);else{switch(typeof n){case`undefined`:case`function`:case`symbol`:case`boolean`:e.removeAttribute(t);return}Be(n,t),e.setAttribute(t,n)}}function Tt(e,t,n,r){if(r===null)e.removeAttribute(n);else{switch(typeof r){case`undefined`:case`function`:case`symbol`:case`boolean`:e.removeAttribute(n);return}Be(r,n),e.setAttributeNS(t,n,r)}}function Et(e){switch(typeof e){case`bigint`:case`boolean`:case`number`:case`string`:case`undefined`:return e;case`object`:return He(e),e;default:return``}}function Dt(e){var t=e.type;return(e=e.nodeName)&&e.toLowerCase()===`input`&&(t===`checkbox`||t===`radio`)}function Ot(e,t,n){var r=Object.getOwnPropertyDescriptor(e.constructor.prototype,t);if(!e.hasOwnProperty(t)&&r!==void 0&&typeof r.get==`function`&&typeof r.set==`function`){var i=r.get,a=r.set;return Object.defineProperty(e,t,{configurable:!0,get:function(){return i.call(this)},set:function(e){He(e),n=``+e,a.call(this,e)}}),Object.defineProperty(e,t,{enumerable:r.enumerable}),{getValue:function(){return n},setValue:function(e){He(e),n=``+e},stopTracking:function(){e._valueTracker=null,delete e[t]}}}}function kt(e){if(!e._valueTracker){var t=Dt(e)?`checked`:`value`;e._valueTracker=Ot(e,t,``+e[t])}}function At(e){if(!e)return!1;var t=e._valueTracker;if(!t)return!0;var n=t.getValue(),r=``;return e&&(r=Dt(e)?e.checked?`true`:`false`:e.value),e=r,e!==n&&(t.setValue(e),!0)}function jt(e){return e.replace(Zh,function(e){return`\\`+e.charCodeAt(0).toString(16)+` `})}function Mt(e,t){t.checked===void 0||t.defaultChecked===void 0||$h||(console.error(`%s contains an input of type %s with both checked and defaultChecked props. Input elements must be either controlled or uncontrolled (specify either the checked prop, or the defaultChecked prop, but not both). Decide between using a controlled or uncontrolled input element and remove one of these props. More info: https://react.dev/link/controlled-components`,Pe()||`A component`,t.type),$h=!0),t.value===void 0||t.defaultValue===void 0||Qh||(console.error(`%s contains an input of type %s with both value and defaultValue props. Input elements must be either controlled or uncontrolled (specify either the value prop, or the defaultValue prop, but not both). Decide between using a controlled or uncontrolled input element and remove one of these props. More info: https://react.dev/link/controlled-components`,Pe()||`A component`,t.type),Qh=!0)}function Nt(e,t,n,r,i,a,o,s){e.name=``,o!=null&&typeof o!=`function`&&typeof o!=`symbol`&&typeof o!=`boolean`?(Be(o,`type`),e.type=o):e.removeAttribute(`type`),t==null?o!==`submit`&&o!==`reset`||e.removeAttribute(`value`):o===`number`?(t===0&&e.value===``||e.value!=t)&&(e.value=``+Et(t)):e.value!==``+Et(t)&&(e.value=``+Et(t)),t==null?n==null?r!=null&&e.removeAttribute(`value`):Ft(e,Et(n)):o===`number`&&e.value==t?Ft(e,Et(e.value)):Ft(e,Et(t)),i==null&&a!=null&&(e.defaultChecked=!!a),i!=null&&(e.checked=i&&typeof i!=`function`&&typeof i!=`symbol`),s!=null&&typeof s!=`function`&&typeof s!=`symbol`&&typeof s!=`boolean`?(Be(s,`name`),e.name=``+Et(s)):e.removeAttribute(`name`)}function Pt(e,t,n,r,i,a,o,s){if(a!=null&&typeof a!=`function`&&typeof a!=`symbol`&&typeof a!=`boolean`&&(Be(a,`type`),e.type=a),t!=null||n!=null){if(!(a!==`submit`&&a!==`reset`||t!=null)){kt(e);return}n=n==null?``:``+Et(n),t=t==null?n:``+Et(t),s||t===e.value||(e.value=t),e.defaultValue=t}r??=i,r=typeof r!=`function`&&typeof r!=`symbol`&&!!r,e.checked=s?e.checked:!!r,e.defaultChecked=!!r,o!=null&&typeof o!=`function`&&typeof o!=`symbol`&&typeof o!=`boolean`&&(Be(o,`name`),e.name=o),kt(e)}function Ft(e,t){e.defaultValue!==``+t&&(e.defaultValue=``+t)}function It(e,t){t.value??(typeof t.children==`object`&&t.children!==null?um.Children.forEach(t.children,function(e){e==null||typeof e==`string`||typeof e==`number`||typeof e==`bigint`||tg||(tg=!0,console.error("Cannot infer the option value of complex children. Pass a `value` prop or use a plain string as children to <option>."))}):t.dangerouslySetInnerHTML==null||ng||(ng=!0,console.error("Pass a `value` prop if you set dangerouslyInnerHTML so React knows which value should be selected."))),t.selected==null||eg||(console.error("Use the `defaultValue` or `value` props on <select> instead of setting `selected` on <option>."),eg=!0)}function Lt(){var e=Pe();return e?`
 
 Check the render method of \``+e+"`.":``}function Rt(e,t,n,r){if(e=e.options,t){t={};for(var i=0;i<n.length;i++)t[`<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -306,6 +334,20 @@ Check the render method of \``+e+"`.":``}function Rt(e,t,n,r){if(e=e.options,t){
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -430,7 +472,7 @@ Check the render method of \``+e+"`.":``}function Rt(e,t,n,r){if(e=e.options,t){
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +n[i]]=!0;for(n=0;n<e.length;n++)i=t.hasOwnProperty(`<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -438,6 +480,20 @@ Check the render method of \``+e+"`.":``}function Rt(e,t,n,r){if(e=e.options,t){
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -718,7 +774,7 @@ https://bugs.webkit.org/show_bug.cgi?id=290923`,e.toLocaleLowerCase(),t.toLocale
   + `+lp(n),Error("Expected stylesheet with precedence to not be updated to a different kind of <link>. Check the `rel`, `href`, and `precedence` props of this component. Alternatively, check whether two different <link> components render in the same slot or share the same key."+n);return null;case`script`:return t=n.async,n=n.src,typeof n==`string`&&t&&typeof t!=`function`&&typeof t!=`symbol`?(n=mp(n),t=mt(i).hoistableScripts,r=t.get(n),r||(r={type:`script`,instance:null,count:0,state:null},t.set(n,r)),r):{type:`void`,instance:null,count:0,state:null};default:throw Error(`getResource encountered a type it did not expect: "`+e+`". this is a bug in React.`)}}function lp(e){var t=0,n=`<link`;return typeof e.rel==`string`?(t++,n+=` rel="`+e.rel+`"`):ah.call(e,`rel`)&&(t++,n+=` rel="`+(e.rel===null?`null`:`invalid type `+typeof e.rel)+`"`),typeof e.href==`string`?(t++,n+=` href="`+e.href+`"`):ah.call(e,`href`)&&(t++,n+=` href="`+(e.href===null?`null`:`invalid type `+typeof e.href)+`"`),typeof e.precedence==`string`?(t++,n+=` precedence="`+e.precedence+`"`):ah.call(e,`precedence`)&&(t++,n+=` precedence={`+(e.precedence===null?`null`:`invalid type `+typeof e.precedence)+`}`),Object.getOwnPropertyNames(e).length>t&&(n+=` ...`),n+` />`}function up(e){return`href="`+jt(e)+`"`}function dp(e){return`link[rel="stylesheet"][`+e+`]`}function fp(e){return mm({},e,{"data-precedence":e.precedence,precedence:null})}function pp(e,t,n,r){if(t=e.querySelector(`link[rel="preload"][as="style"][`+t+`]`)){if(!0!==t[Hh]){r.loading=LT;return}}else t=e.createElement(`link`),t[Hh]=!0,t.onload=t.onerror=gt.bind(null,t),bd(t,`link`,n),ht(t),e.head.appendChild(t);r.preload=t,t.addEventListener(`load`,function(){return r.loading|=LT}),t.addEventListener(`error`,function(){return r.loading|=RT})}function mp(e){return`[src="`+jt(e)+`"]`}function hp(e){return`script[async]`+e}function gp(e,t,n){if(t.count++,t.instance===null)switch(t.type){case`style`:var r=e.querySelector(`style[data-href~="`+jt(n.href)+`"]`);if(r)return t.instance=r,ht(r),r;var i=mm({},n,{"data-href":n.href,"data-precedence":n.precedence,href:null,precedence:null});return r=(e.ownerDocument||e).createElement(`style`),ht(r),bd(r,`style`,i),_p(r,n.precedence,e),t.instance=r;case`stylesheet`:i=up(n.href);var a=e.querySelector(dp(i));if(a)return t.state.loading|=BT,t.instance=a,ht(a),a;r=fp(n),(i=VT.get(i))&&vp(r,i),a=(e.ownerDocument||e).createElement(`link`),ht(a);var o=a;return o._p=new Promise(function(e,t){o.onload=e,o.onerror=t}),bd(a,`link`,r),t.state.loading|=BT,_p(a,n.precedence,e),t.instance=a;case`script`:return a=mp(n.src),(i=e.querySelector(hp(a)))?(t.instance=i,ht(i),i):(r=n,(i=VT.get(a))&&(r=mm({},n),yp(r,i)),e=e.ownerDocument||e,i=e.createElement(`script`),ht(i),bd(i,`link`,r),e.head.appendChild(i),t.instance=i);case`void`:return null;default:throw Error(`acquireResource encountered a resource type it did not expect: "`+t.type+`". this is a bug in React.`)}else t.type===`stylesheet`&&(t.state.loading&BT)===IT&&(r=t.instance,t.state.loading|=BT,_p(r,n.precedence,e));return t.instance}function _p(e,t,n){for(var r=n.querySelectorAll(`link[rel="stylesheet"][data-precedence],style[data-precedence]`),i=r.length?r[r.length-1]:null,a=i,o=0;o<r.length;o++){var s=r[o];if(s.dataset.precedence===t)a=s;else if(a!==i)break}a?a.parentNode.insertBefore(e,a.nextSibling):(t=n.nodeType===9?n.head:n,t.insertBefore(e,t.firstChild))}function vp(e,t){e.crossOrigin??=t.crossOrigin,e.referrerPolicy??=t.referrerPolicy,e.title??=t.title}function yp(e,t){e.crossOrigin??=t.crossOrigin,e.referrerPolicy??=t.referrerPolicy,e.integrity??=t.integrity}function bp(e,t,n){if(GT===null){var r=new Map,i=GT=new Map;i.set(n,r)}else i=GT,r=i.get(n),r||(r=new Map,i.set(n,r));if(r.has(e))return r;for(r.set(e,null),n=n.getElementsByTagName(e),i=0;i<n.length;i++){var a=n[i];if(!(a[Vh]||a[Ph]||e===`link`&&a.getAttribute(`rel`)===`stylesheet`)&&a.namespaceURI!==Eg){var o=a.getAttribute(t)||``;o=e+o;var s=r.get(o);s?s.push(a):r.set(o,[a])}}return r}function xp(e,t,n){e=e.ownerDocument||e,e.head.insertBefore(n,t===`title`?e.querySelector(`head > title`):null)}function Sp(e,t,n){var r=!n.ancestorInfo.containerTagInScope;if(n.context===vT||t.itemProp!=null)return!r||t.itemProp==null||e!==`meta`&&e!==`title`&&e!==`style`&&e!==`link`&&e!==`script`||console.error("Cannot render a <%s> outside the main document if it has an `itemProp` prop. `itemProp` suggests the tag belongs to an `itemScope` which can appear anywhere in the DOM. If you were intending for React to hoist this <%s> remove the `itemProp` prop. Otherwise, try moving this tag into the <head> or <body> of the Document.",e,e),!1;switch(e){case`meta`:case`title`:return!0;case`style`:if(typeof t.precedence!=`string`||typeof t.href!=`string`||t.href===``){r&&console.error('Cannot render a <style> outside the main document without knowing its precedence and a unique href key. React can hoist and deduplicate <style> tags if you provide a `precedence` prop along with an `href` prop that does not conflict with the `href` values used in any other hoisted <style> or <link rel="stylesheet" ...> tags.  Note that hoisting <style> tags is considered an advanced feature that most will not use directly. Consider moving the <style> tag to the <head> or consider adding a `precedence="default"` and `href="some unique resource identifier"`.');break}return!0;case`link`:if(typeof t.rel!=`string`||typeof t.href!=`string`||t.href===``||t.onLoad||t.onError){if(t.rel===`stylesheet`&&typeof t.precedence==`string`){e=t.href;var i=t.onError,a=t.disabled;n=[],t.onLoad&&n.push("`onLoad`"),i&&n.push("`onError`"),a!=null&&n.push("`disabled`"),i=jd(n,`and`),i+=n.length===1?` prop`:` props`,a=n.length===1?`an `+i:`the `+i,n.length&&console.error('React encountered a <link rel="stylesheet" href="%s" ... /> with a `precedence` prop that also included %s. The presence of loading and error handlers indicates an intent to manage the stylesheet loading state from your from your Component code and React will not hoist or deduplicate this stylesheet. If your intent was to have React hoist and deduplciate this stylesheet using the `precedence` prop remove the %s, otherwise remove the `precedence` prop.',e,a,i)}r&&(typeof t.rel!=`string`||typeof t.href!=`string`||t.href===``?console.error("Cannot render a <link> outside the main document without a `rel` and `href` prop. Try adding a `rel` and/or `href` prop to this <link> or moving the link into the <head> tag"):(t.onError||t.onLoad)&&console.error(`Cannot render a <link> with onLoad or onError listeners outside the main document. Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or somewhere in the <body>.`));break}switch(t.rel){case`stylesheet`:return e=t.precedence,t=t.disabled,typeof e!=`string`&&r&&console.error(`Cannot render a <link rel="stylesheet" /> outside the main document without knowing its precedence. Consider adding precedence="default" or moving it into the root <head> tag.`),typeof e==`string`&&t==null;default:return!0}case`script`:if(e=t.async&&typeof t.async!=`function`&&typeof t.async!=`symbol`,!e||t.onLoad||t.onError||!t.src||typeof t.src!=`string`){r&&(e?t.onLoad||t.onError?console.error(`Cannot render a <script> with onLoad or onError listeners outside the main document. Try removing onLoad={...} and onError={...} or moving it into the root <head> tag or somewhere in the <body>.`):console.error("Cannot render a <script> outside the main document without `async={true}` and a non-empty `src` prop. Ensure there is a valid `src` and either make the script async or move it into the root <head> tag or somewhere in the <body>."):console.error(`Cannot render a sync or defer <script> outside the main document without knowing its order. Try adding async="" or moving it into the root <head> tag.`));break}return!0;case`noscript`:case`template`:r&&console.error(`Cannot render <%s> outside the main document. Try moving it into the root <head> tag.`,e)}return!1}function Cp(e,t){return e===`img`&&t.src!=null&&t.src!==``&&t.onLoad==null&&t.loading!==`lazy`}function wp(e){return e.type!==`stylesheet`||(e.state.loading&zT)!==IT}function Tp(e){return(e.width||100)*(e.height||100)*(typeof devicePixelRatio==`number`?devicePixelRatio:1)*.25}function Ep(e,t){typeof t.decode==`function`&&(e.imgCount++,t.complete||(e.imgBytes+=Tp(t),e.suspenseyImages.push(t)),e=jp.bind(e),t.decode().then(e,e))}function Dp(e,t,n,r){if(n.type===`stylesheet`&&(typeof r.media!=`string`||!1!==matchMedia(r.media).matches)&&(n.state.loading&BT)===IT){if(n.instance===null){var i=up(r.href),a=t.querySelector(dp(i));if(a){t=a._p,typeof t==`object`&&t&&typeof t.then==`function`&&(e.count++,e=Ap.bind(e),t.then(e,e)),n.state.loading|=BT,n.instance=a,ht(a);return}a=t.ownerDocument||t,r=fp(r),(i=VT.get(i))&&vp(r,i),a=a.createElement(`link`),ht(a);var o=a;o._p=new Promise(function(e,t){o.onload=e,o.onerror=t}),bd(a,`link`,r),n.instance=a}e.stylesheets===null&&(e.stylesheets=new Map),e.stylesheets.set(n,t),(t=n.state.preload)&&(n.state.loading&zT)===IT&&(e.count++,n=Ap.bind(e),t.addEventListener(`load`,n),t.addEventListener(`error`,n))}}function Op(e,t){return e.stylesheets&&e.count===0&&Mp(e,e.stylesheets),0<e.count||0<e.imgCount?function(n){var r=setTimeout(function(){if(e.stylesheets&&Mp(e,e.stylesheets),e.unsuspend){var t=e.unsuspend;e.unsuspend=null,t()}},KT+t);0<e.imgBytes&&YT===0&&(YT=125*Nd()*JT);var i=setTimeout(function(){if(e.waitingForImages=!1,e.count===0&&(e.stylesheets&&Mp(e,e.stylesheets),e.unsuspend)){var t=e.unsuspend;e.unsuspend=null,t()}},(e.imgBytes>YT?50:qT)+t);return e.unsuspend=n,function(){e.unsuspend=null,clearTimeout(r),clearTimeout(i)}}:null}function kp(e){if(e.count===0&&(e.imgCount===0||!e.waitingForImages)){if(e.stylesheets)Mp(e,e.stylesheets);else if(e.unsuspend){var t=e.unsuspend;e.unsuspend=null,t()}}}function Ap(){this.count--,kp(this)}function jp(){this.imgCount--,kp(this)}function Mp(e,t){e.stylesheets=null,e.unsuspend!==null&&(e.count++,ZT=new Map,t.forEach(Np,e),ZT=null,Ap.call(e))}function Np(e,t){if(!(t.state.loading&BT)){var n=ZT.get(e);if(n)var r=n.get(XT);else{n=new Map,ZT.set(e,n);for(var i=e.querySelectorAll(`link[data-precedence],style[data-precedence]`),a=0;a<i.length;a++){var o=i[a];(o.nodeName===`LINK`||o.getAttribute(`media`)!==`not all`)&&(n.set(o.dataset.precedence,o),r=o)}r&&n.set(XT,r)}i=t.instance,o=i.getAttribute(`data-precedence`),a=n.get(o)||r,a===r&&n.set(XT,i),n.set(o,i),this.count++,r=Ap.bind(this),i.addEventListener(`load`,r),i.addEventListener(`error`,r),a?a.parentNode.insertBefore(i,a.nextSibling):(e=e.nodeType===9?e.head:e,e.insertBefore(i,e.firstChild)),t.state.loading|=BT}}function Pp(e,t,n,r,i,a,o,s,c){for(this.tag=1,this.containerInfo=e,this.pingCache=this.current=this.pendingChildren=null,this.timeoutHandle=OT,this.callbackNode=this.next=this.pendingContext=this.context=this.cancelPendingCommit=null,this.callbackPriority=0,this.expirationTimes=Qe(-1),this.entangledLanes=this.shellSuspendCounter=this.errorRecoveryDisabledLanes=this.expiredLanes=this.warmLanes=this.pingedLanes=this.suspendedLanes=this.pendingLanes=0,this.entanglements=Qe(0),this.hiddenUpdates=Qe(null),this.identifierPrefix=r,this.onUncaughtError=i,this.onCaughtError=a,this.onRecoverableError=o,this.pooledCache=null,this.pooledCacheLanes=0,this.formState=c,this.transitionTypes=null,this.incompleteTransitions=new Map,this.passiveEffectDuration=this.effectDuration=-0,this.memoizedUpdaters=new Set,e=this.pendingUpdatersLaneMap=[],t=0;31>t;t++)e.push(new Set);this._debugRootType=n?`hydrateRoot()`:`createRoot()`}function Fp(e,t,n,r,i,a,o,s,c,l,u,d){return e=new Pp(e,t,n,o,c,l,u,d,s),t=Nv,!0===a&&(t|=Fv|Iv),t|=Pv,a=g(3,null,null,t),e.current=a,a.stateNode=e,t=ai(),oi(t),e.pooledCache=t,oi(t),a.memoizedState={element:r,isDehydrated:n,cache:t},ea(a),e}function Ip(e){return e?(e=kv,e):kv}function Lp(e,t,n,r,i,a){if(bh&&typeof bh.onScheduleFiberRoot==`function`)try{bh.onScheduleFiberRoot(yh,r,n)}catch(e){xh||(xh=!0,console.error(`React instrumentation encountered an error: %o`,e))}i=Ip(i),r.context===null?r.context=i:r.pendingContext=i,ih&&rh!==null&&!aE&&(aE=!0,console.error(`Render methods should be a pure function of props and state; triggering nested component updates from render is not allowed. If necessary, trigger nested updates in componentDidUpdate.
 
 Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n},a=a===void 0?null:a,a!==null&&(typeof a!=`function`&&console.error("Expected the last optional `callback` argument to be a function. Instead received: %s.",a),r.callback=a),n=ra(e,r,t),n!==null&&(li(t,`root.render()`,null),Hl(n,e,t),ia(n,e,t))}function Rp(e,t){if(e=e.memoizedState,e!==null&&e.dehydrated!==null){var n=e.retryLane;e.retryLane=n!==0&&n<t?n:t}}function zp(e,t){Rp(e,t),(e=e.alternate)&&Rp(e,t)}function Bp(e){if(e.tag===13||e.tag===31){var t=vr(e,67108864);t!==null&&Hl(t,e,67108864),zp(e,67108864)}}function Vp(e){if(e.tag===13||e.tag===31){var t=zl(e);t=it(t);var n=vr(e,t);n!==null&&Hl(n,e,t),zp(e,t)}}function Hp(){return rh}function Up(e,t,n,r){var i=Z.T;Z.T=null;var a=Im.p;try{Im.p=kh,Gp(e,t,n,r)}finally{Im.p=a,Z.T=i}}function Wp(e,t,n,r){var i=Z.T;Z.T=null;var a=Im.p;try{Im.p=Ah,Gp(e,t,n,r)}finally{Im.p=a,Z.T=i}}function Gp(e,t,n,r){if(gE){var i=Kp(r);if(i===null)id(e,t,r,_E,n),Yp(e,r);else if(Zp(i,e,t,n,r))r.stopPropagation();else if(Yp(e,r),t&4&&-1<TE.indexOf(e)){for(;i!==null;){var a=ft(i);if(a!==null)switch(a.tag){case 3:if(a=a.stateNode,a.current.memoizedState.isDehydrated){var o=Ke(a.pendingLanes);if(o!==0){var s=a;for(s.pendingLanes|=2,s.entangledLanes|=2;o;){var c=1<<31-Ch(o);s.entanglements[1]|=c,o&=~c}Bu(a),(uC&(tC|nC))===eC&&(HC=uh()+UC,Vu(0,!1))}}break;case 31:case 13:s=vr(a,2),s!==null&&Hl(s,a,2),ql(),zp(a,2)}if(a=Kp(r),a===null&&id(e,t,r,_E,n),a===i)break;i=a}i!==null&&r.stopPropagation()}else id(e,t,r,null,n)}}function Kp(e){return e=bn(e),qp(e)}function qp(e){if(_E=null,e=dt(e),e!==null){var t=x(e);if(t===null)e=null;else{var n=t.tag;if(n===13){if(e=S(t),e!==null)return e;e=null}else if(n===31){if(e=ee(t),e!==null)return e;e=null}else if(n===3){if(t.stateNode.current.memoizedState.isDehydrated)return t.tag===3?t.stateNode.containerInfo:null;e=null}else t!==e&&(e=null)}}return _E=e,null}function Jp(e){switch(e){case`beforetoggle`:case`cancel`:case`click`:case`close`:case`contextmenu`:case`copy`:case`cut`:case`auxclick`:case`dblclick`:case`dragend`:case`dragstart`:case`drop`:case`focusin`:case`focusout`:case`input`:case`invalid`:case`keydown`:case`keypress`:case`keyup`:case`mousedown`:case`mouseup`:case`paste`:case`pause`:case`play`:case`pointercancel`:case`pointerdown`:case`pointerup`:case`ratechange`:case`reset`:case`seeked`:case`submit`:case`toggle`:case`touchcancel`:case`touchend`:case`touchstart`:case`volumechange`:case`change`:case`selectionchange`:case`textInput`:case`compositionstart`:case`compositionend`:case`compositionupdate`:case`beforeblur`:case`afterblur`:case`beforeinput`:case`blur`:case`fullscreenchange`:case`fullscreenerror`:case`focus`:case`hashchange`:case`popstate`:case`select`:case`selectstart`:return kh;case`drag`:case`dragenter`:case`dragexit`:case`dragleave`:case`dragover`:case`mousemove`:case`mouseout`:case`mouseover`:case`pointermove`:case`pointerout`:case`pointerover`:case`resize`:case`scroll`:case`touchmove`:case`wheel`:case`mouseenter`:case`mouseleave`:case`pointerenter`:case`pointerleave`:return Ah;case`message`:switch(dh()){case fh:return kh;case ph:return Ah;case mh:case hh:return jh;case gh:return Mh;default:return jh}default:return jh}}function Yp(e,t){switch(e){case`focusin`:case`focusout`:yE=null;break;case`dragenter`:case`dragleave`:bE=null;break;case`mouseover`:case`mouseout`:xE=null;break;case`pointerover`:case`pointerout`:SE.delete(t.pointerId);break;case`gotpointercapture`:case`lostpointercapture`:CE.delete(t.pointerId)}}function Xp(e,t,n,r,i,a){return e===null||e.nativeEvent!==a?(e={blockedOn:t,domEventName:n,eventSystemFlags:r,nativeEvent:a,targetContainers:[i]},t!==null&&(t=ft(t),t!==null&&Bp(t)),e):(e.eventSystemFlags|=r,t=e.targetContainers,i!==null&&t.indexOf(i)===-1&&t.push(i),e)}function Zp(e,t,n,r,i){switch(t){case`focusin`:return yE=Xp(yE,e,t,n,r,i),!0;case`dragenter`:return bE=Xp(bE,e,t,n,r,i),!0;case`mouseover`:return xE=Xp(xE,e,t,n,r,i),!0;case`pointerover`:var a=i.pointerId;return SE.set(a,Xp(SE.get(a)||null,e,t,n,r,i)),!0;case`gotpointercapture`:return a=i.pointerId,CE.set(a,Xp(CE.get(a)||null,e,t,n,r,i)),!0}return!1}function Qp(e){var t=dt(e.target);if(t!==null){var n=x(t);if(n!==null){if(t=n.tag,t===13){if(t=S(n),t!==null){e.blockedOn=t,lt(e.priority,function(){Vp(n)});return}}else if(t===31){if(t=ee(n),t!==null){e.blockedOn=t,lt(e.priority,function(){Vp(n)});return}}else if(t===3&&n.stateNode.current.memoizedState.isDehydrated){e.blockedOn=n.tag===3?n.stateNode.containerInfo:null;return}}}e.blockedOn=null}function $p(e){if(e.blockedOn!==null)return!1;for(var t=e.targetContainers;0<t.length;){var n=Kp(e.nativeEvent);if(n===null){n=e.nativeEvent;var r=new n.constructor(n.type,n),i=r;Bg!==null&&console.error(`Expected currently replaying event to be null. This error is likely caused by a bug in React. Please file an issue.`),Bg=i,n.target.dispatchEvent(r),Bg===null&&console.error(`Expected currently replaying event to not be null. This error is likely caused by a bug in React. Please file an issue.`),Bg=null}else return t=ft(n),t!==null&&Bp(t),e.blockedOn=n,!1;t.shift()}return!0}function em(e,t,n){$p(e)&&n.delete(t)}function tm(){vE=!1,yE!==null&&$p(yE)&&(yE=null),bE!==null&&$p(bE)&&(bE=null),xE!==null&&$p(xE)&&(xE=null),SE.forEach(em),CE.forEach(em)}function nm(e,t){e.blockedOn===t&&(e.blockedOn=null,vE||(vE=!0,lm.unstable_scheduleCallback(lm.unstable_NormalPriority,tm)))}function rm(e){EE!==e&&(EE=e,lm.unstable_scheduleCallback(lm.unstable_NormalPriority,function(){EE===e&&(EE=null);for(var t=0;t<e.length;t+=3){var n=e[t],r=e[t+1],i=e[t+2];if(typeof r!=`function`){if(qp(r||n)===null)continue;break}var a=ft(n);a!==null&&(e.splice(t,3),t-=3,n={pending:!0,data:i,method:n.method,action:r},Object.freeze(n),Bo(a,n,r,i))}}))}function im(e){function t(t){return nm(t,e)}yE!==null&&nm(yE,e),bE!==null&&nm(bE,e),xE!==null&&nm(xE,e),SE.forEach(t),CE.forEach(t);for(var n=0;n<wE.length;n++){var r=wE[n];r.blockedOn===e&&(r.blockedOn=null)}for(;0<wE.length&&(n=wE[0],n.blockedOn===null);)Qp(n),n.blockedOn===null&&wE.shift();if(n=(e.ownerDocument||e).$reactFormReplay,n!=null)for(r=0;r<n.length;r+=3){var i=n[r],a=n[r+1],o=i[Fh]||null;if(typeof a==`function`)o||rm(n);else if(o){var s=null;if(a&&a.hasAttribute(`formAction`)){if(i=a,o=a[Fh]||null)s=o.formAction;else if(qp(i)!==null)continue}else s=o.action;typeof s==`function`?n[r+1]=s:(n.splice(r,3),r-=3),rm(n)}}}function am(){function e(e){e.canIntercept&&e.info===`react-transition`&&e.intercept({handler:function(){return new Promise(function(e){return i=e})},focusReset:`manual`,scroll:`manual`})}function t(){i!==null&&(i(),i=null),r||setTimeout(n,20)}function n(){if(!r&&!navigation.transition){var e=navigation.currentEntry;e&&e.url!=null&&navigation.navigate(e.url,{state:e.getState(),info:`react-transition`,history:`replace`})}}if(typeof navigation==`object`){var r=!1,i=null;return navigation.addEventListener(`navigate`,e),navigation.addEventListener(`navigatesuccess`,t),navigation.addEventListener(`navigateerror`,t),setTimeout(n,100),function(){r=!0,navigation.removeEventListener(`navigate`,e),navigation.removeEventListener(`navigatesuccess`,t),navigation.removeEventListener(`navigateerror`,t),i!==null&&(i(),i=null)}}}function om(e){this._internalRoot=e}function sm(e){this._internalRoot=e}function cm(e){e[Ih]&&(e._reactRootContainer?console.error(`You are calling ReactDOMClient.createRoot() on a container that was previously passed to ReactDOM.render(). This is not supported.`):console.error(`You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() on the existing root instead if you want to update it.`))}typeof __REACT_DEVTOOLS_GLOBAL_HOOK__<`u`&&typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart==`function`&&__REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());var lm=f(),um=u(),dm=m(),fm=null,pm=null,mm=Object.assign,hm=Symbol.for(`react.element`),gm=Symbol.for(`react.transitional.element`),_m=Symbol.for(`react.portal`),vm=Symbol.for(`react.fragment`),ym=Symbol.for(`react.strict_mode`),bm=Symbol.for(`react.profiler`),xm=Symbol.for(`react.consumer`),Sm=Symbol.for(`react.context`),Cm=Symbol.for(`react.forward_ref`),wm=Symbol.for(`react.suspense`),Tm=Symbol.for(`react.suspense_list`),Em=Symbol.for(`react.memo`),Dm=Symbol.for(`react.lazy`),Om=Symbol.for(`react.activity`),km=Symbol.for(`react.legacy_hidden`),Am=Symbol.for(`react.memo_cache_sentinel`),jm=Symbol.for(`react.view_transition`),Mm=Symbol.for(`react.recoverable`),Nm=Symbol.iterator,Pm=Symbol.for(`react.client.reference`),Fm=Array.isArray,Z=um.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,Im=dm.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE,Lm=Object.freeze({pending:!1,data:null,method:null,action:null}),Rm=[],zm=[],Bm=-1,Vm=_e(null),Hm=_e(null),Um=_e(null),Wm=_e(null),Gm=0,Km,qm,Jm,Ym,Xm,Zm,Qm;Te.__reactDisabledLog=!0;var $m,eh,th=!1,nh=new(typeof WeakMap==`function`?WeakMap:Map),rh=null,ih=!1,ah=Object.prototype.hasOwnProperty,oh=lm.unstable_scheduleCallback,sh=lm.unstable_cancelCallback,ch=lm.unstable_shouldYield,lh=lm.unstable_requestPaint,uh=lm.unstable_now,dh=lm.unstable_getCurrentPriorityLevel,fh=lm.unstable_ImmediatePriority,ph=lm.unstable_UserBlockingPriority,mh=lm.unstable_NormalPriority,hh=lm.unstable_LowPriority,gh=lm.unstable_IdlePriority,_h=lm.log,vh=lm.unstable_setDisableYieldValue,yh=null,bh=null,xh=!1,Sh=typeof __REACT_DEVTOOLS_GLOBAL_HOOK__<`u`,Ch=Math.clz32?Math.clz32:Ge,wh=Math.log,Th=Math.LN2,Eh=256,Dh=262144,Oh=4194304,kh=2,Ah=8,jh=32,Mh=268435456,Nh=Math.random().toString(36).slice(2),Ph=`__reactFiber<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -726,6 +782,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -850,7 +920,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Fh=`__reactProps<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -858,6 +928,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -982,7 +1066,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Ih=`__reactContainer<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -990,6 +1074,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -1114,7 +1212,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Lh=`__reactEvents<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -1122,6 +1220,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -1246,7 +1358,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Rh=`__reactListeners<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -1254,6 +1366,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -1378,7 +1504,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,zh=`__reactHandles<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -1386,6 +1512,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -1510,7 +1650,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Bh=`__reactResources<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -1518,6 +1658,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -1642,7 +1796,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Vh=`__reactMarker<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -1650,6 +1804,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -1774,7 +1942,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Hh=`__reactLoad<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -1782,6 +1950,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -1906,7 +2088,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     +Nh,Uh=new Set,Wh={},Gh={},Kh={button:!0,checkbox:!0,image:!0,hidden:!0,radio:!0,reset:!0,submit:!0},qh=RegExp(`^[:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD][:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -1914,6 +2096,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -2038,7 +2234,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     ),Jh={},Yh={},Xh=!1,Zh=/[\n"\\]/g,Qh=!1,$h=!1,eg=!1,tg=!1,ng=!1,rg=!1,ig=[`value`,`defaultValue`],ag=!1,og=/["'&<>\n\t]|^\s|\s$/,sg=`address applet area article aside base basefont bgsound blockquote body br button caption center col colgroup dd details dir div dl dt embed fieldset figcaption figure footer form frame frameset h1 h2 h3 h4 h5 h6 head header hgroup hr html iframe img input isindex li link listing main marquee menu menuitem meta nav noembed noframes noscript object ol p param plaintext pre script section select source style summary table tbody td template textarea tfoot th thead title tr track ul wbr xmp`.split(` `),cg=`applet caption html table td th marquee object select template foreignObject desc title`.split(` `),lg=cg.concat([`button`]),ug=`dd dt li option optgroup p rp rt`.split(` `),dg={current:null,formTag:null,aTagInScope:null,buttonTagInScope:null,nobrTagInScope:null,pTagInButtonScope:null,listItemTagAutoclosing:null,dlItemTagAutoclosing:null,containerTagInScope:null,implicitRootScope:!1},fg={},pg={animation:`animationDelay animationDirection animationDuration animationFillMode animationIterationCount animationName animationPlayState animationTimingFunction`.split(` `),background:`backgroundAttachment backgroundClip backgroundColor backgroundImage backgroundOrigin backgroundPositionX backgroundPositionY backgroundRepeat backgroundSize`.split(` `),backgroundPosition:[`backgroundPositionX`,`backgroundPositionY`],border:`borderBottomColor borderBottomStyle borderBottomWidth borderImageOutset borderImageRepeat borderImageSlice borderImageSource borderImageWidth borderLeftColor borderLeftStyle borderLeftWidth borderRightColor borderRightStyle borderRightWidth borderTopColor borderTopStyle borderTopWidth`.split(` `),borderBlock:`borderBlockEndColor borderBlockEndStyle borderBlockEndWidth borderBlockStartColor borderBlockStartStyle borderBlockStartWidth`.split(` `),borderBlockColor:[`borderBlockEndColor`,`borderBlockStartColor`],borderBlockEnd:[`borderBlockEndColor`,`borderBlockEndStyle`,`borderBlockEndWidth`],borderBlockStart:[`borderBlockStartColor`,`borderBlockStartStyle`,`borderBlockStartWidth`],borderBlockStyle:[`borderBlockEndStyle`,`borderBlockStartStyle`],borderBlockWidth:[`borderBlockEndWidth`,`borderBlockStartWidth`],borderBottom:[`borderBottomColor`,`borderBottomStyle`,`borderBottomWidth`],borderColor:[`borderBottomColor`,`borderLeftColor`,`borderRightColor`,`borderTopColor`],borderImage:[`borderImageOutset`,`borderImageRepeat`,`borderImageSlice`,`borderImageSource`,`borderImageWidth`],borderInline:`borderInlineEndColor borderInlineEndStyle borderInlineEndWidth borderInlineStartColor borderInlineStartStyle borderInlineStartWidth`.split(` `),borderInlineColor:[`borderInlineEndColor`,`borderInlineStartColor`],borderInlineEnd:[`borderInlineEndColor`,`borderInlineEndStyle`,`borderInlineEndWidth`],borderInlineStart:[`borderInlineStartColor`,`borderInlineStartStyle`,`borderInlineStartWidth`],borderInlineStyle:[`borderInlineEndStyle`,`borderInlineStartStyle`],borderInlineWidth:[`borderInlineEndWidth`,`borderInlineStartWidth`],borderLeft:[`borderLeftColor`,`borderLeftStyle`,`borderLeftWidth`],borderRadius:[`borderBottomLeftRadius`,`borderBottomRightRadius`,`borderTopLeftRadius`,`borderTopRightRadius`],borderRight:[`borderRightColor`,`borderRightStyle`,`borderRightWidth`],borderStyle:[`borderBottomStyle`,`borderLeftStyle`,`borderRightStyle`,`borderTopStyle`],borderTop:[`borderTopColor`,`borderTopStyle`,`borderTopWidth`],borderWidth:[`borderBottomWidth`,`borderLeftWidth`,`borderRightWidth`,`borderTopWidth`],colorAdjust:[`printColorAdjust`],columnRule:[`columnRuleColor`,`columnRuleStyle`,`columnRuleWidth`],columns:[`columnCount`,`columnWidth`],containIntrinsicSize:[`containIntrinsicHeight`,`containIntrinsicWidth`],container:[`containerName`,`containerType`],flex:[`flexBasis`,`flexGrow`,`flexShrink`],flexFlow:[`flexDirection`,`flexWrap`],font:`fontFamily fontFeatureSettings fontKerning fontLanguageOverride fontSize fontSizeAdjust fontStretch fontStyle fontVariant fontVariantAlternates fontVariantCaps fontVariantEastAsian fontVariantLigatures fontVariantNumeric fontVariantPosition fontWeight lineHeight`.split(` `),fontSynthesis:[`fontSynthesisPosition`,`fontSynthesisSmallCaps`,`fontSynthesisStyle`,`fontSynthesisWeight`],fontVariant:`fontVariantAlternates fontVariantCaps fontVariantEastAsian fontVariantLigatures fontVariantNumeric fontVariantPosition`.split(` `),gap:[`columnGap`,`rowGap`],grid:`gridAutoColumns gridAutoFlow gridAutoRows gridTemplateAreas gridTemplateColumns gridTemplateRows`.split(` `),gridArea:[`gridColumnEnd`,`gridColumnStart`,`gridRowEnd`,`gridRowStart`],gridColumn:[`gridColumnEnd`,`gridColumnStart`],gridColumnGap:[`columnGap`],gridGap:[`columnGap`,`rowGap`],gridRow:[`gridRowEnd`,`gridRowStart`],gridRowGap:[`rowGap`],gridTemplate:[`gridTemplateAreas`,`gridTemplateColumns`,`gridTemplateRows`],inset:[`bottom`,`left`,`right`,`top`],insetBlock:[`insetBlockEnd`,`insetBlockStart`],insetInline:[`insetInlineEnd`,`insetInlineStart`],listStyle:[`listStyleImage`,`listStylePosition`,`listStyleType`],margin:[`marginBottom`,`marginLeft`,`marginRight`,`marginTop`],marginBlock:[`marginBlockEnd`,`marginBlockStart`],marginInline:[`marginInlineEnd`,`marginInlineStart`],marker:[`markerEnd`,`markerMid`,`markerStart`],mask:`maskClip maskComposite maskImage maskMode maskOrigin maskPositionX maskPositionY maskRepeat maskSize`.split(` `),maskPosition:[`maskPositionX`,`maskPositionY`],offset:[`offsetAnchor`,`offsetDistance`,`offsetPath`,`offsetPosition`,`offsetRotate`],outline:[`outlineColor`,`outlineStyle`,`outlineWidth`],overflow:[`overflowX`,`overflowY`],overscrollBehavior:[`overscrollBehaviorX`,`overscrollBehaviorY`],padding:[`paddingBottom`,`paddingLeft`,`paddingRight`,`paddingTop`],paddingBlock:[`paddingBlockEnd`,`paddingBlockStart`],paddingInline:[`paddingInlineEnd`,`paddingInlineStart`],pageBreakAfter:[`breakAfter`],pageBreakBefore:[`breakBefore`],pageBreakInside:[`breakInside`],placeContent:[`alignContent`,`justifyContent`],placeItems:[`alignItems`,`justifyItems`],placeSelf:[`alignSelf`,`justifySelf`],scrollMargin:[`scrollMarginBottom`,`scrollMarginLeft`,`scrollMarginRight`,`scrollMarginTop`],scrollMarginBlock:[`scrollMarginBlockEnd`,`scrollMarginBlockStart`],scrollMarginInline:[`scrollMarginInlineEnd`,`scrollMarginInlineStart`],scrollPadding:[`scrollPaddingBottom`,`scrollPaddingLeft`,`scrollPaddingRight`,`scrollPaddingTop`],scrollPaddingBlock:[`scrollPaddingBlockEnd`,`scrollPaddingBlockStart`],scrollPaddingInline:[`scrollPaddingInlineEnd`,`scrollPaddingInlineStart`],textDecoration:[`textDecorationColor`,`textDecorationLine`,`textDecorationStyle`,`textDecorationThickness`],textEmphasis:[`textEmphasisColor`,`textEmphasisStyle`],textWrap:[`textWrapMode`,`textWrapStyle`],transition:[`transitionBehavior`,`transitionDelay`,`transitionDuration`,`transitionProperty`,`transitionTimingFunction`],verticalAlign:[`alignmentBaseline`,`baselineShift`,`baselineSource`],whiteSpace:[`textWrapMode`,`whiteSpaceCollapse`],wordWrap:[`overflowWrap`]},mg=/([A-Z])/g,hg=/^ms-/,gg=/^(?:webkit|moz|o)[A-Z]/,_g=/^-ms-/,vg=/-(.)/g,yg=/;\s*$/,bg={},xg={},Sg=!1,Cg=!1,wg=new Set(`animationIterationCount aspectRatio borderImageOutset borderImageSlice borderImageWidth boxFlex boxFlexGroup boxOrdinalGroup columnCount columns flex flexGrow flexPositive flexShrink flexNegative flexOrder gridArea gridRow gridRowEnd gridRowSpan gridRowStart gridColumn gridColumnEnd gridColumnSpan gridColumnStart fontWeight lineClamp lineHeight opacity order orphans scale tabSize widows zIndex zoom fillOpacity floodOpacity stopOpacity strokeDasharray strokeDashoffset strokeMiterlimit strokeOpacity strokeWidth MozAnimationIterationCount MozBoxFlex MozBoxFlexGroup MozLineClamp msAnimationIterationCount msFlex msZoom msFlexGrow msFlexNegative msFlexOrder msFlexPositive msFlexShrink msGridColumn msGridColumnSpan msGridRow msGridRowSpan WebkitAnimationIterationCount WebkitBoxFlex WebKitBoxFlexGroup WebkitBoxOrdinalGroup WebkitColumnCount WebkitColumns WebkitFlex WebkitFlexGrow WebkitFlexPositive WebkitFlexShrink WebkitLineClamp`.split(` `)),Tg=`http://www.w3.org/1998/Math/MathML`,Eg=`http://www.w3.org/2000/svg`,Dg=new Map([[`acceptCharset`,`accept-charset`],[`htmlFor`,`for`],[`httpEquiv`,`http-equiv`],[`crossOrigin`,`crossorigin`],[`accentHeight`,`accent-height`],[`alignmentBaseline`,`alignment-baseline`],[`arabicForm`,`arabic-form`],[`baselineShift`,`baseline-shift`],[`capHeight`,`cap-height`],[`clipPath`,`clip-path`],[`clipRule`,`clip-rule`],[`colorInterpolation`,`color-interpolation`],[`colorInterpolationFilters`,`color-interpolation-filters`],[`colorProfile`,`color-profile`],[`colorRendering`,`color-rendering`],[`dominantBaseline`,`dominant-baseline`],[`enableBackground`,`enable-background`],[`fillOpacity`,`fill-opacity`],[`fillRule`,`fill-rule`],[`floodColor`,`flood-color`],[`floodOpacity`,`flood-opacity`],[`fontFamily`,`font-family`],[`fontSize`,`font-size`],[`fontSizeAdjust`,`font-size-adjust`],[`fontStretch`,`font-stretch`],[`fontStyle`,`font-style`],[`fontVariant`,`font-variant`],[`fontWeight`,`font-weight`],[`glyphName`,`glyph-name`],[`glyphOrientationHorizontal`,`glyph-orientation-horizontal`],[`glyphOrientationVertical`,`glyph-orientation-vertical`],[`horizAdvX`,`horiz-adv-x`],[`horizOriginX`,`horiz-origin-x`],[`imageRendering`,`image-rendering`],[`letterSpacing`,`letter-spacing`],[`lightingColor`,`lighting-color`],[`markerEnd`,`marker-end`],[`markerMid`,`marker-mid`],[`markerStart`,`marker-start`],[`maskType`,`mask-type`],[`overlinePosition`,`overline-position`],[`overlineThickness`,`overline-thickness`],[`paintOrder`,`paint-order`],[`panose-1`,`panose-1`],[`pointerEvents`,`pointer-events`],[`renderingIntent`,`rendering-intent`],[`shapeRendering`,`shape-rendering`],[`stopColor`,`stop-color`],[`stopOpacity`,`stop-opacity`],[`strikethroughPosition`,`strikethrough-position`],[`strikethroughThickness`,`strikethrough-thickness`],[`strokeDasharray`,`stroke-dasharray`],[`strokeDashoffset`,`stroke-dashoffset`],[`strokeLinecap`,`stroke-linecap`],[`strokeLinejoin`,`stroke-linejoin`],[`strokeMiterlimit`,`stroke-miterlimit`],[`strokeOpacity`,`stroke-opacity`],[`strokeWidth`,`stroke-width`],[`textAnchor`,`text-anchor`],[`textDecoration`,`text-decoration`],[`textRendering`,`text-rendering`],[`transformOrigin`,`transform-origin`],[`underlinePosition`,`underline-position`],[`underlineThickness`,`underline-thickness`],[`unicodeBidi`,`unicode-bidi`],[`unicodeRange`,`unicode-range`],[`unitsPerEm`,`units-per-em`],[`vAlphabetic`,`v-alphabetic`],[`vHanging`,`v-hanging`],[`vIdeographic`,`v-ideographic`],[`vMathematical`,`v-mathematical`],[`vectorEffect`,`vector-effect`],[`vertAdvY`,`vert-adv-y`],[`vertOriginX`,`vert-origin-x`],[`vertOriginY`,`vert-origin-y`],[`wordSpacing`,`word-spacing`],[`writingMode`,`writing-mode`],[`xmlnsXlink`,`xmlns:xlink`],[`xHeight`,`x-height`]]),Og={accept:`accept`,acceptcharset:`acceptCharset`,"accept-charset":`acceptCharset`,accesskey:`accessKey`,action:`action`,allowfullscreen:`allowFullScreen`,alt:`alt`,as:`as`,async:`async`,autocapitalize:`autoCapitalize`,autocomplete:`autoComplete`,autocorrect:`autoCorrect`,autofocus:`autoFocus`,autoplay:`autoPlay`,autosave:`autoSave`,capture:`capture`,cellpadding:`cellPadding`,cellspacing:`cellSpacing`,challenge:`challenge`,charset:`charSet`,checked:`checked`,children:`children`,cite:`cite`,class:`className`,classid:`classID`,classname:`className`,cols:`cols`,colspan:`colSpan`,content:`content`,contenteditable:`contentEditable`,contextmenu:`contextMenu`,controls:`controls`,controlslist:`controlsList`,coords:`coords`,credentialless:`credentialless`,crossorigin:`crossOrigin`,dangerouslysetinnerhtml:`dangerouslySetInnerHTML`,data:`data`,datetime:`dateTime`,default:`default`,defaultchecked:`defaultChecked`,defaultvalue:`defaultValue`,defer:`defer`,dir:`dir`,disabled:`disabled`,disablepictureinpicture:`disablePictureInPicture`,disableremoteplayback:`disableRemotePlayback`,download:`download`,draggable:`draggable`,enctype:`encType`,enterkeyhint:`enterKeyHint`,fetchpriority:`fetchPriority`,for:`htmlFor`,form:`form`,formmethod:`formMethod`,formaction:`formAction`,formenctype:`formEncType`,formnovalidate:`formNoValidate`,formtarget:`formTarget`,frameborder:`frameBorder`,headers:`headers`,height:`height`,hidden:`hidden`,high:`high`,href:`href`,hreflang:`hrefLang`,htmlfor:`htmlFor`,httpequiv:`httpEquiv`,"http-equiv":`httpEquiv`,icon:`icon`,id:`id`,imagesizes:`imageSizes`,imagesrcset:`imageSrcSet`,inert:`inert`,innerhtml:`innerHTML`,inputmode:`inputMode`,integrity:`integrity`,is:`is`,itemid:`itemID`,itemprop:`itemProp`,itemref:`itemRef`,itemscope:`itemScope`,itemtype:`itemType`,keyparams:`keyParams`,keytype:`keyType`,kind:`kind`,label:`label`,lang:`lang`,list:`list`,loop:`loop`,low:`low`,manifest:`manifest`,marginwidth:`marginWidth`,marginheight:`marginHeight`,max:`max`,maxlength:`maxLength`,media:`media`,mediagroup:`mediaGroup`,method:`method`,min:`min`,minlength:`minLength`,multiple:`multiple`,muted:`muted`,name:`name`,nomodule:`noModule`,nonce:`nonce`,novalidate:`noValidate`,open:`open`,optimum:`optimum`,pattern:`pattern`,placeholder:`placeholder`,playsinline:`playsInline`,poster:`poster`,preload:`preload`,profile:`profile`,radiogroup:`radioGroup`,readonly:`readOnly`,referrerpolicy:`referrerPolicy`,rel:`rel`,required:`required`,reversed:`reversed`,role:`role`,rows:`rows`,rowspan:`rowSpan`,sandbox:`sandbox`,scope:`scope`,scoped:`scoped`,scrolling:`scrolling`,seamless:`seamless`,selected:`selected`,shape:`shape`,size:`size`,sizes:`sizes`,span:`span`,spellcheck:`spellCheck`,src:`src`,srcdoc:`srcDoc`,srclang:`srcLang`,srcset:`srcSet`,start:`start`,step:`step`,style:`style`,summary:`summary`,tabindex:`tabIndex`,target:`target`,title:`title`,type:`type`,usemap:`useMap`,value:`value`,width:`width`,wmode:`wmode`,wrap:`wrap`,about:`about`,accentheight:`accentHeight`,"accent-height":`accentHeight`,accumulate:`accumulate`,additive:`additive`,alignmentbaseline:`alignmentBaseline`,"alignment-baseline":`alignmentBaseline`,allowreorder:`allowReorder`,alphabetic:`alphabetic`,amplitude:`amplitude`,arabicform:`arabicForm`,"arabic-form":`arabicForm`,ascent:`ascent`,attributename:`attributeName`,attributetype:`attributeType`,autoreverse:`autoReverse`,azimuth:`azimuth`,basefrequency:`baseFrequency`,baselineshift:`baselineShift`,"baseline-shift":`baselineShift`,baseprofile:`baseProfile`,bbox:`bbox`,begin:`begin`,bias:`bias`,by:`by`,calcmode:`calcMode`,capheight:`capHeight`,"cap-height":`capHeight`,clip:`clip`,clippath:`clipPath`,"clip-path":`clipPath`,clippathunits:`clipPathUnits`,cliprule:`clipRule`,"clip-rule":`clipRule`,color:`color`,colorinterpolation:`colorInterpolation`,"color-interpolation":`colorInterpolation`,colorinterpolationfilters:`colorInterpolationFilters`,"color-interpolation-filters":`colorInterpolationFilters`,colorprofile:`colorProfile`,"color-profile":`colorProfile`,colorrendering:`colorRendering`,"color-rendering":`colorRendering`,contentscripttype:`contentScriptType`,contentstyletype:`contentStyleType`,cursor:`cursor`,cx:`cx`,cy:`cy`,d:`d`,datatype:`datatype`,decelerate:`decelerate`,descent:`descent`,diffuseconstant:`diffuseConstant`,direction:`direction`,display:`display`,divisor:`divisor`,dominantbaseline:`dominantBaseline`,"dominant-baseline":`dominantBaseline`,dur:`dur`,dx:`dx`,dy:`dy`,edgemode:`edgeMode`,elevation:`elevation`,enablebackground:`enableBackground`,"enable-background":`enableBackground`,end:`end`,exponent:`exponent`,externalresourcesrequired:`externalResourcesRequired`,fill:`fill`,fillopacity:`fillOpacity`,"fill-opacity":`fillOpacity`,fillrule:`fillRule`,"fill-rule":`fillRule`,filter:`filter`,filterres:`filterRes`,filterunits:`filterUnits`,floodopacity:`floodOpacity`,"flood-opacity":`floodOpacity`,floodcolor:`floodColor`,"flood-color":`floodColor`,focusable:`focusable`,fontfamily:`fontFamily`,"font-family":`fontFamily`,fontsize:`fontSize`,"font-size":`fontSize`,fontsizeadjust:`fontSizeAdjust`,"font-size-adjust":`fontSizeAdjust`,fontstretch:`fontStretch`,"font-stretch":`fontStretch`,fontstyle:`fontStyle`,"font-style":`fontStyle`,fontvariant:`fontVariant`,"font-variant":`fontVariant`,fontweight:`fontWeight`,"font-weight":`fontWeight`,format:`format`,from:`from`,fx:`fx`,fy:`fy`,g1:`g1`,g2:`g2`,glyphname:`glyphName`,"glyph-name":`glyphName`,glyphorientationhorizontal:`glyphOrientationHorizontal`,"glyph-orientation-horizontal":`glyphOrientationHorizontal`,glyphorientationvertical:`glyphOrientationVertical`,"glyph-orientation-vertical":`glyphOrientationVertical`,glyphref:`glyphRef`,gradienttransform:`gradientTransform`,gradientunits:`gradientUnits`,hanging:`hanging`,horizadvx:`horizAdvX`,"horiz-adv-x":`horizAdvX`,horizoriginx:`horizOriginX`,"horiz-origin-x":`horizOriginX`,ideographic:`ideographic`,imagerendering:`imageRendering`,"image-rendering":`imageRendering`,in2:`in2`,in:`in`,inlist:`inlist`,intercept:`intercept`,k1:`k1`,k2:`k2`,k3:`k3`,k4:`k4`,k:`k`,kernelmatrix:`kernelMatrix`,kernelunitlength:`kernelUnitLength`,kerning:`kerning`,keypoints:`keyPoints`,keysplines:`keySplines`,keytimes:`keyTimes`,lengthadjust:`lengthAdjust`,letterspacing:`letterSpacing`,"letter-spacing":`letterSpacing`,lightingcolor:`lightingColor`,"lighting-color":`lightingColor`,limitingconeangle:`limitingConeAngle`,local:`local`,markerend:`markerEnd`,"marker-end":`markerEnd`,markerheight:`markerHeight`,markermid:`markerMid`,"marker-mid":`markerMid`,markerstart:`markerStart`,"marker-start":`markerStart`,markerunits:`markerUnits`,markerwidth:`markerWidth`,mask:`mask`,maskcontentunits:`maskContentUnits`,masktype:`maskType`,maskunits:`maskUnits`,mathematical:`mathematical`,mode:`mode`,numoctaves:`numOctaves`,offset:`offset`,opacity:`opacity`,operator:`operator`,order:`order`,orient:`orient`,orientation:`orientation`,origin:`origin`,overflow:`overflow`,overlineposition:`overlinePosition`,"overline-position":`overlinePosition`,overlinethickness:`overlineThickness`,"overline-thickness":`overlineThickness`,paintorder:`paintOrder`,"paint-order":`paintOrder`,panose1:`panose1`,"panose-1":`panose1`,pathlength:`pathLength`,patterncontentunits:`patternContentUnits`,patterntransform:`patternTransform`,patternunits:`patternUnits`,pointerevents:`pointerEvents`,"pointer-events":`pointerEvents`,points:`points`,pointsatx:`pointsAtX`,pointsaty:`pointsAtY`,pointsatz:`pointsAtZ`,popover:`popover`,popovertarget:`popoverTarget`,popovertargetaction:`popoverTargetAction`,prefix:`prefix`,preservealpha:`preserveAlpha`,preserveaspectratio:`preserveAspectRatio`,primitiveunits:`primitiveUnits`,property:`property`,r:`r`,radius:`radius`,refx:`refX`,refy:`refY`,renderingintent:`renderingIntent`,"rendering-intent":`renderingIntent`,repeatcount:`repeatCount`,repeatdur:`repeatDur`,requiredextensions:`requiredExtensions`,requiredfeatures:`requiredFeatures`,resource:`resource`,restart:`restart`,result:`result`,results:`results`,rotate:`rotate`,rx:`rx`,ry:`ry`,scale:`scale`,security:`security`,seed:`seed`,shaperendering:`shapeRendering`,"shape-rendering":`shapeRendering`,slope:`slope`,spacing:`spacing`,specularconstant:`specularConstant`,specularexponent:`specularExponent`,speed:`speed`,spreadmethod:`spreadMethod`,startoffset:`startOffset`,stddeviation:`stdDeviation`,stemh:`stemh`,stemv:`stemv`,stitchtiles:`stitchTiles`,stopcolor:`stopColor`,"stop-color":`stopColor`,stopopacity:`stopOpacity`,"stop-opacity":`stopOpacity`,strikethroughposition:`strikethroughPosition`,"strikethrough-position":`strikethroughPosition`,strikethroughthickness:`strikethroughThickness`,"strikethrough-thickness":`strikethroughThickness`,string:`string`,stroke:`stroke`,strokedasharray:`strokeDasharray`,"stroke-dasharray":`strokeDasharray`,strokedashoffset:`strokeDashoffset`,"stroke-dashoffset":`strokeDashoffset`,strokelinecap:`strokeLinecap`,"stroke-linecap":`strokeLinecap`,strokelinejoin:`strokeLinejoin`,"stroke-linejoin":`strokeLinejoin`,strokemiterlimit:`strokeMiterlimit`,"stroke-miterlimit":`strokeMiterlimit`,strokewidth:`strokeWidth`,"stroke-width":`strokeWidth`,strokeopacity:`strokeOpacity`,"stroke-opacity":`strokeOpacity`,suppresscontenteditablewarning:`suppressContentEditableWarning`,suppresshydrationwarning:`suppressHydrationWarning`,surfacescale:`surfaceScale`,systemlanguage:`systemLanguage`,tablevalues:`tableValues`,targetx:`targetX`,targety:`targetY`,textanchor:`textAnchor`,"text-anchor":`textAnchor`,textdecoration:`textDecoration`,"text-decoration":`textDecoration`,textlength:`textLength`,textrendering:`textRendering`,"text-rendering":`textRendering`,to:`to`,transform:`transform`,transformorigin:`transformOrigin`,"transform-origin":`transformOrigin`,typeof:`typeof`,u1:`u1`,u2:`u2`,underlineposition:`underlinePosition`,"underline-position":`underlinePosition`,underlinethickness:`underlineThickness`,"underline-thickness":`underlineThickness`,unicode:`unicode`,unicodebidi:`unicodeBidi`,"unicode-bidi":`unicodeBidi`,unicoderange:`unicodeRange`,"unicode-range":`unicodeRange`,unitsperem:`unitsPerEm`,"units-per-em":`unitsPerEm`,unselectable:`unselectable`,valphabetic:`vAlphabetic`,"v-alphabetic":`vAlphabetic`,values:`values`,vectoreffect:`vectorEffect`,"vector-effect":`vectorEffect`,version:`version`,vertadvy:`vertAdvY`,"vert-adv-y":`vertAdvY`,vertoriginx:`vertOriginX`,"vert-origin-x":`vertOriginX`,vertoriginy:`vertOriginY`,"vert-origin-y":`vertOriginY`,vhanging:`vHanging`,"v-hanging":`vHanging`,videographic:`vIdeographic`,"v-ideographic":`vIdeographic`,viewbox:`viewBox`,viewtarget:`viewTarget`,visibility:`visibility`,vmathematical:`vMathematical`,"v-mathematical":`vMathematical`,vocab:`vocab`,widths:`widths`,wordspacing:`wordSpacing`,"word-spacing":`wordSpacing`,writingmode:`writingMode`,"writing-mode":`writingMode`,x1:`x1`,x2:`x2`,x:`x`,xchannelselector:`xChannelSelector`,xheight:`xHeight`,"x-height":`xHeight`,xlinkactuate:`xlinkActuate`,"xlink:actuate":`xlinkActuate`,xlinkarcrole:`xlinkArcrole`,"xlink:arcrole":`xlinkArcrole`,xlinkhref:`xlinkHref`,"xlink:href":`xlinkHref`,xlinkrole:`xlinkRole`,"xlink:role":`xlinkRole`,xlinkshow:`xlinkShow`,"xlink:show":`xlinkShow`,xlinktitle:`xlinkTitle`,"xlink:title":`xlinkTitle`,xlinktype:`xlinkType`,"xlink:type":`xlinkType`,xmlbase:`xmlBase`,"xml:base":`xmlBase`,xmllang:`xmlLang`,"xml:lang":`xmlLang`,xmlns:`xmlns`,"xml:space":`xmlSpace`,xmlnsxlink:`xmlnsXlink`,"xmlns:xlink":`xmlnsXlink`,xmlspace:`xmlSpace`,y1:`y1`,y2:`y2`,y:`y`,ychannelselector:`yChannelSelector`,z:`z`,zoomandpan:`zoomAndPan`},kg={"aria-current":0,"aria-description":0,"aria-details":0,"aria-disabled":0,"aria-hidden":0,"aria-invalid":0,"aria-keyshortcuts":0,"aria-label":0,"aria-roledescription":0,"aria-autocomplete":0,"aria-checked":0,"aria-expanded":0,"aria-haspopup":0,"aria-level":0,"aria-modal":0,"aria-multiline":0,"aria-multiselectable":0,"aria-orientation":0,"aria-placeholder":0,"aria-pressed":0,"aria-readonly":0,"aria-required":0,"aria-selected":0,"aria-sort":0,"aria-valuemax":0,"aria-valuemin":0,"aria-valuenow":0,"aria-valuetext":0,"aria-atomic":0,"aria-busy":0,"aria-live":0,"aria-relevant":0,"aria-dropeffect":0,"aria-grabbed":0,"aria-activedescendant":0,"aria-colcount":0,"aria-colindex":0,"aria-colspan":0,"aria-controls":0,"aria-describedby":0,"aria-errormessage":0,"aria-flowto":0,"aria-labelledby":0,"aria-owns":0,"aria-posinset":0,"aria-rowcount":0,"aria-rowindex":0,"aria-rowspan":0,"aria-setsize":0,"aria-braillelabel":0,"aria-brailleroledescription":0,"aria-colindextext":0,"aria-rowindextext":0},Ag={},jg=RegExp(`^(aria)-[:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -2046,6 +2242,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -2170,7 +2380,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     ),Mg=RegExp(`^(aria)[A-Z][:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -2178,6 +2388,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -2302,7 +2526,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     ),Ng=!1,Pg={},Fg=/^on./,Ig=/^on[^A-Z]/,Lg=RegExp(`^(aria)-[:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -2310,6 +2534,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -2434,7 +2672,7 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     ),Rg=RegExp(`^(aria)[A-Z][:A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040]*<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -2442,6 +2680,20 @@ Check the render method of %s.`,w(rh)||`Unknown`)),r=na(t),r.payload={element:n}
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -2605,7 +2857,7 @@ Learn more about this warning here: https://react.dev/link/legacy-context`,r)})}
 Check the render method of \``+i+"`."),a||r&&(a=`
 
 Check the top-level render call using <`+r+`>.`);var o=``;n!=null&&e!==n&&(r=null,typeof n.tag==`number`?r=w(n):typeof n.name==`string`&&(r=n.name),r&&(o=` It was passed a child from `+r+`.`)),E(t,function(){console.error(`Each child in a list should have a unique "key" prop.%s%s See https://react.dev/link/warning-keys for more information.`,a,o)})}}};var tx=Qi(!0),nx=Qi(!1),rx=0,ix=1,ax=2,ox=3,sx=!1,cx=!1,lx=null,ux=!1,dx=_e(null),fx=_e(0),px=_e(null),mx=null,hx=1,gx=2,_x=_e(0),vx=0,yx=1,bx=2,xx=4,Sx=8,Cx,wx=new Set,Tx=new Set,Ex=new Set,Dx=new Set,Ox=0,kx=null,Ax=null,jx=null,Mx=!1,Nx=!1,Px=!1,Fx=0,Ix=0,Lx=null,Rx=0,zx=25,$=null,Bx=null,Vx=-1,Hx=!1,Ux={readContext:ni,use:Ra,useCallback:Ta,useContext:Ta,useEffect:Ta,useImperativeHandle:Ta,useLayoutEffect:Ta,useInsertionEffect:Ta,useMemo:Ta,useReducer:Ta,useRef:Ta,useState:Ta,useDebugValue:Ta,useDeferredValue:Ta,useTransition:Ta,useSyncExternalStore:Ta,useId:Ta,useHostTransitionStatus:Ta,useFormState:Ta,useActionState:Ta,useOptimistic:Ta,useMemoCache:Ta,useCacheRefresh:Ta,useEffectEvent:Ta},Wx=null,Gx=null,Kx=null,qx=null,Jx=null,Yx=null,Xx=null;Wx={readContext:function(e){return ni(e)},use:Ra,useCallback:function(e,t){return $=`useCallback`,Sa(),Ca(t),ko(e,t)},useContext:function(e){return $=`useContext`,Sa(),ni(e)},useEffect:function(e,t){return $=`useEffect`,Sa(),Ca(t),xo(e,t)},useImperativeHandle:function(e,t,n){return $=`useImperativeHandle`,Sa(),Ca(n),Do(e,t,n)},useInsertionEffect:function(e,t){$=`useInsertionEffect`,Sa(),Ca(t),yo(4,bx,e,t)},useLayoutEffect:function(e,t){return $=`useLayoutEffect`,Sa(),Ca(t),To(e,t)},useMemo:function(e,t){$=`useMemo`,Sa(),Ca(t);var n=Z.H;Z.H=Jx;try{return jo(e,t)}finally{Z.H=n}},useReducer:function(e,t,n){$=`useReducer`,Sa();var r=Z.H;Z.H=Jx;try{return Va(e,t,n)}finally{Z.H=r}},useRef:function(e){return $=`useRef`,Sa(),vo(e)},useState:function(e){$=`useState`,Sa();var t=Z.H;Z.H=Jx;try{return $a(e)}finally{Z.H=t}},useDebugValue:function(){$=`useDebugValue`,Sa()},useDeferredValue:function(e,t){return $=`useDeferredValue`,Sa(),No(e,t)},useTransition:function(){return $=`useTransition`,Sa(),Uo()},useSyncExternalStore:function(e,t,n){return $=`useSyncExternalStore`,Sa(),Ga(e,t,n)},useId:function(){return $=`useId`,Sa(),qo()},useFormState:function(e,t){return $=`useFormState`,Sa(),wa(),fo(e,t)},useActionState:function(e,t){return $=`useActionState`,Sa(),fo(e,t)},useOptimistic:function(e){return $=`useOptimistic`,Sa(),eo(e)},useHostTransitionStatus:Ko,useMemoCache:za,useCacheRefresh:function(){return $=`useCacheRefresh`,Sa(),Jo()},useEffectEvent:function(e){return $=`useEffectEvent`,Sa(),Co(e)}},Gx={readContext:function(e){return ni(e)},use:Ra,useCallback:function(e,t){return $=`useCallback`,X(),ko(e,t)},useContext:function(e){return $=`useContext`,X(),ni(e)},useEffect:function(e,t){return $=`useEffect`,X(),xo(e,t)},useImperativeHandle:function(e,t,n){return $=`useImperativeHandle`,X(),Do(e,t,n)},useInsertionEffect:function(e,t){$=`useInsertionEffect`,X(),yo(4,bx,e,t)},useLayoutEffect:function(e,t){return $=`useLayoutEffect`,X(),To(e,t)},useMemo:function(e,t){$=`useMemo`,X();var n=Z.H;Z.H=Jx;try{return jo(e,t)}finally{Z.H=n}},useReducer:function(e,t,n){$=`useReducer`,X();var r=Z.H;Z.H=Jx;try{return Va(e,t,n)}finally{Z.H=r}},useRef:function(e){return $=`useRef`,X(),vo(e)},useState:function(e){$=`useState`,X();var t=Z.H;Z.H=Jx;try{return $a(e)}finally{Z.H=t}},useDebugValue:function(){$=`useDebugValue`,X()},useDeferredValue:function(e,t){return $=`useDeferredValue`,X(),No(e,t)},useTransition:function(){return $=`useTransition`,X(),Uo()},useSyncExternalStore:function(e,t,n){return $=`useSyncExternalStore`,X(),Ga(e,t,n)},useId:function(){return $=`useId`,X(),qo()},useActionState:function(e,t){return $=`useActionState`,X(),fo(e,t)},useFormState:function(e,t){return $=`useFormState`,X(),wa(),fo(e,t)},useOptimistic:function(e){return $=`useOptimistic`,X(),eo(e)},useHostTransitionStatus:Ko,useMemoCache:za,useCacheRefresh:function(){return $=`useCacheRefresh`,X(),Jo()},useEffectEvent:function(e){return $=`useEffectEvent`,X(),Co(e)}},Kx={readContext:function(e){return ni(e)},use:Ra,useCallback:function(e,t){return $=`useCallback`,X(),Ao(e,t)},useContext:function(e){return $=`useContext`,X(),ni(e)},useEffect:function(e,t){$=`useEffect`,X(),bo(2048,Sx,e,t)},useImperativeHandle:function(e,t,n){return $=`useImperativeHandle`,X(),Oo(e,t,n)},useInsertionEffect:function(e,t){return $=`useInsertionEffect`,X(),bo(4,bx,e,t)},useLayoutEffect:function(e,t){return $=`useLayoutEffect`,X(),bo(4,xx,e,t)},useMemo:function(e,t){$=`useMemo`,X();var n=Z.H;Z.H=Yx;try{return Mo(e,t)}finally{Z.H=n}},useReducer:function(e,t,n){$=`useReducer`,X();var r=Z.H;Z.H=Yx;try{return Ha(e,t,n)}finally{Z.H=r}},useRef:function(){return $=`useRef`,X(),Fa().memoizedState},useState:function(){$=`useState`,X();var e=Z.H;Z.H=Yx;try{return Ha(Ba)}finally{Z.H=e}},useDebugValue:function(){$=`useDebugValue`,X()},useDeferredValue:function(e,t){return $=`useDeferredValue`,X(),Po(e,t)},useTransition:function(){return $=`useTransition`,X(),Wo()},useSyncExternalStore:function(e,t,n){return $=`useSyncExternalStore`,X(),Ka(e,t,n)},useId:function(){return $=`useId`,X(),Fa().memoizedState},useFormState:function(e){return $=`useFormState`,X(),wa(),po(e)},useActionState:function(e){return $=`useActionState`,X(),po(e)},useOptimistic:function(e,t){return $=`useOptimistic`,X(),to(e,t)},useHostTransitionStatus:Ko,useMemoCache:za,useCacheRefresh:function(){return $=`useCacheRefresh`,X(),Fa().memoizedState},useEffectEvent:function(e){return $=`useEffectEvent`,X(),wo(e)}},qx={readContext:function(e){return ni(e)},use:Ra,useCallback:function(e,t){return $=`useCallback`,X(),Ao(e,t)},useContext:function(e){return $=`useContext`,X(),ni(e)},useEffect:function(e,t){$=`useEffect`,X(),bo(2048,Sx,e,t)},useImperativeHandle:function(e,t,n){return $=`useImperativeHandle`,X(),Oo(e,t,n)},useInsertionEffect:function(e,t){return $=`useInsertionEffect`,X(),bo(4,bx,e,t)},useLayoutEffect:function(e,t){return $=`useLayoutEffect`,X(),bo(4,xx,e,t)},useMemo:function(e,t){$=`useMemo`,X();var n=Z.H;Z.H=Xx;try{return Mo(e,t)}finally{Z.H=n}},useReducer:function(e,t,n){$=`useReducer`,X();var r=Z.H;Z.H=Xx;try{return Wa(e,t,n)}finally{Z.H=r}},useRef:function(){return $=`useRef`,X(),Fa().memoizedState},useState:function(){$=`useState`,X();var e=Z.H;Z.H=Xx;try{return Wa(Ba)}finally{Z.H=e}},useDebugValue:function(){$=`useDebugValue`,X()},useDeferredValue:function(e,t){return $=`useDeferredValue`,X(),Fo(e,t)},useTransition:function(){return $=`useTransition`,X(),Go()},useSyncExternalStore:function(e,t,n){return $=`useSyncExternalStore`,X(),Ka(e,t,n)},useId:function(){return $=`useId`,X(),Fa().memoizedState},useFormState:function(e){return $=`useFormState`,X(),wa(),go(e)},useActionState:function(e){return $=`useActionState`,X(),go(e)},useOptimistic:function(e,t){return $=`useOptimistic`,X(),ro(e,t)},useHostTransitionStatus:Ko,useMemoCache:za,useCacheRefresh:function(){return $=`useCacheRefresh`,X(),Fa().memoizedState},useEffectEvent:function(e){return $=`useEffectEvent`,X(),wo(e)}},Jx={readContext:function(e){return l(),ni(e)},use:function(e){return c(),Ra(e)},useCallback:function(e,t){return $=`useCallback`,c(),Sa(),ko(e,t)},useContext:function(e){return $=`useContext`,c(),Sa(),ni(e)},useEffect:function(e,t){return $=`useEffect`,c(),Sa(),xo(e,t)},useImperativeHandle:function(e,t,n){return $=`useImperativeHandle`,c(),Sa(),Do(e,t,n)},useInsertionEffect:function(e,t){$=`useInsertionEffect`,c(),Sa(),yo(4,bx,e,t)},useLayoutEffect:function(e,t){return $=`useLayoutEffect`,c(),Sa(),To(e,t)},useMemo:function(e,t){$=`useMemo`,c(),Sa();var n=Z.H;Z.H=Jx;try{return jo(e,t)}finally{Z.H=n}},useReducer:function(e,t,n){$=`useReducer`,c(),Sa();var r=Z.H;Z.H=Jx;try{return Va(e,t,n)}finally{Z.H=r}},useRef:function(e){return $=`useRef`,c(),Sa(),vo(e)},useState:function(e){$=`useState`,c(),Sa();var t=Z.H;Z.H=Jx;try{return $a(e)}finally{Z.H=t}},useDebugValue:function(){$=`useDebugValue`,c(),Sa()},useDeferredValue:function(e,t){return $=`useDeferredValue`,c(),Sa(),No(e,t)},useTransition:function(){return $=`useTransition`,c(),Sa(),Uo()},useSyncExternalStore:function(e,t,n){return $=`useSyncExternalStore`,c(),Sa(),Ga(e,t,n)},useId:function(){return $=`useId`,c(),Sa(),qo()},useFormState:function(e,t){return $=`useFormState`,c(),Sa(),fo(e,t)},useActionState:function(e,t){return $=`useActionState`,c(),Sa(),fo(e,t)},useOptimistic:function(e){return $=`useOptimistic`,c(),Sa(),eo(e)},useMemoCache:function(e){return c(),za(e)},useHostTransitionStatus:Ko,useCacheRefresh:function(){return $=`useCacheRefresh`,Sa(),Jo()},useEffectEvent:function(e){return $=`useEffectEvent`,c(),Sa(),Co(e)}},Yx={readContext:function(e){return l(),ni(e)},use:function(e){return c(),Ra(e)},useCallback:function(e,t){return $=`useCallback`,c(),X(),Ao(e,t)},useContext:function(e){return $=`useContext`,c(),X(),ni(e)},useEffect:function(e,t){$=`useEffect`,c(),X(),bo(2048,Sx,e,t)},useImperativeHandle:function(e,t,n){return $=`useImperativeHandle`,c(),X(),Oo(e,t,n)},useInsertionEffect:function(e,t){return $=`useInsertionEffect`,c(),X(),bo(4,bx,e,t)},useLayoutEffect:function(e,t){return $=`useLayoutEffect`,c(),X(),bo(4,xx,e,t)},useMemo:function(e,t){$=`useMemo`,c(),X();var n=Z.H;Z.H=Yx;try{return Mo(e,t)}finally{Z.H=n}},useReducer:function(e,t,n){$=`useReducer`,c(),X();var r=Z.H;Z.H=Yx;try{return Ha(e,t,n)}finally{Z.H=r}},useRef:function(){return $=`useRef`,c(),X(),Fa().memoizedState},useState:function(){$=`useState`,c(),X();var e=Z.H;Z.H=Yx;try{return Ha(Ba)}finally{Z.H=e}},useDebugValue:function(){$=`useDebugValue`,c(),X()},useDeferredValue:function(e,t){return $=`useDeferredValue`,c(),X(),Po(e,t)},useTransition:function(){return $=`useTransition`,c(),X(),Wo()},useSyncExternalStore:function(e,t,n){return $=`useSyncExternalStore`,c(),X(),Ka(e,t,n)},useId:function(){return $=`useId`,c(),X(),Fa().memoizedState},useFormState:function(e){return $=`useFormState`,c(),X(),po(e)},useActionState:function(e){return $=`useActionState`,c(),X(),po(e)},useOptimistic:function(e,t){return $=`useOptimistic`,c(),X(),to(e,t)},useMemoCache:function(e){return c(),za(e)},useHostTransitionStatus:Ko,useCacheRefresh:function(){return $=`useCacheRefresh`,X(),Fa().memoizedState},useEffectEvent:function(e){return $=`useEffectEvent`,c(),X(),wo(e)}},Xx={readContext:function(e){return l(),ni(e)},use:function(e){return c(),Ra(e)},useCallback:function(e,t){return $=`useCallback`,c(),X(),Ao(e,t)},useContext:function(e){return $=`useContext`,c(),X(),ni(e)},useEffect:function(e,t){$=`useEffect`,c(),X(),bo(2048,Sx,e,t)},useImperativeHandle:function(e,t,n){return $=`useImperativeHandle`,c(),X(),Oo(e,t,n)},useInsertionEffect:function(e,t){return $=`useInsertionEffect`,c(),X(),bo(4,bx,e,t)},useLayoutEffect:function(e,t){return $=`useLayoutEffect`,c(),X(),bo(4,xx,e,t)},useMemo:function(e,t){$=`useMemo`,c(),X();var n=Z.H;Z.H=Yx;try{return Mo(e,t)}finally{Z.H=n}},useReducer:function(e,t,n){$=`useReducer`,c(),X();var r=Z.H;Z.H=Yx;try{return Wa(e,t,n)}finally{Z.H=r}},useRef:function(){return $=`useRef`,c(),X(),Fa().memoizedState},useState:function(){$=`useState`,c(),X();var e=Z.H;Z.H=Yx;try{return Wa(Ba)}finally{Z.H=e}},useDebugValue:function(){$=`useDebugValue`,c(),X()},useDeferredValue:function(e,t){return $=`useDeferredValue`,c(),X(),Fo(e,t)},useTransition:function(){return $=`useTransition`,c(),X(),Go()},useSyncExternalStore:function(e,t,n){return $=`useSyncExternalStore`,c(),X(),Ka(e,t,n)},useId:function(){return $=`useId`,c(),X(),Fa().memoizedState},useFormState:function(e){return $=`useFormState`,c(),X(),go(e)},useActionState:function(e){return $=`useActionState`,c(),X(),go(e)},useOptimistic:function(e,t){return $=`useOptimistic`,c(),X(),ro(e,t)},useMemoCache:function(e){return c(),za(e)},useHostTransitionStatus:Ko,useCacheRefresh:function(){return $=`useCacheRefresh`,X(),Fa().memoizedState},useEffectEvent:function(e){return $=`useEffectEvent`,c(),X(),wo(e)}};var Zx={},Qx=new Set,$x=new Set,eS=new Set,tS=new Set,nS=new Set,rS=new Set,iS=new Set,aS=new Set,oS=new Set,sS=new Set;Object.freeze(Zx);var cS={enqueueSetState:function(e,t,n){e=e._reactInternals;var r=zl(e),i=na(r);i.payload=t,n!=null&&(rs(n),i.callback=n),t=ra(e,i,r),t!==null&&(li(r,`this.setState()`,e),Hl(t,e,r),ia(t,e,r))},enqueueReplaceState:function(e,t,n){e=e._reactInternals;var r=zl(e),i=na(r);i.tag=ix,i.payload=t,n!=null&&(rs(n),i.callback=n),t=ra(e,i,r),t!==null&&(li(r,`this.replaceState()`,e),Hl(t,e,r),ia(t,e,r))},enqueueForceUpdate:function(e,t){e=e._reactInternals;var n=zl(e),r=na(n);r.tag=ax,t!=null&&(rs(t),r.callback=t),t=ra(e,r,n),t!==null&&(li(n,`this.forceUpdate()`,e),Hl(t,e,n),ia(t,e,n))}},lS=null,uS=null,dS=Error(`This is not a real error. It's an implementation detail of React's selective hydration feature. If this leaks into userspace, it's a bug in React. Please file an issue.`),fS=!1,pS={},mS={},hS={},gS={},_S=!1,vS={},yS={},bS={},xS={dehydrated:null,treeContext:null,retryLane:0,hydrationErrors:null},SS=!1,CS=null;CS=new Set;var wS=!1,TS=null,ES=null,DS=0,OS=new Map,kS={},AS=0,jS=1,MS=2,NS=!1,PS=!1,FS=!1,IS=!1,LS=typeof WeakSet==`function`?WeakSet:Set,RS=null,zS=null,BS=null,VS=!1,HS=!1,US=!1,WS=!1,GS=null,KS=!1,qS=null,JS=!1,YS=8192,XS={getCacheForType:function(e){var t=ni(fy),n=t.data.get(e);return n===void 0&&(n=e(),t.data.set(e,n)),n},cacheSignal:function(){return ni(fy).controller.signal},getOwner:function(){return rh}};if(typeof Symbol==`function`&&Symbol.for){var ZS=Symbol.for;ZS(`selector.component`),ZS(`selector.has_pseudo_class`),ZS(`selector.role`),ZS(`selector.test_id`),ZS(`selector.text`)}var QS=[],$S=typeof WeakMap==`function`?WeakMap:Map,eC=0,tC=2,nC=4,rC=0,iC=1,aC=2,oC=3,sC=4,cC=6,lC=5,uC=eC,dC=null,fC=null,pC=0,mC=0,hC=1,gC=2,_C=3,vC=4,yC=5,bC=6,xC=7,SC=8,CC=9,wC=mC,TC=null,EC=!1,DC=!1,OC=!1,kC=0,AC=rC,jC=0,MC=0,NC=0,PC=0,FC=0,IC=null,LC=null,RC=!1,zC=0,BC=0,VC=300,HC=1/0,UC=500,WC=null,GC=null,KC=null,qC=0,JC=1,YC=2,XC=3,ZC=0,QC=1,$C=2,ew=3,tw=4,nw=5,rw=0,iw=null,aw=null,ow=0,sw=0,cw=-0,lw=null,uw=null,dw=null,fw=null,pw=null,mw=null,hw=qC,gw=null,_w=50,vw=0,yw=null,bw=!1,xw=!1,Sw=50,Cw=0,ww=null,Tw=!1,Ew=!1,Dw=null,Ow=!1,kw=new Set,Aw={},jw=null,Mw=null,Nw=!1,Pw=!1,Fw=!1,Iw=!1,Lw=0,Rw={};(function(){for(var e=0;e<Q_.length;e++){var t=Q_[e],n=t.toLowerCase();t=t[0].toUpperCase()+t.slice(1),$n(n,`on`+t)}$n(W_,`onAnimationEnd`),$n(G_,`onAnimationIteration`),$n(K_,`onAnimationStart`),$n(`dblclick`,`onDoubleClick`),$n(`focusin`,`onFocus`),$n(`focusout`,`onBlur`),$n(q_,`onTransitionRun`),$n(J_,`onTransitionStart`),$n(Y_,`onTransitionCancel`),$n(X_,`onTransitionEnd`)})(),vt(`onMouseEnter`,[`mouseout`,`mouseover`]),vt(`onMouseLeave`,[`mouseout`,`mouseover`]),vt(`onPointerEnter`,[`pointerout`,`pointerover`]),vt(`onPointerLeave`,[`pointerout`,`pointerover`]),_t(`onChange`,`change click focusin focusout input keydown keyup selectionchange`.split(` `)),_t(`onSelect`,`focusout contextmenu dragend focusin keydown keyup mousedown mouseup selectionchange`.split(` `)),_t(`onBeforeInput`,[`compositionend`,`keypress`,`textInput`,`paste`]),_t(`onCompositionEnd`,`compositionend focusout keydown keypress keyup mousedown`.split(` `)),_t(`onCompositionStart`,`compositionstart focusout keydown keypress keyup mousedown`.split(` `)),_t(`onCompositionUpdate`,`compositionupdate focusout keydown keypress keyup mousedown`.split(` `));var zw=`abort canplay canplaythrough durationchange emptied encrypted ended error loadeddata loadedmetadata loadstart pause play playing progress ratechange resize seeked seeking stalled suspend timeupdate volumechange waiting`.split(` `),Bw=new Set(`beforetoggle cancel close invalid load scroll scrollend toggle`.split(` `).concat(zw)),Vw=`_reactListening`+Math.random().toString(36).slice(2),Hw=!1,Uw=!1,Ww=!1,Gw=!1,Kw=!1,qw=!1,Jw=!1,Yw={},Xw=/\r\n?/g,Zw=/\u0000|\uFFFD/g,Qw=`http://www.w3.org/1999/xlink`,$w=`http://www.w3.org/XML/1998/namespace`,eT={},tT=`javascript:throw new Error('React form unexpectedly submitted.')`,nT=`suppressHydrationWarning`,rT=`&`,iT=`/&`,aT=`<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -2613,6 +2865,20 @@ Check the top-level render call using <`+r+`>.`);var o=``;n!=null&&e!==n&&(r=nul
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -2737,7 +3003,7 @@ Check the top-level render call using <`+r+`>.`);var o=``;n!=null&&e!==n&&(r=nul
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     ,oT=`/<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -2745,6 +3011,20 @@ Check the top-level render call using <`+r+`>.`);var o=``;n!=null&&e!==n&&(r=nul
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -3140,7 +3420,7 @@ https://g.page/r/code-it-neumarkt/review
 Das hilft unserem lokalen Meisterbetrieb enorm weiter. Vielen Dank und beste Grüße!
 ${d}`;case`custom`:return o}})(),h=`https://wa.me/${u}?text=${encodeURIComponent(m)}`;return(0,x.jsxDEV)(`div`,{className:`fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in`,children:(0,x.jsxDEV)(`div`,{className:`bg-[#0B1416] border border-[#00E676]/40 rounded-2xl max-w-lg w-full p-6 shadow-2xl shadow-green-950/30 relative`,children:[(0,x.jsxDEV)(`button`,{type:`button`,onClick:t,className:`absolute top-4 right-4 text-[#859B9E] hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer`,children:(0,x.jsxDEV)(Rt,{className:`w-5 h-5`},void 0,!1,{fileName:fr,lineNumber:119,columnNumber:11},void 0)},void 0,!1,{fileName:fr,lineNumber:114,columnNumber:9},void 0),(0,x.jsxDEV)(`div`,{className:`flex items-center gap-3 mb-4`,children:[(0,x.jsxDEV)(`div`,{className:`w-12 h-12 rounded-xl bg-emerald-950/50 border border-[#00E676]/50 flex items-center justify-center text-[#00E676]`,children:(0,x.jsxDEV)(Ye,{className:`w-6 h-6`},void 0,!1,{fileName:fr,lineNumber:124,columnNumber:13},void 0)},void 0,!1,{fileName:fr,lineNumber:123,columnNumber:11},void 0),(0,x.jsxDEV)(`div`,{children:[(0,x.jsxDEV)(`h3`,{className:`font-mono text-base font-black text-white`,children:`WhatsApp-Kundenbenachrichtigung`},void 0,!1,{fileName:fr,lineNumber:127,columnNumber:13},void 0),(0,x.jsxDEV)(`p`,{className:`text-[11px] font-mono text-[#00E676] font-bold`,children:[`// 1-KLICK KUNDEN-UPDATE FÜR `,n.id]},void 0,!0,{fileName:fr,lineNumber:130,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:126,columnNumber:11},void 0)]},void 0,!0,{fileName:fr,lineNumber:122,columnNumber:9},void 0),(0,x.jsxDEV)(`div`,{className:`p-3 rounded-xl bg-[#040809] border border-white/10 mb-4 flex items-center justify-between text-xs font-mono`,children:[(0,x.jsxDEV)(`div`,{children:[(0,x.jsxDEV)(`span`,{className:`text-[#859B9E] text-[10px] uppercase block`,children:`Empfänger:`},void 0,!1,{fileName:fr,lineNumber:138,columnNumber:13},void 0),(0,x.jsxDEV)(`strong`,{className:`text-white`,children:n.cust},void 0,!1,{fileName:fr,lineNumber:139,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:137,columnNumber:11},void 0),(0,x.jsxDEV)(`div`,{className:`text-right`,children:[(0,x.jsxDEV)(`span`,{className:`text-[#859B9E] text-[10px] uppercase block`,children:`WhatsApp-Nummer:`},void 0,!1,{fileName:fr,lineNumber:142,columnNumber:13},void 0),(0,x.jsxDEV)(`span`,{className:`text-[#00F5D4] font-bold`,children:[`+`,u||`–`]},void 0,!0,{fileName:fr,lineNumber:143,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:141,columnNumber:11},void 0)]},void 0,!0,{fileName:fr,lineNumber:136,columnNumber:9},void 0),(0,x.jsxDEV)(`div`,{className:`mb-4`,children:[(0,x.jsxDEV)(`label`,{className:`block text-[11px] font-mono text-[#859B9E] uppercase mb-1.5`,children:`Vorlage auswählen:`},void 0,!1,{fileName:fr,lineNumber:148,columnNumber:11},void 0),(0,x.jsxDEV)(`div`,{className:`grid grid-cols-2 sm:grid-cols-5 gap-1.5 font-mono text-xs`,children:[(0,x.jsxDEV)(`button`,{type:`button`,onClick:()=>a(`ready`),className:`p-2 rounded-lg border text-center font-bold transition cursor-pointer ${i===`ready`?`bg-[#00E676]/20 border-[#00E676] text-[#00E676]`:`bg-white/5 border-white/10 text-gray-400 hover:text-white`}`,children:`✅ Abholbereit`},void 0,!1,{fileName:fr,lineNumber:152,columnNumber:13},void 0),(0,x.jsxDEV)(`button`,{type:`button`,onClick:()=>a(`kva`),className:`p-2 rounded-lg border text-center font-bold transition cursor-pointer ${i===`kva`?`bg-[#00E676]/20 border-[#00E676] text-[#00E676]`:`bg-white/5 border-white/10 text-gray-400 hover:text-white`}`,children:`📋 KVA`},void 0,!1,{fileName:fr,lineNumber:163,columnNumber:13},void 0),(0,x.jsxDEV)(`button`,{type:`button`,onClick:()=>a(`in_progress`),className:`p-2 rounded-lg border text-center font-bold transition cursor-pointer ${i===`in_progress`?`bg-[#00E676]/20 border-[#00E676] text-[#00E676]`:`bg-white/5 border-white/10 text-gray-400 hover:text-white`}`,children:`🔧 In Arbeit`},void 0,!1,{fileName:fr,lineNumber:174,columnNumber:13},void 0),(0,x.jsxDEV)(`button`,{type:`button`,onClick:()=>a(`review`),className:`p-2 rounded-lg border text-center font-bold transition cursor-pointer ${i===`review`?`bg-[#FFD700]/20 border-[#FFD700] text-[#FFD700]`:`bg-white/5 border-white/10 text-gray-400 hover:text-white`}`,children:`⭐ Google Bewertung`},void 0,!1,{fileName:fr,lineNumber:185,columnNumber:13},void 0),(0,x.jsxDEV)(`button`,{type:`button`,onClick:()=>{a(`custom`),o||s(`Hallo ${n.cust}, `)},className:`p-2 rounded-lg border text-center font-bold transition cursor-pointer ${i===`custom`?`bg-[#00E676]/20 border-[#00E676] text-[#00E676]`:`bg-white/5 border-white/10 text-gray-400 hover:text-white`}`,children:`✏️ Freitext`},void 0,!1,{fileName:fr,lineNumber:196,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:151,columnNumber:11},void 0)]},void 0,!0,{fileName:fr,lineNumber:147,columnNumber:9},void 0),(0,x.jsxDEV)(`div`,{className:`mb-5`,children:[(0,x.jsxDEV)(`label`,{className:`block text-[11px] font-mono text-[#859B9E] uppercase mb-1 flex items-center justify-between`,children:[(0,x.jsxDEV)(`span`,{children:`Nachrichtenvorschau:`},void 0,!1,{fileName:fr,lineNumber:215,columnNumber:13},void 0),(0,x.jsxDEV)(`span`,{className:`text-[10px] text-gray-500`,children:`Wird an WhatsApp übergeben`},void 0,!1,{fileName:fr,lineNumber:216,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:214,columnNumber:11},void 0),i===`custom`?(0,x.jsxDEV)(`textarea`,{rows:6,value:o,onChange:e=>s(e.target.value),className:`w-full p-3 rounded-xl bg-[#040809] border border-[#00E676]/40 text-white font-mono text-xs focus:outline-none focus:border-[#00E676] resize-none`,placeholder:`Eigene Nachricht tippen...`},void 0,!1,{fileName:fr,lineNumber:219,columnNumber:13},void 0):(0,x.jsxDEV)(`div`,{className:`p-3.5 rounded-xl bg-[#051410] border border-[#00E676]/30 text-emerald-100 font-mono text-xs whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto`,children:m},void 0,!1,{fileName:fr,lineNumber:227,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:213,columnNumber:9},void 0),(0,x.jsxDEV)(`div`,{className:`flex flex-wrap items-center justify-between gap-3`,children:[(0,x.jsxDEV)(`button`,{type:`button`,onClick:()=>{navigator.clipboard.writeText(m),l(!0),setTimeout(()=>l(!1),2e3)},className:`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-white/5 border border-white/10 text-gray-300 hover:text-white transition cursor-pointer`,children:[c?(0,x.jsxDEV)(T,{className:`w-3.5 h-3.5 text-green-400`},void 0,!1,{fileName:fr,lineNumber:243,columnNumber:23},void 0):(0,x.jsxDEV)(Oe,{className:`w-3.5 h-3.5`},void 0,!1,{fileName:fr,lineNumber:243,columnNumber:74},void 0),(0,x.jsxDEV)(`span`,{children:c?`Kopiert!`:`Text kopieren`},void 0,!1,{fileName:fr,lineNumber:244,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:234,columnNumber:11},void 0),(0,x.jsxDEV)(`div`,{className:`flex items-center gap-2`,children:[(0,x.jsxDEV)(`button`,{type:`button`,onClick:t,className:`px-4 py-2 rounded-xl text-xs font-mono font-bold text-gray-400 hover:text-white border border-white/10 transition cursor-pointer`,children:`Schließen`},void 0,!1,{fileName:fr,lineNumber:248,columnNumber:13},void 0),(0,x.jsxDEV)(`button`,{type:`button`,onClick:()=>{window.open(h,`_blank`)},className:`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-mono font-bold uppercase bg-[#00E676] hover:bg-[#00E676]/90 text-black transition cursor-pointer shadow-lg shadow-emerald-500/20`,children:[(0,x.jsxDEV)(ut,{className:`w-3.5 h-3.5`},void 0,!1,{fileName:fr,lineNumber:262,columnNumber:15},void 0),(0,x.jsxDEV)(`span`,{children:`WhatsApp öffnen`},void 0,!1,{fileName:fr,lineNumber:263,columnNumber:15},void 0)]},void 0,!0,{fileName:fr,lineNumber:255,columnNumber:13},void 0)]},void 0,!0,{fileName:fr,lineNumber:247,columnNumber:11},void 0)]},void 0,!0,{fileName:fr,lineNumber:233,columnNumber:9},void 0)]},void 0,!0,{fileName:fr,lineNumber:113,columnNumber:7},void 0)},void 0,!1,{fileName:fr,lineNumber:112,columnNumber:5},void 0)},mr=o(((e,t)=>{t.exports=function(){return typeof Promise==`function`&&Promise.prototype&&Promise.prototype.then}})),hr=o((e=>{var t,n=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];e.getSymbolSize=function(e){if(!e)throw Error(`"version" cannot be null or undefined`);if(e<1||e>40)throw Error(`"version" should be in range from 1 to 40`);return e*4+17},e.getSymbolTotalCodewords=function(e){return n[e]},e.getBCHDigit=function(e){let t=0;for(;e!==0;)t++,e>>>=1;return t},e.setToSJISFunction=function(e){if(typeof e!=`function`)throw Error(`"toSJISFunc" is not a valid function.`);t=e},e.isKanjiModeEnabled=function(){return t!==void 0},e.toSJIS=function(e){return t(e)}})),gr=o((e=>{e.L={bit:1},e.M={bit:0},e.Q={bit:3},e.H={bit:2};function t(t){if(typeof t!=`string`)throw Error(`Param is not a string`);switch(t.toLowerCase()){case`l`:case`low`:return e.L;case`m`:case`medium`:return e.M;case`q`:case`quartile`:return e.Q;case`h`:case`high`:return e.H;default:throw Error(`Unknown EC Level: `+t)}}e.isValid=function(e){return e&&e.bit!==void 0&&e.bit>=0&&e.bit<4},e.from=function(n,r){if(e.isValid(n))return n;try{return t(n)}catch{return r}}})),_r=o(((e,t)=>{function n(){this.buffer=[],this.length=0}n.prototype={get:function(e){let t=Math.floor(e/8);return(this.buffer[t]>>>7-e%8&1)==1},put:function(e,t){for(let n=0;n<t;n++)this.putBit((e>>>t-n-1&1)==1)},getLengthInBits:function(){return this.length},putBit:function(e){let t=Math.floor(this.length/8);this.buffer.length<=t&&this.buffer.push(0),e&&(this.buffer[t]|=128>>>this.length%8),this.length++}},t.exports=n})),vr=o(((e,t)=>{function n(e){if(!e||e<1)throw Error(`BitMatrix size must be defined and greater than 0`);this.size=e,this.data=new Uint8Array(e*e),this.reservedBit=new Uint8Array(e*e)}n.prototype.set=function(e,t,n,r){let i=e*this.size+t;this.data[i]=n,r&&(this.reservedBit[i]=!0)},n.prototype.get=function(e,t){return this.data[e*this.size+t]},n.prototype.xor=function(e,t,n){this.data[e*this.size+t]^=n},n.prototype.isReserved=function(e,t){return this.reservedBit[e*this.size+t]},t.exports=n})),yr=o((e=>{var t=hr().getSymbolSize;e.getRowColCoords=function(e){if(e===1)return[];let n=Math.floor(e/7)+2,r=t(e),i=r===145?26:Math.ceil((r-13)/(2*n-2))*2,a=[r-7];for(let e=1;e<n-1;e++)a[e]=a[e-1]-i;return a.push(6),a.reverse()},e.getPositions=function(t){let n=[],r=e.getRowColCoords(t),i=r.length;for(let e=0;e<i;e++)for(let t=0;t<i;t++)e===0&&t===0||e===0&&t===i-1||e===i-1&&t===0||n.push([r[e],r[t]]);return n}})),br=o((e=>{var t=hr().getSymbolSize,n=7;e.getPositions=function(e){let r=t(e);return[[0,0],[r-n,0],[0,r-n]]}})),xr=o((e=>{e.Patterns={PATTERN000:0,PATTERN001:1,PATTERN010:2,PATTERN011:3,PATTERN100:4,PATTERN101:5,PATTERN110:6,PATTERN111:7};var t={N1:3,N2:3,N3:40,N4:10};e.isValid=function(e){return e!=null&&e!==``&&!isNaN(e)&&e>=0&&e<=7},e.from=function(t){return e.isValid(t)?parseInt(t,10):void 0},e.getPenaltyN1=function(e){let n=e.size,r=0,i=0,a=0,o=null,s=null;for(let c=0;c<n;c++){i=a=0,o=s=null;for(let l=0;l<n;l++){let n=e.get(c,l);n===o?i++:(i>=5&&(r+=t.N1+(i-5)),o=n,i=1),n=e.get(l,c),n===s?a++:(a>=5&&(r+=t.N1+(a-5)),s=n,a=1)}i>=5&&(r+=t.N1+(i-5)),a>=5&&(r+=t.N1+(a-5))}return r},e.getPenaltyN2=function(e){let n=e.size,r=0;for(let t=0;t<n-1;t++)for(let i=0;i<n-1;i++){let n=e.get(t,i)+e.get(t,i+1)+e.get(t+1,i)+e.get(t+1,i+1);(n===4||n===0)&&r++}return r*t.N2},e.getPenaltyN3=function(e){let n=e.size,r=0,i=0,a=0;for(let t=0;t<n;t++){i=a=0;for(let o=0;o<n;o++)i=i<<1&2047|e.get(t,o),o>=10&&(i===1488||i===93)&&r++,a=a<<1&2047|e.get(o,t),o>=10&&(a===1488||a===93)&&r++}return r*t.N3},e.getPenaltyN4=function(e){let n=0,r=e.data.length;for(let t=0;t<r;t++)n+=e.data[t];return Math.abs(Math.ceil(n*100/r/5)-10)*t.N4};function n(t,n,r){switch(t){case e.Patterns.PATTERN000:return(n+r)%2==0;case e.Patterns.PATTERN001:return n%2==0;case e.Patterns.PATTERN010:return r%3==0;case e.Patterns.PATTERN011:return(n+r)%3==0;case e.Patterns.PATTERN100:return(Math.floor(n/2)+Math.floor(r/3))%2==0;case e.Patterns.PATTERN101:return n*r%2+n*r%3==0;case e.Patterns.PATTERN110:return(n*r%2+n*r%3)%2==0;case e.Patterns.PATTERN111:return(n*r%3+(n+r)%2)%2==0;default:throw Error(`bad maskPattern:`+t)}}e.applyMask=function(e,t){let r=t.size;for(let i=0;i<r;i++)for(let a=0;a<r;a++)t.isReserved(a,i)||t.xor(a,i,n(e,a,i))},e.getBestMask=function(t,n){let r=Object.keys(e.Patterns).length,i=0,a=1/0;for(let o=0;o<r;o++){n(o),e.applyMask(o,t);let r=e.getPenaltyN1(t)+e.getPenaltyN2(t)+e.getPenaltyN3(t)+e.getPenaltyN4(t);e.applyMask(o,t),r<a&&(a=r,i=o)}return i}})),Sr=o((e=>{var t=gr(),n=[1,1,1,1,1,1,1,1,1,1,2,2,1,2,2,4,1,2,4,4,2,4,4,4,2,4,6,5,2,4,6,6,2,5,8,8,4,5,8,8,4,5,8,11,4,8,10,11,4,9,12,16,4,9,16,16,6,10,12,18,6,10,17,16,6,11,16,19,6,13,18,21,7,14,21,25,8,16,20,25,8,17,23,25,9,17,23,34,9,18,25,30,10,20,27,32,12,21,29,35,12,23,34,37,12,25,34,40,13,26,35,42,14,28,38,45,15,29,40,48,16,31,43,51,17,33,45,54,18,35,48,57,19,37,51,60,19,38,53,63,20,40,56,66,21,43,59,70,22,45,62,74,24,47,65,77,25,49,68,81],r=[7,10,13,17,10,16,22,28,15,26,36,44,20,36,52,64,26,48,72,88,36,64,96,112,40,72,108,130,48,88,132,156,60,110,160,192,72,130,192,224,80,150,224,264,96,176,260,308,104,198,288,352,120,216,320,384,132,240,360,432,144,280,408,480,168,308,448,532,180,338,504,588,196,364,546,650,224,416,600,700,224,442,644,750,252,476,690,816,270,504,750,900,300,560,810,960,312,588,870,1050,336,644,952,1110,360,700,1020,1200,390,728,1050,1260,420,784,1140,1350,450,812,1200,1440,480,868,1290,1530,510,924,1350,1620,540,980,1440,1710,570,1036,1530,1800,570,1064,1590,1890,600,1120,1680,1980,630,1204,1770,2100,660,1260,1860,2220,720,1316,1950,2310,750,1372,2040,2430];e.getBlocksCount=function(e,r){switch(r){case t.L:return n[(e-1)*4+0];case t.M:return n[(e-1)*4+1];case t.Q:return n[(e-1)*4+2];case t.H:return n[(e-1)*4+3];default:return}},e.getTotalCodewordsCount=function(e,n){switch(n){case t.L:return r[(e-1)*4+0];case t.M:return r[(e-1)*4+1];case t.Q:return r[(e-1)*4+2];case t.H:return r[(e-1)*4+3];default:return}}})),Cr=o((e=>{var t=new Uint8Array(512),n=new Uint8Array(256);(function(){let e=1;for(let r=0;r<255;r++)t[r]=e,n[e]=r,e<<=1,e&256&&(e^=285);for(let e=255;e<512;e++)t[e]=t[e-255]})(),e.log=function(e){if(e<1)throw Error(`log(`+e+`)`);return n[e]},e.exp=function(e){return t[e]},e.mul=function(e,r){return e===0||r===0?0:t[n[e]+n[r]]}})),wr=o((e=>{var t=Cr();e.mul=function(e,n){let r=new Uint8Array(e.length+n.length-1);for(let i=0;i<e.length;i++)for(let a=0;a<n.length;a++)r[i+a]^=t.mul(e[i],n[a]);return r},e.mod=function(e,n){let r=new Uint8Array(e);for(;r.length-n.length>=0;){let e=r[0];for(let i=0;i<n.length;i++)r[i]^=t.mul(n[i],e);let i=0;for(;i<r.length&&r[i]===0;)i++;r=r.slice(i)}return r},e.generateECPolynomial=function(n){let r=new Uint8Array([1]);for(let i=0;i<n;i++)r=e.mul(r,new Uint8Array([1,t.exp(i)]));return r}})),Tr=o(((e,t)=>{var n=wr();function r(e){this.genPoly=void 0,this.degree=e,this.degree&&this.initialize(this.degree)}r.prototype.initialize=function(e){this.degree=e,this.genPoly=n.generateECPolynomial(this.degree)},r.prototype.encode=function(e){if(!this.genPoly)throw Error(`Encoder not initialized`);let t=new Uint8Array(e.length+this.degree);t.set(e);let r=n.mod(t,this.genPoly),i=this.degree-r.length;if(i>0){let e=new Uint8Array(this.degree);return e.set(r,i),e}return r},t.exports=r})),Er=o((e=>{e.isValid=function(e){return!isNaN(e)&&e>=1&&e<=40}})),Dr=o((e=>{var t=`[0-9]+`,n=`[A-Z $%*+\\-./:]+`,r=`(?:[u3000-u303F]|[u3040-u309F]|[u30A0-u30FF]|[uFF00-uFFEF]|[u4E00-u9FAF]|[u2605-u2606]|[u2190-u2195]|u203B|[u2010u2015u2018u2019u2025u2026u201Cu201Du2225u2260]|[u0391-u0451]|[u00A7u00A8u00B1u00B4u00D7u00F7])+`;r=r.replace(/u/g,`\\u`);var i=`(?:(?![A-Z0-9 $%*+\\-./:]|`+r+`)(?:.|[\r
 ]))+`;e.KANJI=new RegExp(r,`g`),e.BYTE_KANJI=RegExp(`[^A-Z0-9 $%*+\\-./:]+`,`g`),e.BYTE=new RegExp(i,`g`),e.NUMERIC=new RegExp(t,`g`),e.ALPHANUMERIC=new RegExp(n,`g`);var a=RegExp(`^`+r+`<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -3148,6 +3428,20 @@ ${d}`;case`custom`:return o}})(),h=`https://wa.me/${u}?text=${encodeURIComponent
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -3272,7 +3566,7 @@ ${d}`;case`custom`:return o}})(),h=`https://wa.me/${u}?text=${encodeURIComponent
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     ),o=RegExp(`^[0-9]+<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -3280,6 +3574,20 @@ ${d}`;case`custom`:return o}})(),h=`https://wa.me/${u}?text=${encodeURIComponent
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -3404,7 +3712,7 @@ ${d}`;case`custom`:return o}})(),h=`https://wa.me/${u}?text=${encodeURIComponent
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     ),s=RegExp(`^[A-Z0-9 $%*+\\-./:]+<!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -3412,6 +3720,20 @@ ${d}`;case`custom`:return o}})(),h=`https://wa.me/${u}?text=${encodeURIComponent
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>html,body{min-height:100vh;margin:0;padding:0;color:#f3f7f7!important;background-color:#060b0c!important}</style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -3559,54 +3881,69 @@ ${kn}`)}finally{o(!1)}};return(0,x.jsxDEV)(`div`,{className:`space-y-6 animate-f
 
 </style>
   </head>
-  <body class="bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4]">
-    <div id="root"></div>
+  <body class="bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4]" style="background-color: #060B0C;">
+    <div id="root">
+      <div style="min-height: 100vh; background-color: #060B0C; color: #00F5D4; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; text-align: center; padding: 20px;">
+        <div style="width: 32px; height: 32px; border: 3px solid rgba(0,245,212,0.2); border-top-color: #00F5D4; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;"></div>
+        <div style="font-weight: bold; font-size: 14px; letter-spacing: 1px;">CODE // IT-WERKSTATT NEUMARKT</div>
+        <div style="color: #859B9E; font-size: 11px; margin-top: 6px;">System wird initialisiert...</div>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>
     <script type="text/javascript">
-      (function (C, A, L) {
-        let p = function (a, ar) { a.q.push(ar); };
-        let d = C.document;
-        C.Cal = C.Cal || function () {
-          let cal = C.Cal;
-          let ar = arguments;
-          if (!cal.loaded) {
-            cal.ns = {};
-            cal.q = cal.q || [];
-            d.head.appendChild(d.createElement("script")).src = A;
-            cal.loaded = true;
-          }
-          if (ar[0] === L) {
-            const api = function () { p(api, arguments); };
-            const namespace = ar[1];
-            api.q = api.q || [];
-            if(typeof namespace === "string"){
-              cal.ns[namespace] = cal.ns[namespace] || api;
-              p(cal.ns[namespace], ar);
-              p(cal, ["initNamespace", namespace]);
-            } else p(cal, ar);
-            return;
-          }
-          p(cal, ar);
-        };
-      })(window, "https://app.cal.com/embed/embed.js", "init");
-      if (window.Cal) {
-        Cal("init", { origin: "https://cal.com" });
-        Cal("ui", {
-          "theme": "dark",
-          "styles": {
-            "branding": { "brandColor": "#00F5D4" }
-          },
-          "hideEventTypeDetails": false,
-          "layout": "month_view"
-        });
+      try {
+        (function (C, A, L) {
+          let p = function (a, ar) { a.q.push(ar); };
+          let d = C.document;
+          C.Cal = C.Cal || function () {
+            let cal = C.Cal;
+            let ar = arguments;
+            if (!cal.loaded) {
+              cal.ns = {};
+              cal.q = cal.q || [];
+              d.head.appendChild(d.createElement("script")).src = A;
+              cal.loaded = true;
+            }
+            if (ar[0] === L) {
+              const api = function () { p(api, arguments); };
+              const namespace = ar[1];
+              api.q = api.q || [];
+              if(typeof namespace === "string"){
+                cal.ns[namespace] = cal.ns[namespace] || api;
+                p(cal.ns[namespace], ar);
+                p(cal, ["initNamespace", namespace]);
+              } else p(cal, ar);
+              return;
+            }
+            p(cal, ar);
+          };
+        })(window, "https://app.cal.com/embed/embed.js", "init");
+        if (window.Cal) {
+          Cal("init", { origin: "https://cal.com" });
+          Cal("ui", {
+            "theme": "dark",
+            "styles": {
+              "branding": { "brandColor": "#00F5D4" }
+            },
+            "hideEventTypeDetails": false,
+            "layout": "month_view"
+          });
+        }
+      } catch (e) {
+        console.warn('Cal.com embed skipped:', e);
       }
     </script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch((err) => {
-            console.warn('SW registration skipped:', err);
+      try {
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('run.app')) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch((err) => {
+              console.warn('SW registration skipped:', err);
+            });
           });
-        });
+        }
+      } catch (e) {
+        console.warn('SW register skipped:', e);
       }
     </script>
   </body>

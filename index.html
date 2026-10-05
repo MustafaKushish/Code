@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" class="dark">
+<html lang="de" class="dark" style="background-color: #060B0C; color-scheme: dark;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -7,6 +7,28 @@
     <meta name="description" content="Spezial-Werkstatt für Platinenreparatur, Mikrolöten, PS5 HDMI, Hall-Effect Sticks, Laptops & Datenrettung in Neumarkt i.d.OPf. mit KI-Bauteildiagnose." />
     <meta name="theme-color" content="#060B0C" />
     <link rel="canonical" href="https://code-ger.com/" />
+    
+    <!-- Instant dark canvas to prevent any white flashes -->
+    <style>
+      html, body {
+        background-color: #060B0C !important;
+        color: #F3F7F7 !important;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+      }
+    </style>
+
+    <!-- Clear any stale or rogue service workers in dev / preview -->
+    <script>
+      if ('serviceWorker' in navigator && (window.location.hostname.includes('localhost') || window.location.hostname.includes('run.app'))) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+    </script>
     
     <!-- PWA & Mobile Web App Meta -->
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -131,55 +153,72 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4]">
-    <div id="root"></div>
+  <body class="bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4]" style="background-color: #060B0C;">
+    <div id="root">
+      <div style="min-height: 100vh; background-color: #060B0C; color: #00F5D4; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: monospace; text-align: center; padding: 20px;">
+        <div style="width: 32px; height: 32px; border: 3px solid rgba(0,245,212,0.2); border-top-color: #00F5D4; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;"></div>
+        <div style="font-weight: bold; font-size: 14px; letter-spacing: 1px;">CODE // IT-WERKSTATT NEUMARKT</div>
+        <div style="color: #859B9E; font-size: 11px; margin-top: 6px;">System wird initialisiert...</div>
+      </div>
+      <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+      </style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     <script type="text/javascript">
-      (function (C, A, L) {
-        let p = function (a, ar) { a.q.push(ar); };
-        let d = C.document;
-        C.Cal = C.Cal || function () {
-          let cal = C.Cal;
-          let ar = arguments;
-          if (!cal.loaded) {
-            cal.ns = {};
-            cal.q = cal.q || [];
-            d.head.appendChild(d.createElement("script")).src = A;
-            cal.loaded = true;
-          }
-          if (ar[0] === L) {
-            const api = function () { p(api, arguments); };
-            const namespace = ar[1];
-            api.q = api.q || [];
-            if(typeof namespace === "string"){
-              cal.ns[namespace] = cal.ns[namespace] || api;
-              p(cal.ns[namespace], ar);
-              p(cal, ["initNamespace", namespace]);
-            } else p(cal, ar);
-            return;
-          }
-          p(cal, ar);
-        };
-      })(window, "https://app.cal.com/embed/embed.js", "init");
-      if (window.Cal) {
-        Cal("init", { origin: "https://cal.com" });
-        Cal("ui", {
-          "theme": "dark",
-          "styles": {
-            "branding": { "brandColor": "#00F5D4" }
-          },
-          "hideEventTypeDetails": false,
-          "layout": "month_view"
-        });
+      try {
+        (function (C, A, L) {
+          let p = function (a, ar) { a.q.push(ar); };
+          let d = C.document;
+          C.Cal = C.Cal || function () {
+            let cal = C.Cal;
+            let ar = arguments;
+            if (!cal.loaded) {
+              cal.ns = {};
+              cal.q = cal.q || [];
+              d.head.appendChild(d.createElement("script")).src = A;
+              cal.loaded = true;
+            }
+            if (ar[0] === L) {
+              const api = function () { p(api, arguments); };
+              const namespace = ar[1];
+              api.q = api.q || [];
+              if(typeof namespace === "string"){
+                cal.ns[namespace] = cal.ns[namespace] || api;
+                p(cal.ns[namespace], ar);
+                p(cal, ["initNamespace", namespace]);
+              } else p(cal, ar);
+              return;
+            }
+            p(cal, ar);
+          };
+        })(window, "https://app.cal.com/embed/embed.js", "init");
+        if (window.Cal) {
+          Cal("init", { origin: "https://cal.com" });
+          Cal("ui", {
+            "theme": "dark",
+            "styles": {
+              "branding": { "brandColor": "#00F5D4" }
+            },
+            "hideEventTypeDetails": false,
+            "layout": "month_view"
+          });
+        }
+      } catch (e) {
+        console.warn('Cal.com embed skipped:', e);
       }
     </script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch((err) => {
-            console.warn('SW registration skipped:', err);
+      try {
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('run.app')) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch((err) => {
+              console.warn('SW registration skipped:', err);
+            });
           });
-        });
+        }
+      } catch (e) {
+        console.warn('SW register skipped:', e);
       }
     </script>
   </body>
