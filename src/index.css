@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-deep: #060B0C;
+    --bg-surface: rgba(13, 22, 24, 0.78);
+    --bg-surface-hover: rgba(19, 33, 36, 0.92);
+    --copper: #C9743F;
+    --copper-glow: #FF8D4D;
+    --copper-alpha: rgba(201, 116, 63, 0.14);
+    --teal: #4FA39B;
+    --teal-glow: #00F5D4;
+    --teal-alpha: rgba(79, 163, 155, 0.14);
+    --text-main: #F3F7F7;
+    --text-muted: #839897;
+    --border: rgba(201, 116, 63, 0.22);
+    --border-active: rgba(0, 245, 212, 0.45);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060B0C;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #172B2E;
+  border-radius: 4px;
+  border: 1px solid rgba(201, 116, 63, 0.25);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C9743F;
+}
+
+@keyframes scanSweep {
+  0% { top: -35%; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 6px #00F5D4); }
+  50% { opacity: 0.4; transform: scale(0.85); filter: drop-shadow(0 0 2px #00F5D4); }
+}
+
+@keyframes laserLine {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+.animate-scan {
+  animation: scanSweep 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Print Modes & Styles */
+#printInvoiceArea,
+#printKvaArea,
+#printTaxArea {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 12mm;
+    size: auto;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide public website & manager UI during print */
+  header,
+  footer,
+  nav,
+  canvas,
+  .no-print,
+  #diagnose,
+  #services,
+  #b2b,
+  #status,
+  #termin,
+  #kontakt,
+  .animate-fade-in > header,
+  .animate-fade-in > nav,
+  .animate-fade-in > main,
+  .animate-fade-in > footer {
+    display: none !important;
+  }
+
+  /* Hide modals unless in direct print */
+  body:not(.print-mode-tax):not(.print-mode-invoice):not(.print-mode-kva) .fixed {
+    display: none !important;
+  }
+
+  /* When printing Invoice */
+  body.print-mode-invoice #printInvoiceArea {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* When printing KVA */
+  body.print-mode-kva #printKvaArea {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* When printing Tax Report */
+  body.print-mode-tax #printTaxArea {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide modals when in print mode */
+  body.print-mode-tax .fixed,
+  body.print-mode-invoice .fixed,
+  body.print-mode-kva .fixed {
+    display: none !important;
+  }
+}
