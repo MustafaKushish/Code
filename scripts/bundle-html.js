@@ -52,13 +52,12 @@ const standalonePath = path.resolve('code-werkstatt-standalone.html');
 fs.writeFileSync(standalonePath, html, 'utf8');
 console.log(`Created standalone HTML: ${standalonePath} (${(fs.statSync(standalonePath).size / 1024).toFixed(1)} KB)`);
 
-// Copy manager.html and 404.html (for GitHub Pages and SPA routers)
+// manager.html für den direkten Werkstatt-Link (/manager)
 fs.copyFileSync(htmlPath, path.join(distDir, 'manager.html'));
-fs.copyFileSync(htmlPath, path.join(distDir, '404.html'));
 
-// Ensure clean SPA routing and headers for Cloudflare Pages and standard static hosts
-fs.writeFileSync(path.join(distDir, '_redirects'), '/*    /index.html   200\n', 'utf8');
+// Kein 404.html und keine "/* /index.html 200"-Regel: Cloudflare Pages liefert
+// unbekannte Pfade dann automatisch als Single-Page-App (index.html) aus.
 if (fs.existsSync('public/_headers')) {
   fs.copyFileSync('public/_headers', path.join(distDir, '_headers'));
 }
-console.log('Created _redirects, _headers, manager.html, and 404.html.');
+console.log('Created _headers and manager.html.');
