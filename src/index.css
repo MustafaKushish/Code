@@ -165,3 +165,49 @@
     display: none !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Design-Refresh: Scroll-Einblendung, Abschnittsbänder, ruhigere Bewegung
+--------------------------------------------------------------------------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Abgesetzter Hintergrund für jeden zweiten Abschnitt – gibt der langen Seite Rhythmus */
+.section-band {
+  background:
+    linear-gradient(180deg, transparent, rgba(79, 163, 155, 0.045) 18%, rgba(79, 163, 155, 0.045) 82%, transparent);
+}
+
+/* Feines Platinen-Raster für Hervorhebungen */
+.pcb-grid {
+  background-image:
+    linear-gradient(rgba(0, 245, 212, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 212, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

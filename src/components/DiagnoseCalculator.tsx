@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Bot, Clock, Zap, MessageSquare, ChevronDown, Check, FileText, Search, Sparkles, Layers } from 'lucide-react';
+import { SectionHeading } from './ui/SectionHeading';
 import { DeviceCategoryKey, FaultItem, CategoryType } from '../types';
 import { CATEGORY_LABELS, REPAIR_DATA } from '../data/repairData';
 
@@ -102,17 +103,12 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
     <section id="diagnose" className="py-16 md:py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Heading */}
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-2">
-            // INTERAKTIVES 4-EBENEN-SYSTEM
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
-            Genaue Diagnose &amp; Preisschätzung
-          </h2>
-          <p className="text-[#839897] text-sm sm:text-base leading-relaxed">
-            Wähle dein Gerät und filtere gezielt nach Schadensebene (Display, Modultausch, Platinen-Mikrolöten oder Software). Du siehst sofort Festpreisrahmen, Ersatzteilkosten und deine Ersparnis gegenüber dem Neukauf.
-          </p>
-        </div>
+        <SectionHeading
+          index="01"
+          eyebrow="Preise & Diagnose"
+          title="Was kostet meine Reparatur?"
+          intro="Gerät wählen, Schaden eingrenzen – du siehst sofort den Festpreisrahmen und was du gegenüber einem Neukauf sparst."
+        />
 
         {/* Diagnosis HUD Container */}
         <div className="max-w-5xl mx-auto bg-[#0A1214]/95 border border-[#C9743F]/30 rounded-3xl p-5 sm:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-xl">

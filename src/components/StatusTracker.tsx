@@ -16,6 +16,7 @@ import {
   Sparkles,
   ExternalLink,
 } from 'lucide-react';
+import { SectionHeading } from './ui/SectionHeading';
 import { QrScannerModal } from './QrScannerModal';
 import { Order } from '../manager/types';
 import { UNIFIED_STEPS, getStepNumber, getStepLabel, UnifiedStep } from '../utils/orderStatus';
@@ -284,19 +285,14 @@ export const StatusTracker: React.FC = () => {
   return (
     <section id="status" className="py-16 md:py-24 relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="bg-[#0A1214]/95 border border-[#00F5D4]/30 rounded-3xl p-6 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.75)] backdrop-blur-xl">
+        <div className="bg-[#0A1214]/95 border border-[#00F5D4]/25 rounded-3xl px-4 py-7 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.6)]">
           {/* Header */}
-          <div className="text-center max-w-xl mx-auto mb-8">
-            <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-1">
-              // ECHTZEIT AUFTRAGS-TRACKER • 5-SCHRITTE SYSTEM
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
-              Reparaturstatus abfragen
-            </h2>
-            <p className="text-[#839897] text-xs sm:text-sm leading-relaxed">
-              Verfolge jeden Bearbeitungsschritt deines Geräts transparent mit. Gib deine Auftragsnummer (oder scanne den QR-Code auf deinem Abholschein) und die letzten 4 Ziffern deiner Telefonnummer ein.
-            </p>
-          </div>
+          <SectionHeading
+            index="02"
+            eyebrow="Auftragsstatus"
+            title="Wo ist mein Gerät gerade?"
+            intro="Auftragsnummer (oder QR-Code vom Abholschein) und die letzten 4 Ziffern deiner Telefonnummer eingeben – fertig."
+          />
 
           {/* Search Form with QR Code Scanner */}
           <div className="max-w-xl mx-auto mb-8 space-y-3">
@@ -306,7 +302,7 @@ export const StatusTracker: React.FC = () => {
                   type="text"
                   value={ticketInput}
                   onChange={(e) => setTicketInput(e.target.value)}
-                  placeholder="Auftrags-Nr. (z. B. CODE-9231)"
+                  placeholder="Auftrags-Nr."
                   aria-label="Auftragsnummer"
                   className="w-full bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono uppercase"
                 />
@@ -320,10 +316,10 @@ export const StatusTracker: React.FC = () => {
                 maxLength={4}
                 value={phone4Input}
                 onChange={(e) => setPhone4Input(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                placeholder="Tel. letzte 4"
+                placeholder="Tel. (4 Ziff.)"
                 aria-label="Letzte 4 Ziffern deiner Telefonnummer"
                 title="Die letzten 4 Ziffern der Telefonnummer, die du bei der Abgabe angegeben hast"
-                className="sm:w-32 bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono tracking-widest"
+                className="sm:w-36 bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono tracking-widest"
               />
 
               <div className="flex items-center gap-2">
@@ -398,7 +394,7 @@ export const StatusTracker: React.FC = () => {
 
           {/* Ticket Live Data View */}
           {ticketData && (
-            <div className="bg-[#050A0B] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 animate-fade-in">
+            <div className="bg-[#050A0B] border border-white/10 rounded-2xl p-4 sm:p-8 space-y-5 sm:space-y-6 animate-fade-in">
               {/* Ticket Top Row */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
@@ -441,16 +437,14 @@ export const StatusTracker: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 relative">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-1.5 sm:gap-2 relative">
                   {UNIFIED_STEPS.map((st) => {
                     const isPassed = st.step <= ticketData.currentStep;
                     const isCurrent = st.step === ticketData.currentStep;
                     return (
                       <div
                         key={st.step}
-                        className={`p-3.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-2 ${
-                          st.step === 5 ? 'col-span-2 sm:col-span-1' : ''
-                        } ${
+                        className={`px-3 py-2 sm:p-3.5 rounded-xl border text-left sm:text-center transition-all flex flex-row sm:flex-col items-center sm:justify-center gap-3 sm:gap-2 ${
                           isCurrent
                             ? 'bg-[#00F5D4]/15 border-[#00F5D4] shadow-[0_0_20px_rgba(0,245,212,0.35)] scale-[1.02]'
                             : isPassed
@@ -459,7 +453,7 @@ export const StatusTracker: React.FC = () => {
                         }`}
                       >
                         <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                          className={`w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl flex items-center justify-center transition-all ${
                             isCurrent
                               ? 'bg-[#00F5D4] text-[#060B0C] shadow-[0_0_12px_rgba(0,245,212,0.5)] font-bold'
                               : isPassed
@@ -498,7 +492,7 @@ export const StatusTracker: React.FC = () => {
               </div>
 
               {/* DYNAMISCHES STATUS-TERMINAL */}
-              <div className="bg-[#0C1719] border border-[#00F5D4]/30 rounded-2xl p-5 space-y-3">
+              <div className="bg-[#0C1719] border border-[#00F5D4]/30 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
                   <div className="flex items-center gap-2 text-xs font-mono text-[#00F5D4] font-bold uppercase">
                     <span className="w-2 h-2 rounded-full bg-[#00F5D4] animate-ping" />
@@ -538,7 +532,7 @@ export const StatusTracker: React.FC = () => {
 
               {/* GROSSER HINWEIS FALLS STATUS = 5 (ABHOLBEREIT) */}
               {ticketData.currentStep === 5 && (
-                <div className="bg-gradient-to-r from-[#00E676]/25 via-[#00F5D4]/15 to-[#00E676]/15 border-2 border-[#00E676] rounded-2xl p-6 sm:p-7 shadow-[0_0_35px_rgba(0,230,118,0.25)] flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in">
+                <div className="bg-gradient-to-r from-[#00E676]/25 via-[#00F5D4]/15 to-[#00E676]/15 border-2 border-[#00E676] rounded-2xl p-5 sm:p-7 shadow-[0_0_35px_rgba(0,230,118,0.25)] flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-[#00E676] text-[#060B0C] flex items-center justify-center shrink-0 shadow-lg shadow-[#00E676]/30">
                       <PackageCheck className="w-8 h-8 stroke-[2.5]" />
@@ -570,7 +564,7 @@ export const StatusTracker: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1.5 text-zinc-300 pt-1">
                       <Clock className="w-3.5 h-3.5 text-[#FF8D4D] shrink-0" />
-                      <span>Mo–Fr 09:00–18:00 Uhr | Sa n. V.</span>
+                      <span>Mo–Fr 10:00–18:00 Uhr | Sa 10:00–14:00 Uhr</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-zinc-300">
                       <Phone className="w-3.5 h-3.5 text-[#00F5D4] shrink-0" />

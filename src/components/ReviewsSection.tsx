@@ -3,38 +3,29 @@ import { Star, ExternalLink } from 'lucide-react';
 
 export const ReviewsSection: React.FC = () => {
   return (
-    <section id="bewertungen" className="py-16 md:py-20 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-2">
-            // Vertrauen
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
-            Ihre Meinung zählt
-          </h2>
-          <p className="text-[#839897] text-sm">
-            Echte Erfahrungsberichte schaffen mehr Vertrauen als jedes Werbeversprechen.
-          </p>
-        </div>
-
-        <div className="max-w-xl mx-auto bg-[#0D1618]/80 border-2 border-dashed border-[#C9743F]/35 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center gap-4 shadow-xl">
-          <div className="w-14 h-14 rounded-full bg-[#00F5D4]/15 text-[#00F5D4] flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(0,245,212,0.2)]">
-            <Star className="w-7 h-7 fill-[#00F5D4] stroke-none" />
+    <section id="bewertungen" className="py-12 md:py-16 relative">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="reveal relative overflow-hidden rounded-3xl border border-[#FF8D4D]/25 bg-gradient-to-br from-[#1A120D]/80 via-[#0B1315]/90 to-[#0B1315]/90 p-7 sm:p-10 flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+          <div className="flex gap-1 text-[#FFB547] shrink-0" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Star key={i} className="w-6 h-6 sm:w-7 sm:h-7 fill-current" strokeWidth={0} />
+            ))}
           </div>
-          <h3 className="text-lg sm:text-xl font-bold text-white">
-            Waren Sie schon bei CODE in Neumarkt?
-          </h3>
-          <p className="text-xs sm:text-sm text-[#839897] leading-relaxed max-w-md">
-            Eine kurze Google-Bewertung dauert eine Minute und hilft der nächsten Person mit kaputtem Gerät bei der Entscheidung.
-          </p>
+          <div className="flex-1">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#FF8D4D] mb-2">05 — Bewertungen</div>
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-1.5">Warst du schon bei CODE in Neumarkt?</h2>
+            <p className="text-sm text-[#94A9AA] leading-relaxed">
+              Eine kurze Google-Bewertung dauert eine Minute und hilft der nächsten Person mit kaputtem Gerät bei der Entscheidung.
+            </p>
+          </div>
           <a
             href="https://www.google.com/maps/search/?api=1&query=CODE+Neumarkt"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-[#00F5D4]/15 border border-[#00F5D4] text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] transition-all shadow-[0_0_15px_rgba(0,245,212,0.2)] mt-2"
+            className="shrink-0 inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl text-[15px] font-semibold bg-white text-[#0A1112] hover:bg-[#FFE7D2] transition-colors"
           >
-            <span>Jetzt bei Google bewerten</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <span>Bei Google bewerten</span>
+            <ExternalLink className="w-4 h-4" />
           </a>
         </div>
       </div>

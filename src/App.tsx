@@ -21,6 +21,7 @@ import { MobileBottomBar } from './components/MobileBottomBar';
 import { SecretTerminalModal } from './components/SecretTerminalModal';
 import { WerkstattManagerApp } from './manager/WerkstattManagerApp';
 import { getAdminKey, ADMIN_UNAUTHORIZED_EVENT } from './services/cloudflareSync';
+import { useReveal } from './components/ui/useReveal';
 
 export default function App() {
   const managerRequested = (() => {
@@ -33,6 +34,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'website' | 'manager'>(() =>
     managerRequested && getAdminKey() ? 'manager' : 'website'
   );
+  useReveal();
   const [currentCategory, setCurrentCategory] = useState<DeviceCategoryKey>('laptop_pc');
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [aiInitialQuery, setAiInitialQuery] = useState<string | undefined>(undefined);
@@ -104,7 +106,7 @@ export default function App() {
 
   // Public customer website view
   return (
-    <div className="relative min-h-screen bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4] pb-28 md:pb-0 overflow-x-hidden w-full max-w-full">
+    <div className="relative min-h-screen bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4] pb-28 md:pb-0 overflow-x-clip w-full max-w-full">
       {/* Background Circuit Particle Grid */}
       <CircuitCanvas />
 
