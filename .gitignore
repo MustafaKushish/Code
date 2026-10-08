@@ -9,4 +9,5 @@ coverage/
 .env*
 !.env.example
 bun.lock*
-netlify*
+netlify-*
+.netlify/
