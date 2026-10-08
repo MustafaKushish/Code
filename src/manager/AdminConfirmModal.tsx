@@ -25,7 +25,7 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({ request, u
 
     if (request.requiredRole === 'admin') {
       const isAdmin = users.find(
-        (u) => (u.active !== false && u.role === 'admin' && u.pin === cleanPin) || cleanPin === '2026'
+        (u) => u.active !== false && u.role === 'admin' && u.pin === cleanPin
       );
       if (isAdmin) {
         setErrorMsg(null);
@@ -38,10 +38,9 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({ request, u
     } else if (request.requiredRole === 'buchhaltung_or_admin') {
       const isAuth = users.find(
         (u) =>
-          (u.active !== false &&
-            (u.role === 'admin' || u.role === 'buchhaltung' || u.canSettleInvoices === true) &&
-            u.pin === cleanPin) ||
-          cleanPin === '2026'
+          u.active !== false &&
+          (u.role === 'admin' || u.role === 'buchhaltung' || u.canSettleInvoices === true) &&
+          u.pin === cleanPin
       );
       if (isAuth) {
         setErrorMsg(null);

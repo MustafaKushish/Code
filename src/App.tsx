@@ -20,25 +20,35 @@ import { LegalModals } from './components/LegalModals';
 import { MobileBottomBar } from './components/MobileBottomBar';
 import { SecretTerminalModal } from './components/SecretTerminalModal';
 import { WerkstattManagerApp } from './manager/WerkstattManagerApp';
+import { getAdminKey, ADMIN_UNAUTHORIZED_EVENT } from './services/cloudflareSync';
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<'website' | 'manager'>(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname.toLowerCase();
-      const search = window.location.search.toLowerCase();
-      if (path.includes('manager') || search.includes('manager=1') || search.includes('view=manager')) {
-        return 'manager';
-      }
-    }
-    return 'website';
-  });
+  const managerRequested = (() => {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname.toLowerCase();
+    const search = window.location.search.toLowerCase();
+    return path.includes('manager') || search.includes('manager=1') || search.includes('view=manager');
+  })();
+  // Der Manager öffnet sich nur mit einem vom Worker bestätigten Werkstatt-Schlüssel
+  const [viewMode, setViewMode] = useState<'website' | 'manager'>(() =>
+    managerRequested && getAdminKey() ? 'manager' : 'website'
+  );
   const [currentCategory, setCurrentCategory] = useState<DeviceCategoryKey>('laptop_pc');
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [aiInitialQuery, setAiInitialQuery] = useState<string | undefined>(undefined);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [checkInPreset, setCheckInPreset] = useState<{ device?: string; fault?: string } | undefined>(undefined);
   const [legalModalType, setLegalModalType] = useState<'impressum' | 'datenschutz' | null>(null);
-  const [isSecretTerminalOpen, setIsSecretTerminalOpen] = useState(false);
+  const [isSecretTerminalOpen, setIsSecretTerminalOpen] = useState(() => managerRequested && !getAdminKey());
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setViewMode('website');
+      setIsSecretTerminalOpen(true);
+    };
+    window.addEventListener(ADMIN_UNAUTHORIZED_EVENT, handleUnauthorized);
+    return () => window.removeEventListener(ADMIN_UNAUTHORIZED_EVENT, handleUnauthorized);
+  }, []);
 
   // Keyboard shortcut for secret workshop manager access: Ctrl + Shift + L or Alt + W
   useEffect(() => {
@@ -174,7 +184,7 @@ export default function App() {
         presetData={checkInPreset}
       />
 
-      {/* Secret Terminal PIN Modal (Access code 2026) */}
+      {/* Werkstatt-Zugang: Schlüssel wird vom Worker geprüft */}
       <SecretTerminalModal
         isOpen={isSecretTerminalOpen}
         onClose={() => setIsSecretTerminalOpen(false)}

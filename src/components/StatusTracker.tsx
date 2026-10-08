@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   AlertCircle,
@@ -19,6 +19,7 @@ import {
 import { QrScannerModal } from './QrScannerModal';
 import { Order } from '../manager/types';
 import { UNIFIED_STEPS, getStepNumber, getStepLabel, UnifiedStep } from '../utils/orderStatus';
+import { fetchPublicOrderStatus } from '../services/cloudflareSync';
 
 interface DisplayTicket {
   ticketId: string;
@@ -55,6 +56,8 @@ export const StatusTracker: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [phone4Input, setPhone4Input] = useState('');
+  const phone4Ref = useRef<HTMLInputElement>(null);
 
   // Auto-detect ?order=CODE-XXXX from URL parameters on page load
   useEffect(() => {
@@ -63,8 +66,10 @@ export const StatusTracker: React.FC = () => {
       const orderParam = params.get('order') || params.get('ticket');
       if (orderParam) {
         const clean = orderParam.trim().toUpperCase();
+        const phoneParam = (params.get('k') || '').replace(/\D/g, '').slice(-4);
         setTicketInput(clean);
-        lookupOrder(clean);
+        setPhone4Input(phoneParam);
+        lookupOrder(clean, phoneParam);
         // Scroll to tracker view smoothly
         setTimeout(() => {
           const el = document.getElementById('status');
@@ -74,7 +79,7 @@ export const StatusTracker: React.FC = () => {
     }
   }, []);
 
-  const lookupOrder = async (queryText: string) => {
+  const lookupOrder = async (queryText: string, phoneText: string = phone4Input) => {
     const cleanQuery = queryText.trim().toUpperCase();
     if (!cleanQuery) return;
 
@@ -89,9 +94,7 @@ export const StatusTracker: React.FC = () => {
         const matched = storedOrders.find(
           (o) =>
             o.id.toUpperCase() === cleanQuery ||
-            o.id.toUpperCase().replace(/^KVA-/, 'RE-') === cleanQuery.replace(/^KVA-/, 'RE-') ||
-            (o.phone && o.phone.replace(/\s+/g, '').includes(cleanQuery.replace(/\s+/g, ''))) ||
-            (o.serial && o.serial.toUpperCase() === cleanQuery)
+            o.id.toUpperCase().replace(/^KVA-/, 'RE-') === cleanQuery.replace(/^KVA-/, 'RE-')
         );
 
         if (matched) {
@@ -133,49 +136,7 @@ export const StatusTracker: React.FC = () => {
       console.warn('LocalStorage order lookup error:', e);
     }
 
-    // 2. Query Cloudflare Worker API
-    try {
-      const cfRes = await fetch('https://code-techniker.mustafa-alzurgany.workers.dev/api/orders');
-      if (cfRes.ok) {
-        const remoteOrders = await cfRes.json();
-        if (Array.isArray(remoteOrders)) {
-          const matched = remoteOrders.find(
-            (o: any) =>
-              (o.id && o.id.toUpperCase() === cleanQuery) ||
-              (o.id && o.id.toUpperCase().replace(/^KVA-/, 'RE-') === cleanQuery.replace(/^KVA-/, 'RE-')) ||
-              (o.phone && o.phone.replace(/\s+/g, '').includes(cleanQuery.replace(/\s+/g, ''))) ||
-              (o.serial && o.serial.toUpperCase() === cleanQuery)
-          );
-          if (matched) {
-            const step = getStepNumber(matched.status);
-            const custName = matched.cust || matched.customer || 'Kunde';
-            const customerMasked = custName.length > 3 ? custName.slice(0, 3) + '***' : custName;
-            const defaultDesc = UNIFIED_STEPS.find((s) => s.step === step)?.defaultStatusText || '';
-
-            setTicketData({
-              ticketId: matched.id,
-              customerName: customerMasked,
-              phone: matched.phone ? matched.phone.slice(0, 4) + ' ****' : '–',
-              device: matched.device || 'Werkstatt-Gerät',
-              fault: matched.faultDescription || matched.fault || 'Diagnose & Reparatur',
-              preDamages: matched.accessories ? `Zubehör: ${matched.accessories}` : '–',
-              status: matched.status || getStepLabel(step),
-              currentStep: step,
-              statusDetails: step === 5 ? 'Reparatur erfolgreich abgeschlossen & versiegelt. Gerät liegt zur Abholung bereit!' : defaultDesc,
-              createdAt: matched.date || matched.createdAt || 'Aktueller Auftrag',
-              estimatedCompletion: step === 5 ? 'Jetzt abholbereit' : '1–2 Werktage',
-              testedPassed: step >= 4,
-            });
-            setIsLoading(false);
-            return;
-          }
-        }
-      }
-    } catch {
-      // ignore
-    }
-
-    // 3. Fallback demo orders for instant testing
+    // 2. Demo-Aufträge zum Ausprobieren
     if (cleanQuery === 'CODE-9231') {
       setTicketData({
         ticketId: 'CODE-9231',
@@ -247,10 +208,42 @@ export const StatusTracker: React.FC = () => {
         testedPassed: false,
       });
     } else {
-      setSearchError(
-        `Auftrag "${queryText}" konnte im System nicht gefunden werden. Bitte prüfe deine Auftragsnummer oder scanne den QR-Code auf deinem Beleg.`
-      );
-      setTicketData(null);
+      // 3. Echte Aufträge: nur mit Auftragsnummer + letzten 4 Ziffern der Telefonnummer
+      const phone4 = phoneText.replace(/\D/g, '');
+      if (phone4.length !== 4) {
+        setSearchError('Bitte zusätzlich die letzten 4 Ziffern deiner Telefonnummer eingeben (Schutz deiner Daten).');
+        setTicketData(null);
+        setIsLoading(false);
+        return;
+      }
+
+      const { order, error } = await fetchPublicOrderStatus(cleanQuery, phone4);
+      if (order) {
+        const step = getStepNumber(order.status);
+        const defaultDesc = UNIFIED_STEPS.find((s) => s.step === step)?.defaultStatusText || '';
+        setTicketData({
+          ticketId: order.id,
+          customerName: order.customer || 'Kunde',
+          phone: `**** ${phone4}`,
+          device: order.device || 'Werkstatt-Gerät',
+          fault: 'Diagnose & Reparatur',
+          status: order.status || getStepLabel(step),
+          currentStep: step,
+          statusDetails:
+            step === 5
+              ? `Reparatur erfolgreich abgeschlossen (${order.paid === 'Bezahlt' ? 'bereits bezahlt' : 'Zahlung bei Abholung'}). Gerät liegt zur Abholung bereit!`
+              : defaultDesc,
+          createdAt: order.date || 'Aktueller Auftrag',
+          estimatedCompletion: step === 5 ? 'Jetzt abholbereit' : step === 4 ? 'Heute noch' : '1–2 Werktage',
+          testedPassed: step >= 4,
+        });
+      } else {
+        setSearchError(
+          error ||
+            `Auftrag "${queryText}" konnte nicht gefunden werden. Bitte prüfe Auftragsnummer und Telefonziffern oder scanne den QR-Code auf deinem Beleg.`
+        );
+        setTicketData(null);
+      }
     }
 
     setIsLoading(false);
@@ -263,7 +256,12 @@ export const StatusTracker: React.FC = () => {
 
   const handleQrScanSuccess = (scannedId: string) => {
     setTicketInput(scannedId);
-    lookupOrder(scannedId);
+    if (phone4Input.replace(/\D/g, '').length === 4 || /^CODE-\d{4}$/.test(scannedId)) {
+      lookupOrder(scannedId);
+    } else {
+      setSearchError(null);
+      phone4Ref.current?.focus();
+    }
   };
 
   const getStepIcon = (step: number, isActive: boolean) => {
@@ -296,7 +294,7 @@ export const StatusTracker: React.FC = () => {
               Reparaturstatus abfragen
             </h2>
             <p className="text-[#839897] text-xs sm:text-sm leading-relaxed">
-              Verfolge jeden Bearbeitungsschritt deines Geräts transparent mit. Gib einfach deine Auftragsnummer ein oder scanne den QR-Code auf deinem Abholschein.
+              Verfolge jeden Bearbeitungsschritt deines Geräts transparent mit. Gib deine Auftragsnummer (oder scanne den QR-Code auf deinem Abholschein) und die letzten 4 Ziffern deiner Telefonnummer ein.
             </p>
           </div>
 
@@ -309,9 +307,24 @@ export const StatusTracker: React.FC = () => {
                   value={ticketInput}
                   onChange={(e) => setTicketInput(e.target.value)}
                   placeholder="Auftrags-Nr. (z. B. CODE-9231)"
+                  aria-label="Auftragsnummer"
                   className="w-full bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono uppercase"
                 />
               </div>
+
+              <input
+                ref={phone4Ref}
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={4}
+                value={phone4Input}
+                onChange={(e) => setPhone4Input(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="Tel. letzte 4"
+                aria-label="Letzte 4 Ziffern deiner Telefonnummer"
+                title="Die letzten 4 Ziffern der Telefonnummer, die du bei der Abgabe angegeben hast"
+                className="sm:w-32 bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono tracking-widest"
+              />
 
               <div className="flex items-center gap-2">
                 <button

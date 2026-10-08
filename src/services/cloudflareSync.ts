@@ -1,6 +1,91 @@
 import { Order, InventoryItem, Appointment } from '../manager/types';
 
-export const CLOUDFLARE_WORKER_URL = 'https://code-techniker.mustafa-alzurgany.workers.dev/api/orders';
+export const CLOUDFLARE_WORKER_BASE = 'https://code-techniker.mustafa-alzurgany.workers.dev';
+export const CLOUDFLARE_WORKER_URL = `${CLOUDFLARE_WORKER_BASE}/api/orders`;
+
+// Der Werkstatt-Schlüssel steht NICHT im Code: er wird einmal pro Gerät eingegeben,
+// vom Worker geprüft und nur lokal im Browser der Werkstatt gespeichert.
+const ADMIN_KEY_STORAGE = 'code_admin_key';
+export const ADMIN_UNAUTHORIZED_EVENT = 'code-admin-unauthorized';
+
+export function getAdminKey(): string {
+  try {
+    return localStorage.getItem(ADMIN_KEY_STORAGE) || '';
+  } catch {
+    return '';
+  }
+}
+
+export function setAdminKey(key: string) {
+  try {
+    localStorage.setItem(ADMIN_KEY_STORAGE, key);
+  } catch {
+    // ignore
+  }
+}
+
+export function clearAdminKey() {
+  try {
+    localStorage.removeItem(ADMIN_KEY_STORAGE);
+  } catch {
+    // ignore
+  }
+}
+
+function adminHeaders(extra: Record<string, string> = {}): Record<string, string> {
+  return { ...extra, Authorization: `Bearer ${getAdminKey()}` };
+}
+
+export type AdminKeyCheck = 'ok' | 'invalid' | 'locked' | 'offline';
+
+/**
+ * Prüft einen Werkstatt-Schlüssel beim Worker
+ */
+export async function verifyAdminKey(key: string): Promise<AdminKeyCheck> {
+  try {
+    const res = await fetch(`${CLOUDFLARE_WORKER_BASE}/api/auth`, {
+      headers: { Authorization: `Bearer ${key}` },
+    });
+    if (res.ok) return 'ok';
+    if (res.status === 429) return 'locked';
+    if (res.status === 401) return 'invalid';
+    return 'offline';
+  } catch {
+    return 'offline';
+  }
+}
+
+export interface PublicOrderStatus {
+  id: string;
+  device: string;
+  status: string;
+  paid: 'Bezahlt' | 'Offen';
+  date: string;
+  serviceDate: string;
+  customer: string;
+}
+
+/**
+ * Öffentliche Status-Abfrage: Auftragsnummer + letzte 4 Ziffern der Telefonnummer.
+ * Der Worker liefert nur diesen einen Auftrag ohne persönliche Daten zurück.
+ */
+export async function fetchPublicOrderStatus(
+  id: string,
+  phone4: string
+): Promise<{ order: PublicOrderStatus | null; error?: string }> {
+  try {
+    const res = await fetch(`${CLOUDFLARE_WORKER_BASE}/api/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, phone4 }),
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.success && data.order) return { order: data.order };
+    return { order: null, error: data?.error };
+  } catch {
+    return { order: null, error: 'Status-Server nicht erreichbar. Bitte später erneut versuchen.' };
+  }
+}
 
 export const INVENTORY_SYNC_ID = 'SYNC_INVENTORY_GLOBAL';
 export const APPOINTMENTS_SYNC_ID = 'SYNC_APPOINTMENTS_GLOBAL';
@@ -45,7 +130,7 @@ export async function saveOrderToCloudflare(order: Partial<Order>): Promise<bool
     }
     const res = await fetch(CLOUDFLARE_WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ action: 'SAVE_ORDER', order: sanitized }),
     });
     if (!res.ok) return false;
@@ -64,7 +149,7 @@ export async function updateOrderStatusInCloudflare(id: string, status: string):
   try {
     const res = await fetch(CLOUDFLARE_WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ action: 'UPDATE_STATUS', id, status }),
     });
     if (!res.ok) return false;
@@ -83,7 +168,7 @@ export async function deleteOrderFromCloudflare(id: string): Promise<boolean> {
   try {
     const res = await fetch(CLOUDFLARE_WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ action: 'DELETE_ORDER', id }),
     });
     if (!res.ok) return false;
@@ -105,8 +190,12 @@ export async function fetchFromCloudflare(): Promise<{
   success: boolean;
 }> {
   try {
-    // Avoid custom headers like Cache-Control because worker only allows Content-Type in CORS preflight
-    const res = await fetch(`${CLOUDFLARE_WORKER_URL}?_t=${Date.now()}`);
+    const res = await fetch(`${CLOUDFLARE_WORKER_URL}?_t=${Date.now()}`, { headers: adminHeaders() });
+    if (res.status === 401) {
+      // Schlüssel wurde im Worker geändert oder ist ungültig → Manager neu entsperren lassen
+      clearAdminKey();
+      window.dispatchEvent(new Event(ADMIN_UNAUTHORIZED_EVENT));
+    }
     if (!res.ok) {
       return { orders: [], inventory: null, appointments: null, success: false };
     }
@@ -202,7 +291,7 @@ export async function saveInventoryToCloudflare(items: InventoryItem[]): Promise
 
     const res = await fetch(CLOUDFLARE_WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ action: 'SAVE_ORDER', order: payload }),
     });
 
@@ -234,7 +323,7 @@ export async function saveAppointmentsToCloudflare(items: Appointment[]): Promis
 
     const res = await fetch(CLOUDFLARE_WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ action: 'SAVE_ORDER', order: payload }),
     });
 

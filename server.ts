@@ -380,59 +380,6 @@ app.get('/code-werkstatt-standalone.html', (_req, res) => {
   res.sendFile(filePath);
 });
 
-// Rate limiter store for high-security manager login (Anti-Brute-Force & Bot Protection)
-const loginAttempts: Record<string, { count: number; lockedUntil: number }> = {};
-const WORKSHOP_PIN = process.env.WORKSHOP_MANAGER_PIN || '2026';
-
-app.post('/api/manager/login', (req, res) => {
-  const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
-  const now = Date.now();
-  const attemptInfo = loginAttempts[clientIp] || { count: 0, lockedUntil: 0 };
-
-  if (attemptInfo.lockedUntil > now) {
-    const remainingMinutes = Math.ceil((attemptInfo.lockedUntil - now) / 60000);
-    return res.status(429).json({
-      success: false,
-      error: `Sicherheits-Sperre aktiv! Zu viele Fehlversuche. Bitte in ${remainingMinutes} Minute(n) erneut versuchen.`,
-      locked: true,
-    });
-  }
-
-  const { pin } = req.body;
-  if (!pin || typeof pin !== 'string') {
-    return res.status(400).json({ success: false, error: 'PIN erforderlich.' });
-  }
-
-  if (pin.trim() === WORKSHOP_PIN) {
-    // Reset on success
-    delete loginAttempts[clientIp];
-    return res.json({
-      success: true,
-      message: 'Authentifizierung erfolgreich. Werkstatt-Manager freigegeben.',
-      token: `code-session-${Date.now()}`,
-      wwsUrl: 'https://code-ger.com/manager.html',
-    });
-  } else {
-    attemptInfo.count += 1;
-    if (attemptInfo.count >= 4) {
-      attemptInfo.lockedUntil = now + 15 * 60 * 1000; // 15 minutes lockout
-      loginAttempts[clientIp] = attemptInfo;
-      return res.status(429).json({
-        success: false,
-        error: 'Sicherheits-Alarm: 4 Fehlversuche erreicht! IP-Adresse für 15 Minuten gesperrt.',
-        locked: true,
-      });
-    } else {
-      loginAttempts[clientIp] = attemptInfo;
-      const remainingTries = 4 - attemptInfo.count;
-      return res.status(401).json({
-        success: false,
-        error: `PIN ungültig! Zugriff verweigert. (Noch ${remainingTries} Versuch${remainingTries > 1 ? 'e' : ''})`,
-      });
-    }
-  }
-});
-
 // Setup Vite middlewares in development or static serve in production
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

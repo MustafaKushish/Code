@@ -1,0 +1,16 @@
+# Cloudflare Worker für die Auftrags-API (code-techniker.mustafa-alzurgany.workers.dev)
+# Anleitung: worker/README.md
+name = "code-techniker"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Erlaubte Website-Adressen (kommagetrennt). localhost ist für Tests immer erlaubt.
+ALLOWED_ORIGINS = "https://code-ger.com,https://www.code-ger.com"
+
+[[d1_databases]]
+binding = "DB"
+# Name und ID der bestehenden D1-Datenbank aus dem Cloudflare-Dashboard eintragen
+# (Workers & Pages → D1 → Datenbank auswählen):
+database_name = "HIER_DATENBANK_NAME"
+database_id = "HIER_DATENBANK_ID"

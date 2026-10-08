@@ -44,17 +44,6 @@ export const LockScreen: React.FC<LockScreenProps> = ({ isLocked, users, onUnloc
       return;
     }
 
-    // Direct PIN unlock for admin if username left blank or entered as admin
-    if (cleanPin === '2026' || cleanPin === 'admin2026') {
-      const adminUser = users.find((u) => u.role === 'admin') || users[0];
-      setFailCount(0);
-      setErrorMsg(null);
-      setPin('');
-      setUsername('');
-      onUnlock(adminUser);
-      return;
-    }
-
     // Match by username/name and PIN
     const matched = users
       .filter((u) => u.active !== false)
