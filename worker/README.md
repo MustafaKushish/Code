@@ -67,7 +67,7 @@ curl -H "Authorization: Bearer DEIN-SCHLÜSSEL" https://code-techniker.mustafa-a
 
 ### 6. Website umstellen
 
-Branch `security/worker-auth` nach `main` mergen. GitHub Pages baut die Seite automatisch neu.
+Branch `security/worker-auth` nach `main` mergen. Cloudflare Pages baut die Seite automatisch neu.
 
 ### 7. Manager entsperren
 
@@ -80,9 +80,9 @@ Diese PIN regelt nur, welcher Mitarbeiter am Gerät angemeldet ist. Den eigentli
 
 ## Für Kunden
 
-Auf dem Abholschein bzw. per WhatsApp: *„Status online abfragen: code-ger.com → Reparaturstatus →
+Auf dem Abholschein bzw. per WhatsApp: *„Status online abfragen: www.code-ger.de → Reparaturstatus →
 Auftragsnummer + die letzten 4 Ziffern Ihrer Telefonnummer.“*
-Direkt-Link möglich: `https://code-ger.com/?order=RE-2026-12345&k=4443`
+Direkt-Link möglich: `https://www.code-ger.de/?order=RE-2026-12345&k=4443`
 
 ## Rückweg im Notfall
 

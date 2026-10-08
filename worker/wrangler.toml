@@ -6,7 +6,7 @@ compatibility_date = "2026-10-01"
 
 [vars]
 # Erlaubte Website-Adressen (kommagetrennt). localhost ist für Tests immer erlaubt.
-ALLOWED_ORIGINS = "https://code-ger.com,https://www.code-ger.com"
+ALLOWED_ORIGINS = "https://www.code-ger.de,https://code-ger.de"
 
 [[d1_databases]]
 binding = "DB"

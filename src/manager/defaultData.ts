@@ -20,7 +20,7 @@ export const DEFAULT_WORKSHOP_SETTINGS: WorkshopSettings = {
   address: '92318 Neumarkt in der Oberpfalz',
   phone: '0176 4174 4443',
   email: 'info@code-ger.com',
-  website: 'code-ger.com',
+  website: 'www.code-ger.de',
   defaultHourlyRate: 85,
 };
 
