@@ -299,7 +299,7 @@ export const PrintTemplates: React.FC<PrintTemplatesProps> = ({
                 <strong style={{ color: '#0f172a' }}>KONTAKT &amp; SERVICE</strong><br />
                 Telefon / WA: 0176 4174 4443<br />
                 E-Mail: info@code-ger.com<br />
-                Internet: code-ger.com
+                Internet: www.code-ger.de
               </div>
               <div>
                 <strong style={{ color: '#0f172a' }}>BANK &amp; STEUERDATEN</strong><br />

@@ -87,7 +87,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
   };
 
   const generateWhatsAppMessage = () => {
-    const text = `Hallo Mustafa, ich habe auf code-ger.com die 4-Ebenen-Diagnose genutzt:
+    const text = `Hallo Mustafa, ich habe auf code-ger.de die 4-Ebenen-Diagnose genutzt:
 Gerät: ${CATEGORY_LABELS[currentCategory].label}
 Schadensebene: ${LAYER_BADGES[currentFault.categoryType]?.label || 'Standard'}
 Defekt: ${currentFault.title}${expressActive ? ' (+ Express-Service)' : ''}

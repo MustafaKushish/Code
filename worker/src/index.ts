@@ -49,7 +49,7 @@ const RATE_WINDOW_MS = 15 * 60 * 1000;
 const MAX_STATUS_FAILS = 10;
 const MAX_AUTH_FAILS = 5;
 
-const DEFAULT_ORIGINS = ['https://code-ger.com', 'https://www.code-ger.com'];
+const DEFAULT_ORIGINS = ['https://www.code-ger.de', 'https://code-ger.de'];
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

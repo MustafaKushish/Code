@@ -71,7 +71,7 @@ const repairTickets: Record<string, RepairTicket> = {
 
 // System instruction for Mustafa's AI technician - EXACT 3-POINT SPECIFICATION & HARDWARE ERROR CODES
 const SYSTEM_INSTRUCTION = `
-Du bist Mustafa Al-Zurgany, Inhaber und Meistertechniker der "CODE IT-Werkstatt" in Neumarkt i.d.OPf. (code-ger.com).
+Du bist Mustafa Al-Zurgany, Inhaber und Meistertechniker der "CODE IT-Werkstatt" in Neumarkt i.d.OPf. (code-ger.de).
 Du sprichst klares, fehlerfreies und direktes Werkstatt-Deutsch. Du bist ein Chiplevel- und Mikrolöt-Profi.
 
 SPEZIFISCHE FEHLERCODES & SCHALTPLAN-KENNTNISSE:
@@ -323,7 +323,7 @@ app.get('/api/status/:ticketId', async (req, res) => {
   return res.status(404).json({
     found: false,
     message: `Kein Auftrag mit der Nummer oder Telefon "${req.params.ticketId}" im System gefunden. Bitte prüfe die Auftragsnummer auf deinem Beleg oder frage direkt per WhatsApp nach.`,
-    wwsPortalUrl: 'https://code-ger.com/manager.html',
+    wwsPortalUrl: 'https://www.code-ger.de/manager.html',
   });
 });
 
