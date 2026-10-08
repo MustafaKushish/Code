@@ -41,7 +41,7 @@ export const LegalModals: React.FC<LegalModalsProps> = ({ modalType, onClose }) 
               <p>
                 Telefon: +49 (0) 176 4174 4443<br />
                 E-Mail: mustafa.alzurgany@gmail.com<br />
-                Web: code-ger.com
+                Web: www.code-ger.de
               </p>
             </div>
 

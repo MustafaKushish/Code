@@ -292,7 +292,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                   <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2 text-xs font-mono">
                     <a
                       href={`https://wa.me/4917641744443?text=${encodeURIComponent(
-                        'Hallo Mustafa, ich habe mit deinem KI-Techniker auf code-ger.com gesprochen:\n\n' +
+                        'Hallo Mustafa, ich habe mit deinem KI-Techniker auf code-ger.de gesprochen:\n\n' +
                           msg.text.substring(0, 180) +
                           '...\n\nWann kann ich mein Gerät zur Reparatur in Neumarkt übergeben?'
                       )}`}

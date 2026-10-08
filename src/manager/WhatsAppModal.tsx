@@ -39,7 +39,7 @@ export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
     maximumFractionDigits: 2,
   });
 
-  const liveTrackerUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://code-ger.com'}/?ticket=${order.id}#tracker`;
+  const liveTrackerUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://www.code-ger.de'}/?ticket=${order.id}#tracker`;
 
   const getMessageText = () => {
     switch (template) {
