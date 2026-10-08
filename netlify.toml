@@ -1,0 +1,8 @@
+# Netlify: code-ger.com wird von hier ausgeliefert.
+# Jeder Push auf "main" baut und veröffentlicht die Seite automatisch.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
