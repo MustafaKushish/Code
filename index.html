@@ -149,9 +149,6 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='500' height='500' rx='100' fill='%2310191A'/%3E%3Crect x='100' y='100' width='300' height='300' rx='40' fill='%23182322' stroke='%23C9743F' stroke-width='16'/%3E%3Cpath d='M 200 60 V 100 M 250 60 V 100 M 300 60 V 100 M 200 400 V 440 M 250 400 V 440 M 300 400 V 440 M 60 200 H 100 M 60 250 H 100 M 60 300 H 100 M 400 200 H 440 M 400 250 H 440 M 400 300 H 440' stroke='%23C9743F' stroke-width='16' stroke-linecap='round'/%3E%3Cpath d='M 190 200 L 140 250 L 190 300 M 310 200 L 360 250 L 310 300' stroke='%234FA39B' stroke-width='24' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cline x1='270' y1='190' x2='230' y2='310' stroke='%23C9743F' stroke-width='24' stroke-linecap='round'/%3E%3C/svg%3E" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   </head>
   <body class="bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4]" style="background-color: #060B0C;">
     <div id="root">
@@ -165,49 +162,6 @@
       </style>
     </div>
     <script type="module" src="/src/main.tsx"></script>
-    <script type="text/javascript">
-      try {
-        (function (C, A, L) {
-          let p = function (a, ar) { a.q.push(ar); };
-          let d = C.document;
-          C.Cal = C.Cal || function () {
-            let cal = C.Cal;
-            let ar = arguments;
-            if (!cal.loaded) {
-              cal.ns = {};
-              cal.q = cal.q || [];
-              d.head.appendChild(d.createElement("script")).src = A;
-              cal.loaded = true;
-            }
-            if (ar[0] === L) {
-              const api = function () { p(api, arguments); };
-              const namespace = ar[1];
-              api.q = api.q || [];
-              if(typeof namespace === "string"){
-                cal.ns[namespace] = cal.ns[namespace] || api;
-                p(cal.ns[namespace], ar);
-                p(cal, ["initNamespace", namespace]);
-              } else p(cal, ar);
-              return;
-            }
-            p(cal, ar);
-          };
-        })(window, "https://app.cal.com/embed/embed.js", "init");
-        if (window.Cal) {
-          Cal("init", { origin: "https://cal.com" });
-          Cal("ui", {
-            "theme": "dark",
-            "styles": {
-              "branding": { "brandColor": "#00F5D4" }
-            },
-            "hideEventTypeDetails": false,
-            "layout": "month_view"
-          });
-        }
-      } catch (e) {
-        console.warn('Cal.com embed skipped:', e);
-      }
-    </script>
     <script>
       try {
         if ('serviceWorker' in navigator && window.location.protocol === 'https:' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('run.app')) {

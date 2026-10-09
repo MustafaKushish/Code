@@ -139,8 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Cal.com Termin – Hauptaktion */}
           <button
             type="button"
-            data-cal-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
-            data-cal-config='{"layout":"month_view","theme":"dark"}'
+            data-booking-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
             className="inline-flex items-center gap-1.5 h-9 px-3 sm:px-4 rounded-xl text-sm font-semibold text-[#160B04] bg-gradient-to-b from-[#FFA060] to-[#D9783E] hover:brightness-110 shadow-[0_6px_20px_rgba(217,120,62,0.35)] transition-all cursor-pointer shrink-0"
           >
             <Calendar className="w-4 h-4" />

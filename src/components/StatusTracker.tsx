@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import {
   Search,
   AlertCircle,
@@ -17,7 +17,9 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { SectionHeading } from './ui/SectionHeading';
-import { QrScannerModal } from './QrScannerModal';
+import { lazyNamed } from './ui/lazy';
+
+const QrScannerModal = lazyNamed(() => import('./QrScannerModal'), 'QrScannerModal');
 import { Order } from '../manager/types';
 import { UNIFIED_STEPS, getStepNumber, getStepLabel, UnifiedStep } from '../utils/orderStatus';
 import { fetchPublicOrderStatus } from '../services/cloudflareSync';
@@ -597,11 +599,11 @@ export const StatusTracker: React.FC = () => {
       </div>
 
       {/* Live QR Camera Scanner Modal */}
-      <QrScannerModal
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onScanSuccess={handleQrScanSuccess}
-      />
+      {isScannerOpen && (
+        <Suspense fallback={null}>
+          <QrScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScanSuccess={handleQrScanSuccess} />
+        </Suspense>
+      )}
     </section>
   );
 };

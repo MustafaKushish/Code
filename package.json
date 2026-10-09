@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && node scripts/bundle-html.js && (python3 scripts/make-cloudflare-zip.py || true) && (rm -f bun.lock bun.lockb || true)",
+    "build": "vite build && STANDALONE=1 vite build --logLevel warn && node scripts/bundle-html.js && (python3 scripts/make-cloudflare-zip.py || true) && (rm -f bun.lock bun.lockb || true)",
     "deploy": "npm run build && npx wrangler deploy",
     "start": "node server.ts",
     "preview": "vite preview",
@@ -13,6 +13,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.1",

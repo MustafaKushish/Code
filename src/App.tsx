@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { DeviceCategoryKey } from './types';
 import { CircuitCanvas } from './components/CircuitCanvas';
 import { Header } from './components/Header';
@@ -14,14 +14,27 @@ import { AppointmentSection } from './components/AppointmentSection';
 import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
-import { AiTechnicianModal } from './components/AiTechnicianModal';
-import { CheckInModal } from './components/CheckInModal';
-import { LegalModals } from './components/LegalModals';
 import { MobileBottomBar } from './components/MobileBottomBar';
-import { SecretTerminalModal } from './components/SecretTerminalModal';
-import { WerkstattManagerApp } from './manager/WerkstattManagerApp';
 import { getAdminKey, ADMIN_UNAUTHORIZED_EVENT } from './services/cloudflareSync';
 import { useReveal } from './components/ui/useReveal';
+import { lazyNamed, useMountedOnce, prefetchWhenIdle } from './components/ui/lazy';
+import { installBookingLinks } from './utils/calBooking';
+
+// Selten genutzte, große Teile werden erst bei Bedarf geladen (schnellerer Seitenaufbau)
+const loadAiModal = () => import('./components/AiTechnicianModal');
+const loadCheckIn = () => import('./components/CheckInModal');
+const AiTechnicianModal = lazyNamed(loadAiModal, 'AiTechnicianModal');
+const CheckInModal = lazyNamed(loadCheckIn, 'CheckInModal');
+const LegalModals = lazyNamed(() => import('./components/LegalModals'), 'LegalModals');
+const SecretTerminalModal = lazyNamed(() => import('./components/SecretTerminalModal'), 'SecretTerminalModal');
+const WerkstattManagerApp = lazyNamed(() => import('./manager/WerkstattManagerApp'), 'WerkstattManagerApp');
+
+const ManagerLoading = () => (
+  <div className="min-h-screen bg-[#060B0C] text-[#00F5D4] flex flex-col items-center justify-center font-mono text-sm gap-4">
+    <div className="w-8 h-8 rounded-full border-[3px] border-[#00F5D4]/20 border-t-[#00F5D4] animate-spin" />
+    Werkstatt-Manager wird geladen…
+  </div>
+);
 
 export default function App() {
   const managerRequested = (() => {
@@ -42,6 +55,14 @@ export default function App() {
   const [checkInPreset, setCheckInPreset] = useState<{ device?: string; fault?: string } | undefined>(undefined);
   const [legalModalType, setLegalModalType] = useState<'impressum' | 'datenschutz' | null>(null);
   const [isSecretTerminalOpen, setIsSecretTerminalOpen] = useState(() => managerRequested && !getAdminKey());
+
+  const aiMounted = useMountedOnce(isAiChatOpen);
+  const checkInMounted = useMountedOnce(isCheckInOpen);
+
+  useEffect(() => {
+    prefetchWhenIdle([loadAiModal, loadCheckIn]);
+    return installBookingLinks();
+  }, []);
 
   useEffect(() => {
     const handleUnauthorized = () => {
@@ -98,9 +119,9 @@ export default function App() {
   // If Manager view is active (triggered by 5x clicking logo)
   if (viewMode === 'manager') {
     return (
-      <WerkstattManagerApp
-        onBackToWebsite={() => setViewMode('website')}
-      />
+      <Suspense fallback={<ManagerLoading />}>
+        <WerkstattManagerApp onBackToWebsite={() => setViewMode('website')} />
+      </Suspense>
     );
   }
 
@@ -170,37 +191,36 @@ export default function App() {
       {/* Sticky Mobile Bar & Floating Desktop AI Trigger */}
       <MobileBottomBar onOpenAiChat={() => handleOpenAiChat()} />
 
-      {/* AI Technician Chat Modal (Gemini 3.1 Pro High Thinking) */}
-      <AiTechnicianModal
-        isOpen={isAiChatOpen}
-        onClose={() => setIsAiChatOpen(false)}
-        initialQuery={aiInitialQuery}
-        defaultCategory={currentCategory}
-        onOpenCheckIn={handleOpenCheckInWithPreset}
-      />
+      {/* Dialoge: Code wird erst beim ersten Öffnen geladen und bleibt danach gemountet */}
+      <Suspense fallback={null}>
+        {aiMounted && (
+          <AiTechnicianModal
+            isOpen={isAiChatOpen}
+            onClose={() => setIsAiChatOpen(false)}
+            initialQuery={aiInitialQuery}
+            defaultCategory={currentCategory}
+            onOpenCheckIn={handleOpenCheckInWithPreset}
+          />
+        )}
 
-      {/* Digital Check-In Modal */}
-      <CheckInModal
-        isOpen={isCheckInOpen}
-        onClose={() => setIsCheckInOpen(false)}
-        presetData={checkInPreset}
-      />
+        {checkInMounted && (
+          <CheckInModal isOpen={isCheckInOpen} onClose={() => setIsCheckInOpen(false)} presetData={checkInPreset} />
+        )}
 
-      {/* Werkstatt-Zugang: Schlüssel wird vom Worker geprüft */}
-      <SecretTerminalModal
-        isOpen={isSecretTerminalOpen}
-        onClose={() => setIsSecretTerminalOpen(false)}
-        onUnlockSuccess={() => {
-          setIsSecretTerminalOpen(false);
-          setViewMode('manager');
-        }}
-      />
+        {/* Werkstatt-Zugang: Schlüssel wird vom Worker geprüft */}
+        {isSecretTerminalOpen && (
+          <SecretTerminalModal
+            isOpen={isSecretTerminalOpen}
+            onClose={() => setIsSecretTerminalOpen(false)}
+            onUnlockSuccess={() => {
+              setIsSecretTerminalOpen(false);
+              setViewMode('manager');
+            }}
+          />
+        )}
 
-      {/* Legal Imprint & GDPR Data Privacy Modals */}
-      <LegalModals
-        modalType={legalModalType}
-        onClose={() => setLegalModalType(null)}
-      />
+        {legalModalType && <LegalModals modalType={legalModalType} onClose={() => setLegalModalType(null)} />}
+      </Suspense>
     </div>
   );
 }

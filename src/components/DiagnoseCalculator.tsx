@@ -124,7 +124,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
             <div className="flex-1">
               <div className="flex items-center gap-2 text-[11px] font-mono text-[#00F5D4] uppercase tracking-wider mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
-                <span>// DIGITALE ERSTEINSCHÄTZUNG • GEMINI 3.1 PRO HIGH THINKING</span>
+                <span>// DIGITALE ERSTEINSCHÄTZUNG</span>
               </div>
               <h3 className="text-base sm:text-lg font-bold text-white mb-1 group-hover:text-[#00F5D4] transition-colors">
                 KI-Techniker: Schadensebene nicht eindeutig?

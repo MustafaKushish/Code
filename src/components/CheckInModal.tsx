@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, CheckCircle2, Send, AlertCircle, Copy } from 'lucide-react';
+import { X, ShieldCheck, CheckCircle2, Send, AlertCircle } from 'lucide-react';
 
 interface CheckInModalProps {
   isOpen: boolean;
@@ -16,10 +16,8 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ isOpen, onClose, pre
     preDamages: '',
     privacyAccepted: false,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [resultTicketId, setResultTicketId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (presetData) {
@@ -31,58 +29,48 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ isOpen, onClose, pre
     }
   }, [presetData]);
 
+  // Beim erneuten Öffnen wieder mit dem Formular beginnen
+  useEffect(() => {
+    if (!isOpen) setSubmitted(false);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Die Angaben gehen als vorbereitete Nachricht direkt an die Werkstatt (WhatsApp oder E-Mail).
+  // So landet jeder Check-in garantiert bei Mustafa – es wird nichts auf einem Server gespeichert.
+  const buildMessage = () =>
+    [
+      'Hallo Mustafa, hier mein digitaler Geräte-Check-in:',
+      '',
+      `Name: ${formData.name.trim()}`,
+      `Telefon/WhatsApp: ${formData.phone.trim()}`,
+      `Gerät: ${formData.device.trim()}`,
+      `Fehler: ${formData.fault.trim()}`,
+      `Vorschäden: ${formData.preDamages.trim() || 'keine angegeben'}`,
+      '',
+      'Angaben bestätigt, Datenschutzhinweise gelesen.',
+      'Wann kann ich das Gerät in Neumarkt abgeben?',
+    ].join('\n');
+
+  const whatsappUrl = () => `https://wa.me/4917641744443?text=${encodeURIComponent(buildMessage())}`;
+  const mailUrl = () =>
+    `mailto:mustafa.alzurgany@gmail.com?subject=${encodeURIComponent(
+      `Check-in: ${formData.device.trim()}`
+    )}&body=${encodeURIComponent(buildMessage())}`;
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.device || !formData.fault) {
       setErrorMsg('Bitte fülle alle markierten Pflichtfelder aus.');
       return;
     }
     if (!formData.privacyAccepted) {
-      setErrorMsg('Bitte bestätige die Datenschutzvereinbarung.');
+      setErrorMsg('Bitte bestätige die Datenschutzhinweise.');
       return;
     }
-
-    setIsSubmitting(true);
     setErrorMsg(null);
-
-    try {
-      const res = await fetch('/api/checkin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        // Fallback for static browser preview without backend
-        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-        const fallbackTicket = `CODE-${randomSuffix}`;
-        setResultTicketId(fallbackTicket);
-        return;
-      }
-
-      const data = await res.json();
-      if (!data.success) {
-        throw new Error(data.error || 'Check-In konnte nicht gespeichert werden.');
-      }
-      setResultTicketId(data.ticketId);
-    } catch {
-      // Local fallback for offline/static browser preview
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const fallbackTicket = `CODE-${randomSuffix}`;
-      setResultTicketId(fallbackTicket);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCopyTicket = () => {
-    if (resultTicketId) {
-      navigator.clipboard.writeText(resultTicketId);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    window.open(whatsappUrl(), '_blank', 'noopener');
+    setSubmitted(true);
   };
 
   return (
@@ -96,7 +84,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ isOpen, onClose, pre
           <X className="w-5 h-5" />
         </button>
 
-        {!resultTicketId ? (
+        {!submitted ? (
           <>
             <div className="mb-6">
               <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-wider block mb-1">
@@ -208,60 +196,56 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ isOpen, onClose, pre
                   className="w-4 h-4 accent-[#FF8D4D] rounded mt-0.5 cursor-pointer"
                 />
                 <span className="text-xs text-[#F3F7F7]">
-                  Ich bestätige die Richtigkeit der Angaben und erteile den Reparaturauftrag gemäß der Datenschutzvereinbarung. *
+                  Ich bestätige die Richtigkeit der Angaben und habe die Datenschutzhinweise gelesen. Der Reparaturauftrag kommt erst nach
+                  Prüfung und Kostenfreigabe zustande. *
                 </span>
               </label>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
                 className="w-full py-3.5 px-6 rounded-xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider bg-[#00F5D4] text-[#060B0C] hover:bg-white transition-all shadow-[0_0_20px_rgba(0,245,212,0.3)] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 mt-4"
               >
                 <Send className="w-4 h-4" />
-                <span>{isSubmitting ? 'Wird übermittelt...' : '✓ Auftrag &amp; Protokoll digital absenden'}</span>
+                <span>Check-in per WhatsApp senden</span>
               </button>
             </form>
           </>
         ) : (
           <div className="text-center py-6 space-y-5 animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-[#00F5D4]/20 border border-[#00F5D4] text-[#00F5D4] flex items-center justify-center mx-auto text-3xl">
+            <div className="w-16 h-16 rounded-full bg-[#25D366]/15 border border-[#25D366] text-[#25D366] flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-10 h-10" />
             </div>
 
             <div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">
-                Auftrag erfolgreich erfasst!
-              </h3>
-              <p className="text-xs sm:text-sm text-[#839897] max-w-md mx-auto">
-                Dein Reparatur-Ticket wurde angelegt. Bitte notiere dir die Ticket-Nummer für die Statusabfrage.
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">Fast geschafft!</h3>
+              <p className="text-sm text-[#A3B5B6] max-w-md mx-auto leading-relaxed">
+                Deine Angaben sind in WhatsApp vorbereitet. <strong className="text-white">Tippe dort nur noch auf „Senden“</strong> –
+                dann meldet sich Mustafa mit einem Abgabetermin und deiner Auftragsnummer.
               </p>
             </div>
 
-            <div className="bg-[#050D0E] border border-[#00F5D4]/40 rounded-xl p-4 max-w-sm mx-auto flex items-center justify-between">
-              <div>
-                <span className="font-mono text-[10px] text-[#839897] uppercase block">Deine Ticket-Nummer</span>
-                <span className="font-mono text-2xl font-extrabold text-[#00F5D4] tracking-wider">
-                  {resultTicketId}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleCopyTicket}
-                className="p-2 rounded-lg bg-white/5 border border-white/10 text-white hover:text-[#00F5D4] transition-colors flex items-center gap-1 font-mono text-xs cursor-pointer"
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <a
+                href={whatsappUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl text-sm font-semibold bg-[#25D366] text-[#04140A] hover:brightness-110 transition-all"
               >
-                <Copy className="w-4 h-4" />
-                <span>{copied ? 'Kopiert!' : 'Kopieren'}</span>
-              </button>
+                <Send className="w-4 h-4" />
+                WhatsApp erneut öffnen
+              </a>
+              <a
+                href={mailUrl()}
+                className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl text-sm font-semibold border border-white/15 text-white hover:border-[#00F5D4]/60 transition-colors"
+              >
+                Stattdessen per E-Mail senden
+              </a>
             </div>
-
-            <p className="text-xs text-[#839897] font-mono max-w-md mx-auto leading-relaxed">
-              Mustafa prüft deine Angaben und bereitet den Arbeitsplatz an der Werkbank in Neumarkt vor.
-            </p>
 
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
+              className="text-xs text-[#839897] hover:text-white underline underline-offset-4 cursor-pointer"
             >
               Fenster schließen
             </button>

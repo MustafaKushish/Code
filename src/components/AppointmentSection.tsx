@@ -26,9 +26,8 @@ export const AppointmentSection: React.FC = () => {
           <div className="flex flex-wrap justify-center gap-4">
             <button
               type="button"
-              data-cal-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
-              data-cal-config='{"layout":"month_view","theme":"dark"}'
-              className="inline-flex items-center gap-2.5 h-12 px-7 rounded-xl text-[15px] font-semibold text-[#160B04] bg-gradient-to-b from-[#FFA060] to-[#D9783E] hover:brightness-110 shadow-[0_10px_30px_rgba(217,120,62,0.35)] transition-all cursor-pointer"
+              data-booking-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
+                className="inline-flex items-center gap-2.5 h-12 px-7 rounded-xl text-[15px] font-semibold text-[#160B04] bg-gradient-to-b from-[#FFA060] to-[#D9783E] hover:brightness-110 shadow-[0_10px_30px_rgba(217,120,62,0.35)] transition-all cursor-pointer"
             >
               <Calendar className="w-4 h-4" />
               <span>Termin an der Werkbank buchen</span>

@@ -7,6 +7,10 @@ export default defineConfig(() => {
   return {
     base: './',
     plugins: [react(), tailwindcss()],
+    // STANDALONE=1: alles in eine Datei bündeln (für code-werkstatt-standalone.html)
+    build: process.env.STANDALONE
+      ? { outDir: 'dist-standalone', assetsInlineLimit: Number.MAX_SAFE_INTEGER, rolldownOptions: { output: { inlineDynamicImports: true } } }
+      : undefined,
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname || '.', '.'),
