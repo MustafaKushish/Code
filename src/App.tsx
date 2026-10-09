@@ -128,6 +128,13 @@ export default function App() {
   // Public customer website view
   return (
     <div className="relative min-h-screen bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4] pb-28 md:pb-0 overflow-x-clip w-full max-w-full">
+      <a
+        href="#inhalt"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#00F5D4] focus:text-[#04110F] focus:font-semibold"
+      >
+        Zum Inhalt springen
+      </a>
+
       {/* Background Circuit Particle Grid */}
       <CircuitCanvas />
 
@@ -140,6 +147,7 @@ export default function App() {
           onOpenStatusTracker={handleScrollToStatus}
         />
 
+        <main id="inhalt" tabIndex={-1} className="outline-none">
         {/* Hero Section */}
         <Hero
           onSelectCategory={handleSelectCategory}
@@ -179,6 +187,8 @@ export default function App() {
 
         {/* Contact & Mail-In Shipping */}
         <ContactSection />
+
+        </main>
 
         {/* Footer with 5-click secret manager trigger on bottom-left logo */}
         <Footer

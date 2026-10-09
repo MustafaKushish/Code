@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { SectionHeading } from './ui/SectionHeading';
 
@@ -38,6 +38,25 @@ export const FaqSection: React.FC = () => {
       badge: 'Versand',
     },
   ];
+
+  // Strukturierte Daten (FAQPage) für Google – aus denselben Fragen wie auf der Seite
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.dataset.faq = 'true';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    });
+    document.head.appendChild(script);
+    return () => script.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section id="faq" className="py-16 md:py-24 relative">

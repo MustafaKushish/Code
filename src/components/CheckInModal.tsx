@@ -74,11 +74,17 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ isOpen, onClose, pre
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Digitaler Geräte-Check-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto"
+    >
       <div className="bg-[#0B1315] border border-[#C9743F]/40 w-full max-w-2xl rounded-2xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.9)] relative my-auto">
         <button
           type="button"
           onClick={onClose}
+          aria-label="Schließen"
           className="absolute top-5 right-5 text-[#839897] hover:text-[#00F5D4] transition-colors p-1 cursor-pointer"
         >
           <X className="w-5 h-5" />

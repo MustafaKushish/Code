@@ -216,6 +216,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             <button
               type="button"
               onClick={onClose}
+              aria-label="Schließen"
               className="p-1.5 rounded-lg text-[#839897] hover:text-[#C9743F] hover:bg-white/5 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
