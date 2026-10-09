@@ -10,7 +10,8 @@
     "start": "node server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "worker:build": "esbuild worker/src/index.ts --format=esm --target=es2022 --outfile=worker/code-techniker.js && sed -i '1i // AUTOMATISCH ERZEUGT aus worker/src/index.ts (npm run worker:build) – diesen Inhalt im Cloudflare-Dashboard einfügen.' worker/code-techniker.js"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

@@ -169,13 +169,19 @@ async function requireAdmin(request: Request, env: Env, cors: Headers): Promise<
 }
 
 async function listOrders(env: Env, cors: Headers): Promise<Response> {
-  const { results } = await env.DB.prepare(`SELECT ${ORDER_COLUMNS.join(', ')} FROM orders`).all<OrderRow>();
-  return json(results, 200, cors);
+  const { results } = await env.DB
+    .prepare(`SELECT ${ORDER_COLUMNS.join(', ')} FROM orders ORDER BY isoDate DESC`)
+    .all<OrderRow>();
+  return json(
+    results.map((o) => ({ ...o, isB2B: !!o.isB2B })),
+    200,
+    cors,
+  );
 }
 
 async function handleOrderAction(request: Request, env: Env, cors: Headers): Promise<Response> {
   const body = (await request.json().catch(() => null)) as
-    | { action?: string; order?: Record<string, unknown>; id?: unknown; status?: unknown }
+    | { action?: string; order?: Record<string, unknown>; id?: unknown; status?: unknown; paid?: unknown }
     | null;
 
   switch (body?.action) {
@@ -195,13 +201,19 @@ async function handleOrderAction(request: Request, env: Env, cors: Headers): Pro
         )
         .bind(...values)
         .run();
-      return json({ success: true }, 200, cors);
+      return json({ success: true, id: order.id }, 200, cors);
     }
     case 'UPDATE_STATUS': {
-      if (typeof body.id !== 'string' || typeof body.status !== 'string') {
-        return json({ success: false, error: 'id und status erforderlich' }, 400, cors);
+      // Wie im bisherigen Worker: Status und/oder Zahlungsstatus aktualisieren
+      if (typeof body.id !== 'string' || (typeof body.status !== 'string' && typeof body.paid !== 'string')) {
+        return json({ success: false, error: 'id und status oder paid erforderlich' }, 400, cors);
       }
-      await env.DB.prepare('UPDATE orders SET status = ? WHERE id = ?').bind(body.status, body.id).run();
+      if (typeof body.status === 'string') {
+        await env.DB.prepare('UPDATE orders SET status = ? WHERE id = ?').bind(body.status, body.id).run();
+      }
+      if (typeof body.paid === 'string') {
+        await env.DB.prepare('UPDATE orders SET paid = ? WHERE id = ?').bind(body.paid, body.id).run();
+      }
       return json({ success: true }, 200, cors);
     }
     case 'DELETE_ORDER': {
