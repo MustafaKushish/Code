@@ -22,20 +22,17 @@ Es gehen also keine Aufträge verloren.
 Mindestens 12 Zeichen, besser ein Satz, z. B. `Lötkolben-Neumarkt-Kaffee-47`.
 Diesen Schlüssel **nirgends in den Code schreiben**, nur im Passwort-Manager aufheben.
 
-### 2. Datenbank nachschlagen
+### 2. Groq-Schlüssel sperren (wichtig!)
 
-Cloudflare-Dashboard → **Workers & Pages → D1** → die Datenbank des Workers öffnen.
-- Namen und ID in `worker/wrangler.toml` bei `database_name` / `database_id` eintragen.
-- Unter **Console** prüfen, wie die Tabelle heißt und welche Spalten sie hat:
-  ```sql
-  SELECT name, sql FROM sqlite_master WHERE type = 'table';
-  ```
-  Der Worker erwartet die Tabelle `orders` mit den Spalten aus `schema.sql`.
-  Falls Name oder Spalten abweichen → kurz melden, dann passen wir den Code an.
+Der alte Worker enthielt einen Groq-API-Schlüssel im Klartext (`gsk_…`). Derselbe Schlüssel steht auch in der
+Git-Historie dieses Repos. Unter **console.groq.com → API Keys** den Schlüssel löschen.
+Der neue Worker braucht Groq nicht mehr – der KI-Techniker der Website läuft über Google Gemini (Cloudflare Pages).
+Die Tabelle `customer_queries` mit den alten KI-Anfragen bleibt unverändert in der Datenbank.
 
 ### 3. Neue Tabelle für die Sperre anlegen
 
-In der D1-**Console** ausführen (ändert an den Aufträgen nichts):
+Cloudflare-Dashboard → **Workers & Pages → D1** → Datenbank des Workers → **Console**, dann ausführen
+(ändert an den Aufträgen nichts):
 ```sql
 CREATE TABLE IF NOT EXISTS rate_limits (
   key TEXT PRIMARY KEY,
@@ -44,30 +41,28 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 );
 ```
 
-### 4. Worker veröffentlichen
+### 4. Worker veröffentlichen (geht auch am Handy)
 
-Vorher den aktuellen Worker-Code im Dashboard sichern (Code bearbeiten → alles kopieren).
+1. **Workers & Pages → code-techniker → Edit code**. Den alten Code komplett kopieren und sicher aufheben (Notfall).
+2. Den gesamten Inhalt von [`worker/code-techniker.js`](code-techniker.js) einfügen (alten Code ersetzen) → **Deploy**.
+3. **code-techniker → Settings → Variables and Secrets → Add**: Typ **Secret**, Name `ADMIN_KEY`, Wert = Schlüssel aus Schritt 1.
+4. Prüfen, dass unter **Settings → Bindings** die D1-Datenbank weiterhin als `DB` verbunden ist (wie bisher).
 
-```bash
-cd worker
-npx wrangler login
-npx wrangler secret put ADMIN_KEY     # Schlüssel aus Schritt 1 eingeben
-npx wrangler deploy
-```
+Erlaubte Website-Adressen sind fest eingebaut: `https://www.code-ger.de` und `https://code-ger.de`.
+Für weitere Adressen eine Variable `ALLOWED_ORIGINS` (kommagetrennt) anlegen.
+
+Alternativ per Kommandozeile: `database_name`/`database_id` in `worker/wrangler.toml` eintragen, dann
+`cd worker && npx wrangler secret put ADMIN_KEY && npx wrangler deploy`.
 
 ### 5. Kurz testen
 
-```bash
-# Muss 401 liefern (ohne Schlüssel kein Zugriff):
-curl -i https://code-techniker.mustafa-alzurgany.workers.dev/api/orders
-
-# Muss {"success":true} liefern:
-curl -H "Authorization: Bearer DEIN-SCHLÜSSEL" https://code-techniker.mustafa-alzurgany.workers.dev/api/auth
-```
+Im Browser öffnen: `https://code-techniker.mustafa-alzurgany.workers.dev/api/orders`
+→ Es muss **„Werkstatt-Schlüssel ungültig.“** erscheinen – **keine** Kundenliste mehr.
 
 ### 6. Website umstellen
 
-Branch `security/worker-auth` nach `main` mergen. Cloudflare Pages baut die Seite automatisch neu.
+Auf GitHub erst `security/worker-auth`, dann `design/refresh` nach `main` mergen.
+Cloudflare Pages baut und veröffentlicht die Seite automatisch.
 
 ### 7. Manager entsperren
 
