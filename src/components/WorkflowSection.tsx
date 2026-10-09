@@ -1,58 +1,61 @@
 import React from 'react';
+import { MessageSquare, PackageOpen, Microscope, BadgeCheck } from 'lucide-react';
+import { SectionHeading } from './ui/SectionHeading';
+
+const STEPS = [
+  {
+    title: 'Kontakt aufnehmen',
+    desc: 'Kurz per WhatsApp oder Anruf Gerät und Fehler beschreiben. Du bekommst sofort eine ehrliche Ersteinschätzung.',
+    Icon: MessageSquare,
+  },
+  {
+    title: 'Gerät übergeben',
+    desc: 'Persönlich nach Terminabsprache an der Werkbank in Neumarkt – oder versichert per Post aus ganz Deutschland.',
+    Icon: PackageOpen,
+  },
+  {
+    title: 'Reparatur & Test',
+    desc: 'Fehlersuche unter dem Mikroskop, Reparatur am Bauteil und gründlicher Funktionstest. Kosten nur nach deiner Freigabe.',
+    Icon: Microscope,
+  },
+  {
+    title: 'Abholen & loslegen',
+    desc: 'Du holst dein getestetes Gerät ab – inklusive 6 Monaten Werkstatt-Garantie auf die Reparatur.',
+    Icon: BadgeCheck,
+  },
+];
 
 export const WorkflowSection: React.FC = () => {
-  const steps = [
-    {
-      num: '1',
-      title: 'Kontaktieren',
-      desc: 'Schreib uns kurz per WhatsApp oder ruf an. Beschreibe kurz dein Gerät und den Fehler.',
-    },
-    {
-      num: '2',
-      title: 'Gerät übergeben',
-      desc: 'Flexible Übergabe deines Geräts nach kurzer Terminabsprache bei uns an der Werkbank in Neumarkt.',
-    },
-    {
-      num: '3',
-      title: 'Reparatur & Test',
-      desc: 'Instandsetzung unter dem Mikroskop, Beseitigung von Kurzschlüssen und gründliche Funktionsprüfung.',
-    },
-    {
-      num: '4',
-      title: 'Abholen & Fertig',
-      desc: 'Du holst dein vollständig getestetes Gerät wieder ab – inklusive 6 Monaten Werkstatt-Garantie.',
-    },
-  ];
-
   return (
-    <section id="ablauf" className="py-16 md:py-20 relative">
+    <section id="ablauf" className="py-16 md:py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-xl mx-auto mb-12">
-          <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-2">
-            // Einfach &amp; Sicher
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
-            So funktioniert die Reparatur
-          </h2>
-          <p className="text-[#839897] text-sm">
-            Unser bewährtes Modell für Neumarkt und Umgebung:
-          </p>
-        </div>
+        <SectionHeading index="04" eyebrow="Ablauf" title="In vier Schritten wieder startklar" />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {steps.map((st) => (
-            <div
-              key={st.num}
-              className="bg-[#0D1618]/80 border border-[#C9743F]/25 hover:border-[#FF8D4D] rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 shadow-md"
+        <ol className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          {/* Verbindungslinie (Desktop) */}
+          <div
+            aria-hidden="true"
+            className="hidden lg:block absolute top-7 left-[12%] right-[12%] h-px bg-gradient-to-r from-[#00F5D4]/0 via-[#00F5D4]/40 to-[#FF8D4D]/0"
+          />
+          {STEPS.map(({ title, desc, Icon }, i) => (
+            <li
+              key={title}
+              className="reveal relative rounded-2xl border border-white/[0.08] bg-[#0B1315]/85 p-6 lg:pt-0 lg:border-0 lg:bg-transparent lg:text-center"
+              style={{ transitionDelay: `${i * 90}ms` }}
             >
-              <div className="w-12 h-12 rounded-full bg-[#C9743F] text-white font-mono text-lg font-bold flex items-center justify-center mx-auto mb-4 shadow-[0_0_15px_rgba(201,116,63,0.4)]">
-                {st.num}
+              <div className="flex lg:flex-col items-center gap-4 lg:gap-5 mb-3 lg:mb-4">
+                <div className="relative w-14 h-14 shrink-0 rounded-2xl bg-[#081012] border border-[#00F5D4]/35 flex items-center justify-center text-[#00F5D4] shadow-[0_0_25px_rgba(0,245,212,0.15)]">
+                  <Icon className="w-6 h-6" strokeWidth={1.6} />
+                  <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#D9783E] text-[#160B04] text-[11px] font-mono font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-white">{title}</h3>
               </div>
-              <h3 className="text-base font-bold text-white mb-2">{st.title}</h3>
-              <p className="text-xs sm:text-sm text-[#839897] leading-relaxed">{st.desc}</p>
-            </div>
+              <p className="text-sm text-[#94A9AA] leading-relaxed lg:max-w-[16rem] lg:mx-auto">{desc}</p>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

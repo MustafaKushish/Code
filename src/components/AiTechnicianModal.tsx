@@ -199,7 +199,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                 </span>
               </div>
               <p className="text-[11px] text-[#839897] font-mono">
-                Gemini 3.1 Pro • Bauteildiagnose &amp; Schaltplan-Analytik
+                KI-Ersteinschätzung • ersetzt keine Messung am Gerät
               </p>
             </div>
           </div>
@@ -216,6 +216,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             <button
               type="button"
               onClick={onClose}
+              aria-label="Schließen"
               className="p-1.5 rounded-lg text-[#839897] hover:text-[#C9743F] hover:bg-white/5 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -305,8 +306,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                     </a>
                     <button
                       type="button"
-                      data-cal-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
-                      data-cal-config='{"layout":"month_view","theme":"dark"}'
+                      data-booking-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00F5D4]/15 border border-[#00F5D4]/40 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] transition-all font-bold cursor-pointer"
                     >
                       <Calendar className="w-3.5 h-3.5" />
@@ -345,7 +345,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
               <div className="bg-[#101D20] border border-[#00F5D4]/40 rounded-2xl rounded-bl-xs px-4 py-3 flex items-center gap-3">
                 <Sparkles className="w-4 h-4 text-[#00F5D4] animate-spin" />
                 <div className="font-mono text-xs text-[#00F5D4]">
-                  Gemini 3.1 Pro High Thinking aktiv: Schaltszenarien &amp; Stromschienen werden analysiert...
+                  KI analysiert deine Beschreibung…
                 </div>
               </div>
             </div>
@@ -392,7 +392,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             <div className="flex items-center gap-2">
               <img src={selectedImage.preview} alt="Vorschau" className="w-10 h-10 object-cover rounded border border-[#00F5D4]/50" />
               <div className="text-xs font-mono text-[#00F5D4]">
-                Foto angehängt (wird zur Bauteil-Erkennung übermittelt)
+                Foto angehängt
               </div>
             </div>
             <button
@@ -418,6 +418,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             type="button"
             onClick={() => fileInputRef.current?.click()}
             title="Foto vom Bauteil / Schaden anhängen"
+            aria-label="Foto anhängen"
             className="p-2.5 rounded-xl border border-white/10 text-[#839897] hover:text-[#00F5D4] hover:border-[#00F5D4]/40 hover:bg-[#00F5D4]/10 transition-colors cursor-pointer"
           >
             <ImageIcon className="w-5 h-5" />
@@ -430,6 +431,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
               if (e.key === 'Enter') handleSend();
             }}
             placeholder="Fehler beschreiben oder Frage stellen..."
+            aria-label="Nachricht an den KI-Techniker"
             disabled={isLoading}
             className="flex-1 bg-[#0E1A1C] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-2.5 text-sm text-white placeholder-[#839897] outline-none font-mono"
           />
@@ -437,11 +439,16 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             type="button"
             onClick={() => handleSend()}
             disabled={isLoading || (!input.trim() && !selectedImage)}
+            aria-label="Senden"
             className="p-2.5 rounded-xl bg-[#C9743F] hover:bg-[#FF8D4D] text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(201,116,63,0.3)] transition-all cursor-pointer"
           >
             <Send className="w-5 h-5" />
           </button>
         </div>
+        <p className="px-4 pb-3 bg-[#050A0C] text-[11px] leading-snug text-[#6F8584]">
+          Deine Beschreibung wird zur automatischen Auswertung an Google (Gemini) übermittelt. Bitte keine Namen,
+          Telefonnummern oder Passwörter eingeben. Die Antwort ist eine unverbindliche Ersteinschätzung.
+        </p>
       </div>
     </div>
   );

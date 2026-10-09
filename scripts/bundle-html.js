@@ -3,13 +3,15 @@ import path from 'path';
 
 const distDir = path.resolve('dist');
 const htmlPath = path.join(distDir, 'index.html');
+// Die Standalone-Datei entsteht aus einem Build ohne Code-Splitting (STANDALONE=1)
+const standaloneDir = fs.existsSync(path.resolve('dist-standalone', 'index.html')) ? path.resolve('dist-standalone') : distDir;
 
 if (!fs.existsSync(htmlPath)) {
   console.error('dist/index.html not found. Run vite build first.');
   process.exit(1);
 }
 
-let html = fs.readFileSync(htmlPath, 'utf8');
+let html = fs.readFileSync(path.join(standaloneDir, 'index.html'), 'utf8');
 
 // Find CSS files in dist/assets
 const cssMatches = html.match(/<link rel="stylesheet"[^>]+href="(\.?\/?assets\/[^"]+\.css)"[^>]*>/g);
@@ -18,7 +20,7 @@ if (cssMatches) {
     const hrefMatch = match.match(/href="\.?\/?assets\/([^"]+\.css)"/);
     if (hrefMatch) {
       const cssFileName = hrefMatch[1];
-      const cssFilePath = path.join(distDir, 'assets', cssFileName);
+      const cssFilePath = path.join(standaloneDir, 'assets', cssFileName);
       if (fs.existsSync(cssFilePath)) {
         const cssContent = fs.readFileSync(cssFilePath, 'utf8');
         html = html.replace(match, `<style>\n${cssContent}\n</style>`);
@@ -35,7 +37,7 @@ if (jsMatches) {
     const srcMatch = match.match(/src="\.?\/?assets\/([^"]+\.js)"/);
     if (srcMatch) {
       const jsFileName = srcMatch[1];
-      const jsFilePath = path.join(distDir, 'assets', jsFileName);
+      const jsFilePath = path.join(standaloneDir, 'assets', jsFileName);
       if (fs.existsSync(jsFilePath)) {
         const jsContent = fs.readFileSync(jsFilePath, 'utf8');
         // Replace </script> inside JS content to avoid breaking HTML parser

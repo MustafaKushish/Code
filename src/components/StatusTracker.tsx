@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import {
   Search,
   AlertCircle,
@@ -16,9 +16,13 @@ import {
   Sparkles,
   ExternalLink,
 } from 'lucide-react';
-import { QrScannerModal } from './QrScannerModal';
+import { SectionHeading } from './ui/SectionHeading';
+import { lazyNamed } from './ui/lazy';
+
+const QrScannerModal = lazyNamed(() => import('./QrScannerModal'), 'QrScannerModal');
 import { Order } from '../manager/types';
 import { UNIFIED_STEPS, getStepNumber, getStepLabel, UnifiedStep } from '../utils/orderStatus';
+import { fetchPublicOrderStatus } from '../services/cloudflareSync';
 
 interface DisplayTicket {
   ticketId: string;
@@ -55,6 +59,8 @@ export const StatusTracker: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [phone4Input, setPhone4Input] = useState('');
+  const phone4Ref = useRef<HTMLInputElement>(null);
 
   // Auto-detect ?order=CODE-XXXX from URL parameters on page load
   useEffect(() => {
@@ -63,8 +69,10 @@ export const StatusTracker: React.FC = () => {
       const orderParam = params.get('order') || params.get('ticket');
       if (orderParam) {
         const clean = orderParam.trim().toUpperCase();
+        const phoneParam = (params.get('k') || '').replace(/\D/g, '').slice(-4);
         setTicketInput(clean);
-        lookupOrder(clean);
+        setPhone4Input(phoneParam);
+        lookupOrder(clean, phoneParam);
         // Scroll to tracker view smoothly
         setTimeout(() => {
           const el = document.getElementById('status');
@@ -74,7 +82,7 @@ export const StatusTracker: React.FC = () => {
     }
   }, []);
 
-  const lookupOrder = async (queryText: string) => {
+  const lookupOrder = async (queryText: string, phoneText: string = phone4Input) => {
     const cleanQuery = queryText.trim().toUpperCase();
     if (!cleanQuery) return;
 
@@ -89,9 +97,7 @@ export const StatusTracker: React.FC = () => {
         const matched = storedOrders.find(
           (o) =>
             o.id.toUpperCase() === cleanQuery ||
-            o.id.toUpperCase().replace(/^KVA-/, 'RE-') === cleanQuery.replace(/^KVA-/, 'RE-') ||
-            (o.phone && o.phone.replace(/\s+/g, '').includes(cleanQuery.replace(/\s+/g, ''))) ||
-            (o.serial && o.serial.toUpperCase() === cleanQuery)
+            o.id.toUpperCase().replace(/^KVA-/, 'RE-') === cleanQuery.replace(/^KVA-/, 'RE-')
         );
 
         if (matched) {
@@ -133,49 +139,7 @@ export const StatusTracker: React.FC = () => {
       console.warn('LocalStorage order lookup error:', e);
     }
 
-    // 2. Query Cloudflare Worker API
-    try {
-      const cfRes = await fetch('https://code-techniker.mustafa-alzurgany.workers.dev/api/orders');
-      if (cfRes.ok) {
-        const remoteOrders = await cfRes.json();
-        if (Array.isArray(remoteOrders)) {
-          const matched = remoteOrders.find(
-            (o: any) =>
-              (o.id && o.id.toUpperCase() === cleanQuery) ||
-              (o.id && o.id.toUpperCase().replace(/^KVA-/, 'RE-') === cleanQuery.replace(/^KVA-/, 'RE-')) ||
-              (o.phone && o.phone.replace(/\s+/g, '').includes(cleanQuery.replace(/\s+/g, ''))) ||
-              (o.serial && o.serial.toUpperCase() === cleanQuery)
-          );
-          if (matched) {
-            const step = getStepNumber(matched.status);
-            const custName = matched.cust || matched.customer || 'Kunde';
-            const customerMasked = custName.length > 3 ? custName.slice(0, 3) + '***' : custName;
-            const defaultDesc = UNIFIED_STEPS.find((s) => s.step === step)?.defaultStatusText || '';
-
-            setTicketData({
-              ticketId: matched.id,
-              customerName: customerMasked,
-              phone: matched.phone ? matched.phone.slice(0, 4) + ' ****' : '–',
-              device: matched.device || 'Werkstatt-Gerät',
-              fault: matched.faultDescription || matched.fault || 'Diagnose & Reparatur',
-              preDamages: matched.accessories ? `Zubehör: ${matched.accessories}` : '–',
-              status: matched.status || getStepLabel(step),
-              currentStep: step,
-              statusDetails: step === 5 ? 'Reparatur erfolgreich abgeschlossen & versiegelt. Gerät liegt zur Abholung bereit!' : defaultDesc,
-              createdAt: matched.date || matched.createdAt || 'Aktueller Auftrag',
-              estimatedCompletion: step === 5 ? 'Jetzt abholbereit' : '1–2 Werktage',
-              testedPassed: step >= 4,
-            });
-            setIsLoading(false);
-            return;
-          }
-        }
-      }
-    } catch {
-      // ignore
-    }
-
-    // 3. Fallback demo orders for instant testing
+    // 2. Demo-Aufträge zum Ausprobieren
     if (cleanQuery === 'CODE-9231') {
       setTicketData({
         ticketId: 'CODE-9231',
@@ -247,10 +211,42 @@ export const StatusTracker: React.FC = () => {
         testedPassed: false,
       });
     } else {
-      setSearchError(
-        `Auftrag "${queryText}" konnte im System nicht gefunden werden. Bitte prüfe deine Auftragsnummer oder scanne den QR-Code auf deinem Beleg.`
-      );
-      setTicketData(null);
+      // 3. Echte Aufträge: nur mit Auftragsnummer + letzten 4 Ziffern der Telefonnummer
+      const phone4 = phoneText.replace(/\D/g, '');
+      if (phone4.length !== 4) {
+        setSearchError('Bitte zusätzlich die letzten 4 Ziffern deiner Telefonnummer eingeben (Schutz deiner Daten).');
+        setTicketData(null);
+        setIsLoading(false);
+        return;
+      }
+
+      const { order, error } = await fetchPublicOrderStatus(cleanQuery, phone4);
+      if (order) {
+        const step = getStepNumber(order.status);
+        const defaultDesc = UNIFIED_STEPS.find((s) => s.step === step)?.defaultStatusText || '';
+        setTicketData({
+          ticketId: order.id,
+          customerName: order.customer || 'Kunde',
+          phone: `**** ${phone4}`,
+          device: order.device || 'Werkstatt-Gerät',
+          fault: 'Diagnose & Reparatur',
+          status: order.status || getStepLabel(step),
+          currentStep: step,
+          statusDetails:
+            step === 5
+              ? `Reparatur erfolgreich abgeschlossen (${order.paid === 'Bezahlt' ? 'bereits bezahlt' : 'Zahlung bei Abholung'}). Gerät liegt zur Abholung bereit!`
+              : defaultDesc,
+          createdAt: order.date || 'Aktueller Auftrag',
+          estimatedCompletion: step === 5 ? 'Jetzt abholbereit' : step === 4 ? 'Heute noch' : '1–2 Werktage',
+          testedPassed: step >= 4,
+        });
+      } else {
+        setSearchError(
+          error ||
+            `Auftrag "${queryText}" konnte nicht gefunden werden. Bitte prüfe Auftragsnummer und Telefonziffern oder scanne den QR-Code auf deinem Beleg.`
+        );
+        setTicketData(null);
+      }
     }
 
     setIsLoading(false);
@@ -263,7 +259,12 @@ export const StatusTracker: React.FC = () => {
 
   const handleQrScanSuccess = (scannedId: string) => {
     setTicketInput(scannedId);
-    lookupOrder(scannedId);
+    if (phone4Input.replace(/\D/g, '').length === 4 || /^CODE-\d{4}$/.test(scannedId)) {
+      lookupOrder(scannedId);
+    } else {
+      setSearchError(null);
+      phone4Ref.current?.focus();
+    }
   };
 
   const getStepIcon = (step: number, isActive: boolean) => {
@@ -286,19 +287,14 @@ export const StatusTracker: React.FC = () => {
   return (
     <section id="status" className="py-16 md:py-24 relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="bg-[#0A1214]/95 border border-[#00F5D4]/30 rounded-3xl p-6 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.75)] backdrop-blur-xl">
+        <div className="bg-[#0A1214]/95 border border-[#00F5D4]/25 rounded-3xl px-4 py-7 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.6)]">
           {/* Header */}
-          <div className="text-center max-w-xl mx-auto mb-8">
-            <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-1">
-              // ECHTZEIT AUFTRAGS-TRACKER • 5-SCHRITTE SYSTEM
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
-              Reparaturstatus abfragen
-            </h2>
-            <p className="text-[#839897] text-xs sm:text-sm leading-relaxed">
-              Verfolge jeden Bearbeitungsschritt deines Geräts transparent mit. Gib einfach deine Auftragsnummer ein oder scanne den QR-Code auf deinem Abholschein.
-            </p>
-          </div>
+          <SectionHeading
+            index="02"
+            eyebrow="Auftragsstatus"
+            title="Wo ist mein Gerät gerade?"
+            intro="Auftragsnummer (oder QR-Code vom Abholschein) und die letzten 4 Ziffern deiner Telefonnummer eingeben – fertig."
+          />
 
           {/* Search Form with QR Code Scanner */}
           <div className="max-w-xl mx-auto mb-8 space-y-3">
@@ -308,10 +304,25 @@ export const StatusTracker: React.FC = () => {
                   type="text"
                   value={ticketInput}
                   onChange={(e) => setTicketInput(e.target.value)}
-                  placeholder="Auftrags-Nr. (z. B. CODE-9231)"
+                  placeholder="Auftrags-Nr."
+                  aria-label="Auftragsnummer"
                   className="w-full bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono uppercase"
                 />
               </div>
+
+              <input
+                ref={phone4Ref}
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={4}
+                value={phone4Input}
+                onChange={(e) => setPhone4Input(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="Tel. (4 Ziff.)"
+                aria-label="Letzte 4 Ziffern deiner Telefonnummer"
+                title="Die letzten 4 Ziffern der Telefonnummer, die du bei der Abgabe angegeben hast"
+                className="sm:w-36 bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono tracking-widest"
+              />
 
               <div className="flex items-center gap-2">
                 <button
@@ -385,7 +396,7 @@ export const StatusTracker: React.FC = () => {
 
           {/* Ticket Live Data View */}
           {ticketData && (
-            <div className="bg-[#050A0B] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 animate-fade-in">
+            <div className="bg-[#050A0B] border border-white/10 rounded-2xl p-4 sm:p-8 space-y-5 sm:space-y-6 animate-fade-in">
               {/* Ticket Top Row */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
@@ -428,16 +439,14 @@ export const StatusTracker: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 relative">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-1.5 sm:gap-2 relative">
                   {UNIFIED_STEPS.map((st) => {
                     const isPassed = st.step <= ticketData.currentStep;
                     const isCurrent = st.step === ticketData.currentStep;
                     return (
                       <div
                         key={st.step}
-                        className={`p-3.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-2 ${
-                          st.step === 5 ? 'col-span-2 sm:col-span-1' : ''
-                        } ${
+                        className={`px-3 py-2 sm:p-3.5 rounded-xl border text-left sm:text-center transition-all flex flex-row sm:flex-col items-center sm:justify-center gap-3 sm:gap-2 ${
                           isCurrent
                             ? 'bg-[#00F5D4]/15 border-[#00F5D4] shadow-[0_0_20px_rgba(0,245,212,0.35)] scale-[1.02]'
                             : isPassed
@@ -446,7 +455,7 @@ export const StatusTracker: React.FC = () => {
                         }`}
                       >
                         <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                          className={`w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl flex items-center justify-center transition-all ${
                             isCurrent
                               ? 'bg-[#00F5D4] text-[#060B0C] shadow-[0_0_12px_rgba(0,245,212,0.5)] font-bold'
                               : isPassed
@@ -485,7 +494,7 @@ export const StatusTracker: React.FC = () => {
               </div>
 
               {/* DYNAMISCHES STATUS-TERMINAL */}
-              <div className="bg-[#0C1719] border border-[#00F5D4]/30 rounded-2xl p-5 space-y-3">
+              <div className="bg-[#0C1719] border border-[#00F5D4]/30 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
                   <div className="flex items-center gap-2 text-xs font-mono text-[#00F5D4] font-bold uppercase">
                     <span className="w-2 h-2 rounded-full bg-[#00F5D4] animate-ping" />
@@ -525,7 +534,7 @@ export const StatusTracker: React.FC = () => {
 
               {/* GROSSER HINWEIS FALLS STATUS = 5 (ABHOLBEREIT) */}
               {ticketData.currentStep === 5 && (
-                <div className="bg-gradient-to-r from-[#00E676]/25 via-[#00F5D4]/15 to-[#00E676]/15 border-2 border-[#00E676] rounded-2xl p-6 sm:p-7 shadow-[0_0_35px_rgba(0,230,118,0.25)] flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in">
+                <div className="bg-gradient-to-r from-[#00E676]/25 via-[#00F5D4]/15 to-[#00E676]/15 border-2 border-[#00E676] rounded-2xl p-5 sm:p-7 shadow-[0_0_35px_rgba(0,230,118,0.25)] flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-[#00E676] text-[#060B0C] flex items-center justify-center shrink-0 shadow-lg shadow-[#00E676]/30">
                       <PackageCheck className="w-8 h-8 stroke-[2.5]" />
@@ -557,7 +566,7 @@ export const StatusTracker: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1.5 text-zinc-300 pt-1">
                       <Clock className="w-3.5 h-3.5 text-[#FF8D4D] shrink-0" />
-                      <span>Mo–Fr 09:00–18:00 Uhr | Sa n. V.</span>
+                      <span>Mo–Fr 10:00–18:00 Uhr | Sa 10:00–14:00 Uhr</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-zinc-300">
                       <Phone className="w-3.5 h-3.5 text-[#00F5D4] shrink-0" />
@@ -590,11 +599,11 @@ export const StatusTracker: React.FC = () => {
       </div>
 
       {/* Live QR Camera Scanner Modal */}
-      <QrScannerModal
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onScanSuccess={handleQrScanSuccess}
-      />
+      {isScannerOpen && (
+        <Suspense fallback={null}>
+          <QrScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} onScanSuccess={handleQrScanSuccess} />
+        </Suspense>
+      )}
     </section>
   );
 };

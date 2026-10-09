@@ -1,6 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
+// Schriften lokal ausgeliefert (keine Verbindung zu Google Fonts – DSGVO)
+import '@fontsource-variable/space-grotesk';
+import '@fontsource/ibm-plex-mono/300.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/400-italic.css';
+import '@fontsource/ibm-plex-mono/600.css';
+import '@fontsource/ibm-plex-mono/700.css';
 import './index.css';
 
 interface ErrorBoundaryProps {

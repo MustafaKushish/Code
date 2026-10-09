@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { SectionHeading } from './ui/SectionHeading';
 
 interface FaqItem {
   q: string;
@@ -38,20 +39,29 @@ export const FaqSection: React.FC = () => {
     },
   ];
 
+  // Strukturierte Daten (FAQPage) für Google – aus denselben Fragen wie auf der Seite
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.dataset.faq = 'true';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    });
+    document.head.appendChild(script);
+    return () => script.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <section className="py-16 md:py-20 relative">
+    <section id="faq" className="py-16 md:py-24 relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-xl mx-auto mb-12">
-          <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-2">
-            // Häufige Fragen &amp; Fachwissen
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
-            Häufige Fragen zu Platinen &amp; Mikrolöten
-          </h2>
-          <p className="text-[#839897] text-sm">
-            Ehrliche Antworten direkt von der Werkbank in Neumarkt.
-          </p>
-        </div>
+        <SectionHeading index="07" eyebrow="Häufige Fragen" title="Ehrliche Antworten von der Werkbank" />
 
         <div className="space-y-3">
           {faqs.map((faq, idx) => {
@@ -59,16 +69,17 @@ export const FaqSection: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="bg-[#0A1214]/90 border border-[#C9743F]/25 hover:border-[#4FA39B]/50 rounded-2xl overflow-hidden transition-colors"
+                className={`reveal bg-[#0B1315]/90 border rounded-2xl overflow-hidden transition-colors ${isOpen ? 'border-[#00F5D4]/35' : 'border-white/[0.08] hover:border-white/20'}`}
               >
                 <button
                   type="button"
+                  aria-expanded={isOpen}
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
                   className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-[#00F5D4] font-mono text-sm font-bold">0{idx + 1}.</span>
-                    <span className="font-bold text-sm sm:text-base text-white">{faq.q}</span>
+                    <span className="font-semibold text-[15px] sm:text-base text-white leading-snug">{faq.q}</span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {faq.badge && (
@@ -85,7 +96,7 @@ export const FaqSection: React.FC = () => {
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[#839897] leading-relaxed border-t border-white/5 bg-[#060B0D]/50 animate-fade-in">
+                  <div className="px-5 sm:pl-14 pb-5 pt-1 text-sm text-[#A3B5B6] leading-relaxed animate-fade-in">
                     <p>{faq.a}</p>
                   </div>
                 )}

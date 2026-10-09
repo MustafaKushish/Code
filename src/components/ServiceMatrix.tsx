@@ -1,26 +1,24 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Laptop, Gamepad2, KeyRound, HardDrive, Microscope, Smartphone } from 'lucide-react';
+import { SectionHeading } from './ui/SectionHeading';
 
 export const ServiceMatrix: React.FC = () => {
   return (
-    <section id="services" className="py-16 md:py-24 relative">
+    <section id="services" className="py-16 md:py-24 relative section-band">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-2">
-            // Leistungsspektrum
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
-            Echtes Handwerk auf Platinenebene
-          </h2>
-          <p className="text-[#839897] text-sm sm:text-base leading-relaxed">
-            Wo herkömmliche Werkstätten aufgeben und nur teure Neuteile verkaufen wollen, reparieren wir direkt auf Bauteilebene.
-          </p>
-        </div>
+        <SectionHeading
+          index="03"
+          eyebrow="Leistungen"
+          title="Echtes Handwerk auf Platinenebene"
+          intro="Wo andere Werkstätten aufgeben und nur teure Neuteile verkaufen, reparieren wir direkt am Bauteil."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card 1: Laptop & MacBook */}
-          <div className="bg-[#0D1618]/80 hover:bg-[#132124]/90 border border-[#C9743F]/25 hover:border-[#FF8D4D] rounded-2xl p-6 transition-all duration-300 group hover:-translate-y-1 shadow-lg">
-            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">💻</div>
+          <div className="reveal bg-[#0B1315]/85 hover:bg-[#0F1A1C] border border-white/[0.08] hover:border-[#00F5D4]/40 rounded-2xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div className="w-12 h-12 mb-5 rounded-xl flex items-center justify-center border border-[#00F5D4]/30 bg-[#00F5D4]/10 text-[#00F5D4] group-hover:scale-105 transition-transform">
+              <Laptop className="w-6 h-6" strokeWidth={1.6} />
+            </div>
             <h3 className="text-lg font-bold text-white mb-2">
               Laptop, MacBook &amp; PC-Systeme
             </h3>
@@ -51,8 +49,10 @@ export const ServiceMatrix: React.FC = () => {
           </div>
 
           {/* Card 2: Konsolen & Controller */}
-          <div className="bg-[#0D1618]/80 hover:bg-[#132124]/90 border border-[#C9743F]/25 hover:border-[#FF8D4D] rounded-2xl p-6 transition-all duration-300 group hover:-translate-y-1 shadow-lg">
-            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">🎮</div>
+          <div className="reveal bg-[#0B1315]/85 hover:bg-[#0F1A1C] border border-white/[0.08] hover:border-[#00F5D4]/40 rounded-2xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div className="w-12 h-12 mb-5 rounded-xl flex items-center justify-center border border-[#FF8D4D]/30 bg-[#FF8D4D]/10 text-[#FF8D4D] group-hover:scale-105 transition-transform">
+              <Gamepad2 className="w-6 h-6" strokeWidth={1.6} />
+            </div>
             <h3 className="text-lg font-bold text-white mb-2">
               Gaming-Konsolen &amp; Controller
             </h3>
@@ -83,8 +83,10 @@ export const ServiceMatrix: React.FC = () => {
           </div>
 
           {/* Card 3: Autoschlüssel */}
-          <div className="bg-[#0D1618]/80 hover:bg-[#132124]/90 border border-[#C9743F]/25 hover:border-[#FF8D4D] rounded-2xl p-6 transition-all duration-300 group hover:-translate-y-1 shadow-lg">
-            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">🔑</div>
+          <div className="reveal bg-[#0B1315]/85 hover:bg-[#0F1A1C] border border-white/[0.08] hover:border-[#00F5D4]/40 rounded-2xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div className="w-12 h-12 mb-5 rounded-xl flex items-center justify-center border border-[#00F5D4]/30 bg-[#00F5D4]/10 text-[#00F5D4] group-hover:scale-105 transition-transform">
+              <KeyRound className="w-6 h-6" strokeWidth={1.6} />
+            </div>
             <h3 className="text-lg font-bold text-white mb-2">
               Autoschlüssel &amp; Funkschlüssel
             </h3>
@@ -98,7 +100,7 @@ export const ServiceMatrix: React.FC = () => {
               </li>
               <li className="flex items-center gap-2 text-[#F3F7F7]">
                 <Check className="w-3.5 h-3.5 text-[#00F5D4] shrink-0" />
-                <span>Austausch fest verlöteter Akkus (z. B. BMWフラッシュ)</span>
+                <span>Austausch fest verlöteter Akkus (z. B. BMW-Schlüssel)</span>
               </li>
               <li className="flex items-center gap-2 text-[#F3F7F7]">
                 <Check className="w-3.5 h-3.5 text-[#00F5D4] shrink-0" />
@@ -115,8 +117,10 @@ export const ServiceMatrix: React.FC = () => {
           </div>
 
           {/* Card 4: Notfall-Datenrettung */}
-          <div className="bg-[#0D1618]/80 hover:bg-[#132124]/90 border border-[#C9743F]/25 hover:border-[#FF8D4D] rounded-2xl p-6 transition-all duration-300 group hover:-translate-y-1 shadow-lg">
-            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">💾</div>
+          <div className="reveal bg-[#0B1315]/85 hover:bg-[#0F1A1C] border border-white/[0.08] hover:border-[#00F5D4]/40 rounded-2xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div className="w-12 h-12 mb-5 rounded-xl flex items-center justify-center border border-[#FF8D4D]/30 bg-[#FF8D4D]/10 text-[#FF8D4D] group-hover:scale-105 transition-transform">
+              <HardDrive className="w-6 h-6" strokeWidth={1.6} />
+            </div>
             <h3 className="text-lg font-bold text-white mb-2">
               Chip-Level Notfall-Datenrettung
             </h3>
@@ -147,8 +151,10 @@ export const ServiceMatrix: React.FC = () => {
           </div>
 
           {/* Card 5: Mikrolöten & B2B */}
-          <div className="bg-[#0D1618]/80 hover:bg-[#132124]/90 border border-[#C9743F]/25 hover:border-[#FF8D4D] rounded-2xl p-6 transition-all duration-300 group hover:-translate-y-1 shadow-lg">
-            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">🔬</div>
+          <div className="reveal bg-[#0B1315]/85 hover:bg-[#0F1A1C] border border-white/[0.08] hover:border-[#00F5D4]/40 rounded-2xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div className="w-12 h-12 mb-5 rounded-xl flex items-center justify-center border border-[#00F5D4]/30 bg-[#00F5D4]/10 text-[#00F5D4] group-hover:scale-105 transition-transform">
+              <Microscope className="w-6 h-6" strokeWidth={1.6} />
+            </div>
             <h3 className="text-lg font-bold text-white mb-2">
               Mikrolöten &amp; Platinenservice
             </h3>
@@ -179,8 +185,10 @@ export const ServiceMatrix: React.FC = () => {
           </div>
 
           {/* Card 6: Smartphone & Tablet */}
-          <div className="bg-[#0D1618]/80 hover:bg-[#132124]/90 border border-[#C9743F]/25 hover:border-[#FF8D4D] rounded-2xl p-6 transition-all duration-300 group hover:-translate-y-1 shadow-lg">
-            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">📱</div>
+          <div className="reveal bg-[#0B1315]/85 hover:bg-[#0F1A1C] border border-white/[0.08] hover:border-[#00F5D4]/40 rounded-2xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div className="w-12 h-12 mb-5 rounded-xl flex items-center justify-center border border-[#FF8D4D]/30 bg-[#FF8D4D]/10 text-[#FF8D4D] group-hover:scale-105 transition-transform">
+              <Smartphone className="w-6 h-6" strokeWidth={1.6} />
+            </div>
             <h3 className="text-lg font-bold text-white mb-2">
               Smartphone &amp; Tablet Service
             </h3>

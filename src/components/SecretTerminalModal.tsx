@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldCheck, ShieldAlert, Terminal, Lock, Unlock, X, RefreshCw, Cpu, CheckCircle } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Terminal, Lock, X, RefreshCw, Cpu, CheckCircle } from 'lucide-react';
+import { verifyAdminKey, setAdminKey } from '../services/cloudflareSync';
 
 interface SecretTerminalModalProps {
   isOpen: boolean;
@@ -32,49 +33,35 @@ export const SecretTerminalModal: React.FC<SecretTerminalModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleVerifyPin = (inputPin = pin) => {
-    const clean = inputPin.trim();
-    if (!clean) return;
+  const handleVerifyKey = async () => {
+    const clean = pin.trim();
+    if (!clean || isVerifying) return;
 
     setIsVerifying(true);
     setErrorMsg(null);
 
-    // Workshop Master PIN is 2026
-    if (clean === '2026' || clean.toLowerCase() === 'admin2026') {
+    // Der Schlüssel wird ausschließlich vom Worker geprüft – im Website-Code steht keiner.
+    const result = await verifyAdminKey(clean);
+    if (result === 'ok') {
+      setAdminKey(clean);
       setIsSuccess(true);
       setTimeout(() => {
         onUnlockSuccess();
         onClose();
       }, 700);
-    } else {
-      setTimeout(() => {
-        setIsVerifying(false);
-        setErrorMsg('ZUGRIFF VERWEIGERT // UNGÜLTIGER WORKSHOP-PIN');
-        setPin('');
-        inputRef.current?.focus();
-      }, 400);
+      return;
     }
-  };
 
-  const handleKeypadPress = (val: string) => {
-    if (isVerifying || isSuccess) return;
-    if (val === 'CLEAR') {
-      setPin('');
-      setErrorMsg(null);
-      return;
-    }
-    if (val === 'ENTER') {
-      handleVerifyPin();
-      return;
-    }
-    if (pin.length < 8) {
-      const nextPin = pin + val;
-      setPin(nextPin);
-      setErrorMsg(null);
-      if (nextPin === '2026') {
-        handleVerifyPin(nextPin);
-      }
-    }
+    setIsVerifying(false);
+    setPin('');
+    setErrorMsg(
+      result === 'locked'
+        ? 'ZU VIELE FEHLVERSUCHE // ZUGANG 15 MINUTEN GESPERRT'
+        : result === 'offline'
+        ? 'SERVER NICHT ERREICHBAR // BITTE SPÄTER ERNEUT VERSUCHEN'
+        : 'ZUGRIFF VERWEIGERT // UNGÜLTIGER WERKSTATT-SCHLÜSSEL'
+    );
+    inputRef.current?.focus();
   };
 
   return (
@@ -127,50 +114,41 @@ export const SecretTerminalModal: React.FC<SecretTerminalModalProps> = ({
                 </div>
 
                 <p className="text-[#839897] text-[11px] mb-4">
-                  Bitte PIN für die Freischaltung des Werkstatt-Managers eingeben:
+                  Bitte Werkstatt-Schlüssel für die Freischaltung des Werkstatt-Managers eingeben:
                 </p>
 
-                {/* Hidden physical keyboard input */}
-                <input
-                  ref={inputRef}
-                  type="password"
-                  maxLength={6}
-                  value={pin}
-                  onChange={(e) => {
-                    const next = e.target.value;
-                    setPin(next);
-                    if (next === '2026') {
-                      handleVerifyPin(next);
-                    }
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleVerifyKey();
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleVerifyPin();
-                    if (e.key === 'Escape') onClose();
-                  }}
-                  className="opacity-0 absolute -z-10"
-                />
-
-                {/* Glowing PIN Display Slots */}
-                <div
-                  onClick={() => inputRef.current?.focus()}
-                  className="flex items-center justify-center gap-3 py-2 cursor-pointer"
+                  className="flex gap-2 max-w-xs mx-auto"
                 >
-                  {[0, 1, 2, 3].map((idx) => {
-                    const filled = pin.length > idx;
-                    return (
-                      <div
-                        key={idx}
-                        className={`w-11 h-12 rounded-xl flex items-center justify-center text-lg font-bold transition-all border ${
-                          filled
-                            ? 'bg-[#00F5D4]/20 border-[#00F5D4] text-[#00F5D4] shadow-[0_0_12px_rgba(0,245,212,0.5)]'
-                            : 'bg-[#050B0C] border-white/20 text-white/30'
-                        }`}
-                      >
-                        {filled ? '•' : ''}
-                      </div>
-                    );
-                  })}
-                </div>
+                  <input
+                    ref={inputRef}
+                    type="password"
+                    autoComplete="current-password"
+                    aria-label="Werkstatt-Schlüssel"
+                    placeholder="Werkstatt-Schlüssel"
+                    value={pin}
+                    onChange={(e) => {
+                      setPin(e.target.value);
+                      setErrorMsg(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') onClose();
+                    }}
+                    disabled={isVerifying}
+                    className="flex-1 min-w-0 bg-[#050B0C] border border-white/20 focus:border-[#00F5D4] rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isVerifying || !pin.trim()}
+                    className="px-4 rounded-xl bg-[#00F5D4] text-[#060B0C] font-bold text-xs uppercase hover:bg-white transition cursor-pointer disabled:opacity-40"
+                  >
+                    {isVerifying ? <RefreshCw className="w-3.5 h-3.5 animate-spin mx-auto" /> : 'OK'}
+                  </button>
+                </form>
 
                 {errorMsg && (
                   <div className="mt-3 p-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[11px] flex items-center justify-center gap-1.5 animate-shake">
@@ -178,42 +156,6 @@ export const SecretTerminalModal: React.FC<SecretTerminalModalProps> = ({
                     <span>{errorMsg}</span>
                   </div>
                 )}
-
-                {/* Touch/Mobile Numeric Keypad */}
-                <div className="grid grid-cols-3 gap-2 mt-5 max-w-xs mx-auto">
-                  {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                    <button
-                      key={digit}
-                      type="button"
-                      onClick={() => handleKeypadPress(digit)}
-                      className="py-2.5 rounded-lg bg-[#0F1B1D] border border-white/10 hover:border-[#00F5D4]/60 hover:bg-[#00F5D4]/15 active:scale-95 text-white font-bold text-sm transition cursor-pointer select-none"
-                    >
-                      {digit}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => handleKeypadPress('CLEAR')}
-                    className="py-2.5 rounded-lg bg-[#1A1210] border border-red-500/30 hover:border-red-400 active:scale-95 text-red-400 font-bold text-xs uppercase transition cursor-pointer select-none"
-                  >
-                    C
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleKeypadPress('0')}
-                    className="py-2.5 rounded-lg bg-[#0F1B1D] border border-white/10 hover:border-[#00F5D4]/60 hover:bg-[#00F5D4]/15 active:scale-95 text-white font-bold text-sm transition cursor-pointer select-none"
-                  >
-                    0
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleKeypadPress('ENTER')}
-                    disabled={isVerifying || !pin.trim()}
-                    className="py-2.5 rounded-lg bg-[#00F5D4] text-[#060B0C] border border-[#00F5D4] active:scale-95 font-bold text-xs uppercase hover:bg-white transition cursor-pointer select-none disabled:opacity-40"
-                  >
-                    {isVerifying ? <RefreshCw className="w-3.5 h-3.5 animate-spin mx-auto" /> : 'OK'}
-                  </button>
-                </div>
               </>
             )}
           </div>
@@ -221,7 +163,7 @@ export const SecretTerminalModal: React.FC<SecretTerminalModalProps> = ({
 
         {/* Terminal Footer */}
         <div className="bg-[#050A0B] px-4 py-2.5 border-t border-white/10 flex items-center justify-between text-[10px] text-[#839897]">
-          <span>MASTER PIN: 2026</span>
+          <span>SERVERSEITIG GEPRÜFT</span>
           <span className="flex items-center gap-1 text-[#00F5D4]">
             <Cpu className="w-3 h-3" />
             ONLINE

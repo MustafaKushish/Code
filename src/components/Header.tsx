@@ -1,5 +1,13 @@
-import React, { useRef } from 'react';
-import { Microscope, Calendar, Phone } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Microscope, Calendar, Phone, MessageSquare, Menu, X } from 'lucide-react';
+
+const NAV_LINKS = [
+  { href: '#diagnose', label: 'Preise', index: '01' },
+  { href: '#status', label: 'Auftragsstatus', index: '02' },
+  { href: '#services', label: 'Leistungen', index: '03' },
+  { href: '#ablauf', label: 'Ablauf', index: '04' },
+  { href: '#kontakt', label: 'Kontakt', index: '09' },
+];
 
 interface HeaderProps {
   onOpenSecretModal: () => void;
@@ -13,6 +21,20 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenStatusTracker,
 }) => {
   const logoClicksRef = useRef(0);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const handleStatusClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onOpenStatusTracker();
+  };
   const logoTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleLogoClick = (e: React.MouseEvent) => {
@@ -32,7 +54,13 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-2 sm:top-3 z-40 mx-2 sm:mx-6 mb-4 sm:mb-6">
-      <div className="max-w-7xl mx-auto bg-[#080E10]/95 backdrop-blur-xl border border-[#00F5D4]/25 rounded-xl sm:rounded-2xl px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-[0_12px_40px_rgba(0,0,0,0.7),0_0_20px_rgba(0,245,212,0.08)]">
+      <div
+        className={`max-w-7xl mx-auto backdrop-blur-xl border rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-all duration-300 ${
+          scrolled
+            ? 'bg-[#070C0E]/92 border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.7)]'
+            : 'bg-[#080E10]/70 border-[#00F5D4]/20 shadow-[0_8px_30px_rgba(0,0,0,0.4)]'
+        }`}
+      >
         {/* Brand Logo with 5x secret backdoor click */}
         <div
           onClick={handleLogoClick}
@@ -68,92 +96,103 @@ export const Header: React.FC<HeaderProps> = ({
                 LAB
               </span>
             </div>
-            <span className="text-[8px] sm:text-[9px] font-mono text-zinc-400 tracking-wider">CHIP-LEVEL · NEUMARKT</span>
+            <span className="hidden sm:block text-[8px] sm:text-[9px] font-mono text-zinc-400 tracking-wider">CHIP-LEVEL · NEUMARKT</span>
           </div>
         </div>
 
         {/* Navigation Links (Desktop) */}
-        <nav className="hidden lg:flex items-center gap-7 font-mono text-xs uppercase tracking-wider text-zinc-300">
-          <a href="#diagnose" className="hover:text-[#00F5D4] transition-colors">
-            Preise &amp; Diagnose
-          </a>
-          <a href="#services" className="hover:text-[#00F5D4] transition-colors">
-            Leistungen
-          </a>
-          <a
-            href="#status"
-            onClick={(e) => {
-              e.preventDefault();
-              onOpenStatusTracker();
-            }}
-            className="hover:text-[#00F5D4] transition-colors flex items-center gap-1.5 cursor-pointer text-white font-semibold"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
-            <span>Auftrags-Status</span>
-          </a>
-          <a href="#b2b" className="hover:text-[#00F5D4] transition-colors">
-            B2B
-          </a>
-          <a href="#kontakt" className="hover:text-[#00F5D4] transition-colors">
-            Kontakt
-          </a>
+        <nav className="hidden lg:flex items-center gap-1 text-sm text-zinc-300" aria-label="Hauptnavigation">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={link.href === '#status' ? handleStatusClick : undefined}
+              className="px-3 py-2 rounded-lg hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1.5"
+            >
+              {link.href === '#status' && <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-pulse" />}
+              {link.label}
+            </a>
+          ))}
         </nav>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
-          {/* Mobile Status Trigger */}
-          <button
-            type="button"
-            onClick={onOpenStatusTracker}
-            className="sm:hidden px-2 py-1.5 text-[11px] font-mono font-bold rounded-lg border border-[#00F5D4]/30 bg-[#00F5D4]/10 text-[#00F5D4] flex items-center gap-1 hover:bg-[#00F5D4] hover:text-black transition-all cursor-pointer"
-            title="Auftrags-Status abfragen"
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <a
+            href="tel:+4917641744443"
+            title="Jetzt in der Werkstatt anrufen"
+            aria-label="Anrufen: 0176 4174 4443"
+            className="hidden md:inline-flex w-9 h-9 items-center justify-center rounded-xl text-zinc-200 bg-white/5 border border-white/10 hover:border-[#00F5D4]/60 hover:text-[#00F5D4] transition-all"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-pulse" />
-            <span>Status</span>
-          </button>
+            <Phone className="w-4 h-4" />
+          </a>
 
-          {/* Desktop/Tablet WhatsApp */}
           <a
             href="https://wa.me/4917641744443?text=Hallo%20Mustafa%2C%20ich%20habe%20eine%20Reparatur-Anfrage."
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-bold bg-[#25D366]/20 border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-black transition-all cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-semibold text-[#25D366] bg-[#25D366]/10 border border-[#25D366]/40 hover:bg-[#25D366] hover:text-[#04140A] transition-all"
           >
+            <MessageSquare className="w-4 h-4" />
             <span>WhatsApp</span>
           </a>
 
-          {/* Desktop/Tablet Anrufen */}
-          <a
-            href="tel:+4917641744443"
-            title="Jetzt in der Werkstatt anrufen"
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-white bg-white/5 border border-white/15 hover:border-[#00F5D4] hover:text-[#00F5D4] hover:bg-[#00F5D4]/10 transition-all cursor-pointer"
-          >
-            <Phone className="w-3.5 h-3.5 text-[#00F5D4]" />
-            <span>Anrufen</span>
-          </a>
-
-          {/* Desktop KI Trigger */}
+          {/* Cal.com Termin – Hauptaktion */}
           <button
             type="button"
-            onClick={onOpenAiChat}
-            className="hidden sm:inline-flex px-3 py-1.5 text-xs font-mono font-bold uppercase rounded-lg border border-[#00F5D4] bg-[#4FA39B]/20 text-white hover:bg-[#00F5D4] hover:text-[#060B0C] transition-all shadow-[0_0_12px_rgba(0,245,212,0.25)] items-center gap-1.5 cursor-pointer"
+            data-booking-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
+            className="inline-flex items-center gap-1.5 h-9 px-3 sm:px-4 rounded-xl text-sm font-semibold text-[#160B04] bg-gradient-to-b from-[#FFA060] to-[#D9783E] hover:brightness-110 shadow-[0_6px_20px_rgba(217,120,62,0.35)] transition-all cursor-pointer shrink-0"
           >
-            <Microscope className="w-3.5 h-3.5" />
-            <span>KI-Diagnose</span>
+            <Calendar className="w-4 h-4" />
+            <span>Termin</span>
           </button>
 
-          {/* Cal.com Appointment button (All screens) */}
+          {/* Mobile Menu Toggle */}
           <button
             type="button"
-            data-cal-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
-            data-cal-config='{"layout":"month_view","theme":"dark"}'
-            className="px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-mono font-bold uppercase rounded-lg border border-[#FF8D4D] bg-[#C9743F]/25 text-white hover:bg-[#C9743F] transition-all shadow-[0_0_12px_rgba(201,116,63,0.3)] flex items-center gap-1.5 cursor-pointer shrink-0"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            aria-label={menuOpen ? 'Menü schließen' : 'Menü öffnen'}
+            className="lg:hidden inline-flex w-9 h-9 items-center justify-center rounded-xl text-zinc-200 bg-white/5 border border-white/10 hover:border-[#00F5D4]/60 transition-all cursor-pointer"
           >
-            <Calendar className="w-3.5 h-3.5 text-[#FF8D4D]" />
-            <span>Termin</span>
+            {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu Panel */}
+      {menuOpen && (
+        <div
+          id="mobile-menu"
+          className="lg:hidden max-w-7xl mx-auto mt-2 bg-[#080E10]/98 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-fade-in"
+        >
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={(e) => {
+                setMenuOpen(false);
+                if (link.href === '#status') handleStatusClick(e);
+              }}
+              className="flex items-center justify-between px-4 py-3 rounded-xl text-[15px] text-zinc-200 hover:bg-white/5"
+            >
+              <span>{link.label}</span>
+              <span className="font-mono text-[11px] text-[#FF8D4D]">{link.index}</span>
+            </a>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              onOpenAiChat();
+            }}
+            className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-[15px] text-[#00F5D4] hover:bg-white/5 cursor-pointer"
+          >
+            <Microscope className="w-4 h-4" />
+            <span>KI-Techniker fragen</span>
+          </button>
+        </div>
+      )}
     </header>
   );
 };

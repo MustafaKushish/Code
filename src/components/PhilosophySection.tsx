@@ -1,52 +1,64 @@
 import React from 'react';
 import { Leaf, TrendingDown, Scale } from 'lucide-react';
+import { SectionHeading } from './ui/SectionHeading';
+
+const STATS = [
+  { value: '60–85 %', label: 'günstiger als ein Neugerät', accent: '#FF8D4D' },
+  { value: 'bis 99 %', label: 'des Geräts bleiben im Kreislauf', accent: '#00F5D4' },
+  { value: '> 75 %', label: 'des CO₂ entstehen schon bei der Herstellung', accent: '#7FE3C8' },
+];
+
+const PRINCIPLES = [
+  {
+    title: 'Ressourcen schonen',
+    text: 'Statt ganzer Platinen tauschen wir einzelne SMD- und BGA-Bauteile. Das vermeidet Elektroschrott und erhält dein Gerät.',
+    Icon: Leaf,
+    color: '#00F5D4',
+  },
+  {
+    title: 'Geld sparen',
+    text: 'Die meisten Defekte sitzen in einem kleinen Bauteil oder einer Buchse – nicht im ganzen Gerät. Genau da setzen wir an.',
+    Icon: TrendingDown,
+    color: '#FF8D4D',
+  },
+  {
+    title: 'Ehrlich beraten',
+    text: 'Lohnt sich eine Reparatur nicht oder hält sie nicht dauerhaft, sagen wir dir das klar – bevor Kosten entstehen.',
+    Icon: Scale,
+    color: '#F3F7F7',
+  },
+];
 
 export const PhilosophySection: React.FC = () => {
   return (
-    <section id="haltung" className="py-16 md:py-24 relative">
+    <section id="haltung" className="py-16 md:py-24 relative section-band">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="font-mono text-xs text-[#00F5D4] uppercase tracking-widest block mb-2">
-            // Philosophie &amp; Grundsätze
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
-            Werterhalt statt Obsoleszenz
-          </h2>
-          <p className="text-[#839897] text-sm sm:text-base leading-relaxed">
-            Industrielle Elektronikfertigung beansprucht enorme Primärrohstoffe und Energie. Wir betrachten Instandsetzung nicht als Behelfslösung, sondern als technologisch und ökonomisch überlegene Form des nachhaltigen Werterhalts.
-          </p>
+        <SectionHeading
+          index="06"
+          eyebrow="Haltung"
+          title="Werterhalt statt Wegwerfen"
+          intro="Ein defektes Bauteil ist selten ein Totalschaden. Reparieren spart Geld, Daten und Rohstoffe."
+        />
+
+        <div className="reveal grid grid-cols-1 sm:grid-cols-3 rounded-2xl border border-white/[0.08] bg-[#0B1315]/80 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.08] mb-6 overflow-hidden">
+          {STATS.map((s) => (
+            <div key={s.label} className="p-6 sm:p-8 text-center">
+              <div className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: s.accent }}>
+                {s.value}
+              </div>
+              <div className="mt-1 text-sm text-[#94A9AA]">{s.label}</div>
+            </div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-[#0D1618]/80 border border-[#C9743F]/25 rounded-2xl p-6 hover:border-[#00F5D4] transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#00F5D4]/10 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4] mb-4">
-              <Leaf className="w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {PRINCIPLES.map(({ title, text, Icon, color }) => (
+            <div key={title} className="reveal rounded-2xl border border-white/[0.08] bg-[#0B1315]/60 p-6">
+              <Icon className="w-6 h-6 mb-4" style={{ color }} strokeWidth={1.6} />
+              <h3 className="text-base font-semibold text-white mb-1.5">{title}</h3>
+              <p className="text-sm text-[#94A9AA] leading-relaxed">{text}</p>
             </div>
-            <h4 className="text-base font-bold text-[#00F5D4] mb-2">Ressourceneffizienz</h4>
-            <p className="text-xs sm:text-sm text-[#839897] leading-relaxed">
-              Über 75 % der gesamten CO₂-Emissionen moderner IT-Hardware entstehen vor Inbetriebnahme im Rahmen der Halbleiter- und Platinenproduktion. Durch den präzisen Tausch einzelner SMD- und BGA-Komponenten verbleiben bis zu 99 % des Basismaterials im Lebenszyklus – giftiger Elektroschrott wird aktiv vermieden.
-            </p>
-          </div>
-
-          <div className="bg-[#0D1618]/80 border border-[#C9743F]/25 rounded-2xl p-6 hover:border-[#FF8D4D] transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#FF8D4D]/10 border border-[#FF8D4D]/30 flex items-center justify-center text-[#FF8D4D] mb-4">
-              <TrendingDown className="w-6 h-6" />
-            </div>
-            <h4 className="text-base font-bold text-[#FF8D4D] mb-2">Ökonomische Rationalität</h4>
-            <p className="text-xs sm:text-sm text-[#839897] leading-relaxed">
-              Elektronische Defekte resultieren in den seltensten Fällen aus einem Totalversagen der Kernarchitektur, sondern meist aus peripherer Bauteilalterung oder mechanischer Beanspruchung. Gezielte Komponentenreparaturen sparen 60 bis 85 % gegenüber Neuanschaffungen – bei voller Funktions- und Datenkontinuität.
-            </p>
-          </div>
-
-          <div className="bg-[#0D1618]/80 border border-[#C9743F]/25 rounded-2xl p-6 hover:border-white transition-all">
-            <div className="w-12 h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white mb-4">
-              <Scale className="w-6 h-6" />
-            </div>
-            <h4 className="text-base font-bold text-white mb-2">Diagnostische Integrität</h4>
-            <p className="text-xs sm:text-sm text-[#839897] leading-relaxed">
-              Jeder Auftrag wird nach fundierten mess- und löttechnischen Parametern bewertet. Weist eine Baugruppe strukturelle Folgeschäden auf oder übersteigt der Aufwand den tatsächlichen Nutzwert, sprechen wir eine klare, sachliche Empfehlung aus. Wir setzen nur instand, was dauerhaft und betriebssicher funktioniert.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
     </section>
