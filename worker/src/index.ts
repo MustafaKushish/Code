@@ -48,6 +48,7 @@ const SYNC_PREFIX = 'SYNC_';
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const MAX_STATUS_FAILS = 10;
 const MAX_AUTH_FAILS = 5;
+const RATE_RETENTION_MS = 24 * 60 * 60 * 1000;
 
 const DEFAULT_ORIGINS = ['https://www.code-ger.de', 'https://code-ger.de'];
 
@@ -282,4 +283,6 @@ async function recordFailure(env: Env, key: string): Promise<void> {
     )
     .bind(key, now, now, RATE_WINDOW_MS, now, RATE_WINDOW_MS, now)
     .run();
+  // Datensparsamkeit: IP-Einträge älter als 24 Stunden löschen (siehe Datenschutzerklärung)
+  await env.DB.prepare('DELETE FROM rate_limits WHERE window_start < ?').bind(now - RATE_RETENTION_MS).run();
 }
