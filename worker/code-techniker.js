@@ -1,4 +1,4 @@
-// AUTOMATISCH ERZEUGT aus worker/src/index.ts (npm run worker:build) – diesen Inhalt im Cloudflare-Dashboard einfügen.
+// CODE Werkstatt Auftrags-API - automatisch erzeugt aus worker/src/index.ts. Gesamten Inhalt im Cloudflare-Editor einfuegen.
 const ORDER_COLUMNS = [
   "id",
   "date",
