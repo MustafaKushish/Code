@@ -166,6 +166,52 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   iPhone/Android: Statusleiste, Notch und Home-Indikator (Safe Areas)
+--------------------------------------------------------------------------- */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Inhalt beginnt unter der Statusleiste */
+#root {
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+/* Kopfzeile klebt unterhalb der Statusleiste statt darunter zu verschwinden */
+.site-header {
+  top: calc(var(--safe-top) + 0.5rem);
+}
+@media (min-width: 640px) {
+  .site-header {
+    top: calc(var(--safe-top) + 0.75rem);
+  }
+}
+
+/* Deckfläche hinter der Statusleiste, damit Uhrzeit & Akku lesbar bleiben */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-top);
+  background: #060b0c;
+  z-index: 45;
+  pointer-events: none;
+}
+
+/* Dialoge nicht unter Statusleiste oder Home-Indikator */
+[role='dialog'] {
+  padding-top: max(1rem, calc(var(--safe-top) + 0.5rem));
+  padding-bottom: max(1rem, calc(var(--safe-bottom) + 0.5rem));
+}
+
 /* Sichtbarer Tastatur-Fokus (nur bei Tastaturbedienung) */
 :focus-visible {
   outline: 2px solid #00F5D4;
