@@ -1,5 +1,27 @@
-import React, { useState } from 'react';
-import { Bot, Clock, Zap, MessageSquare, ChevronDown, Check, FileText, Search, Sparkles, Layers } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import {
+  Bot,
+  Clock,
+  Zap,
+  MessageSquare,
+  ChevronDown,
+  Check,
+  FileText,
+  Search,
+  Sparkles,
+  Layers,
+  Smartphone,
+  Laptop,
+  Gamepad2,
+  Joystick,
+  KeyRound,
+  HardDrive,
+  Monitor,
+  BatteryCharging,
+  Microscope,
+  Cpu,
+  type LucideIcon,
+} from 'lucide-react';
 import { SectionHeading } from './ui/SectionHeading';
 import { DeviceCategoryKey, FaultItem, CategoryType } from '../types';
 import { CATEGORY_LABELS, REPAIR_DATA } from '../data/repairData';
@@ -10,19 +32,29 @@ interface DiagnoseCalculatorProps {
   onOpenAiChat: (initialQuery?: string) => void;
 }
 
-const SUB_FILTERS: { key: 'all' | CategoryType; label: string; icon: string; shortLabel: string }[] = [
-  { key: 'all', label: 'Alle Ebenen', shortLabel: 'Alle', icon: '⚡' },
-  { key: 'display', label: 'Display & Optik', shortLabel: 'Display', icon: '🖥️' },
-  { key: 'module', label: 'Module & Akku', shortLabel: 'Module/Akku', icon: '🔋' },
-  { key: 'board', label: 'Platine & Mikrolöten', shortLabel: 'Platine', icon: '🔬' },
-  { key: 'software', label: 'Software & Firmware', shortLabel: 'Software', icon: '💾' },
+// Symbole statt Emojis – einheitlich mit dem restlichen Design
+const DEVICE_ICONS: Record<DeviceCategoryKey, LucideIcon> = {
+  phone: Smartphone,
+  laptop_pc: Laptop,
+  konsole: Gamepad2,
+  controller: Joystick,
+  schluessel: KeyRound,
+  daten: HardDrive,
+};
+
+const SUB_FILTERS: { key: 'all' | CategoryType; label: string; icon: LucideIcon; shortLabel: string }[] = [
+  { key: 'all', label: 'Alle Ebenen', shortLabel: 'Alle', icon: Zap },
+  { key: 'display', label: 'Display & Optik', shortLabel: 'Display', icon: Monitor },
+  { key: 'module', label: 'Module & Akku', shortLabel: 'Module/Akku', icon: BatteryCharging },
+  { key: 'board', label: 'Platine & Mikrolöten', shortLabel: 'Platine', icon: Microscope },
+  { key: 'software', label: 'Software & Firmware', shortLabel: 'Software', icon: Cpu },
 ];
 
-const LAYER_BADGES: Record<CategoryType, { label: string; icon: string; color: string }> = {
-  display: { label: 'Display & Optik', icon: '🖥️', color: 'border-blue-400/40 text-blue-300 bg-blue-500/10' },
-  module: { label: 'Module & Akku', icon: '🔋', color: 'border-amber-400/40 text-amber-300 bg-amber-500/10' },
-  board: { label: 'Platine & Mikrolöten', icon: '🔬', color: 'border-[#C9743F]/50 text-[#FF8D4D] bg-[#C9743F]/10' },
-  software: { label: 'Software & Firmware', icon: '💾', color: 'border-[#00F5D4]/40 text-[#00F5D4] bg-[#00F5D4]/10' },
+const LAYER_BADGES: Record<CategoryType, { label: string; icon: LucideIcon; color: string }> = {
+  display: { label: 'Display & Optik', icon: Monitor, color: 'border-blue-400/40 text-blue-300 bg-blue-500/10' },
+  module: { label: 'Module & Akku', icon: BatteryCharging, color: 'border-amber-400/40 text-amber-300 bg-amber-500/10' },
+  board: { label: 'Platine & Mikrolöten', icon: Microscope, color: 'border-[#C9743F]/50 text-[#FF8D4D] bg-[#C9743F]/10' },
+  software: { label: 'Software & Firmware', icon: Cpu, color: 'border-[#00F5D4]/40 text-[#00F5D4] bg-[#00F5D4]/10' },
 };
 
 export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
@@ -32,6 +64,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
 }) => {
   const [activeSubFilter, setActiveSubFilter] = useState<'all' | CategoryType>('all');
   const [selectedFaultId, setSelectedFaultId] = useState<string>('');
+  const priceRef = useRef<HTMLDivElement>(null);
   const [isExpressChecked, setIsExpressChecked] = useState(false);
   const [showTechDetails, setShowTechDetails] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -111,7 +144,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
         />
 
         {/* Diagnosis HUD Container */}
-        <div className="max-w-5xl mx-auto bg-[#0A1214]/95 border border-[#C9743F]/30 rounded-3xl p-5 sm:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto bg-[#0A1214]/95 border border-[#C9743F]/30 rounded-3xl px-3 py-5 sm:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-xl">
           {/* KI-Techniker Banner */}
           <button
             type="button"
@@ -139,23 +172,24 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
           </button>
 
           {/* 1. Haupt-Geräteauswahl */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-6">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-6">
             {(Object.keys(CATEGORY_LABELS) as DeviceCategoryKey[]).map((catKey) => {
               const info = CATEGORY_LABELS[catKey];
+              const DeviceIcon = DEVICE_ICONS[catKey];
               const isActive = currentCategory === catKey;
               return (
                 <button
                   key={catKey}
                   type="button"
                   onClick={() => handleCategorySwitch(catKey)}
-                  className={`py-3 px-2 rounded-xl border text-center font-mono text-xs flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`py-3 px-1.5 rounded-xl border text-center text-xs sm:text-[13px] flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                     isActive
                       ? 'bg-[#C9743F]/25 border-[#FF8D4D] text-white shadow-[0_0_15px_rgba(201,116,63,0.35)] -translate-y-0.5'
                       : 'bg-[#0E1A1C]/90 border-[#C9743F]/20 text-[#839897] hover:border-[#4FA39B]/50 hover:text-white'
                   }`}
                 >
-                  <span className="text-xl">{info.icon}</span>
-                  <span className="font-semibold">{info.label}</span>
+                  <DeviceIcon className="w-5 h-5" strokeWidth={1.75} />
+                  <span className="font-medium leading-tight">{info.label}</span>
                 </button>
               );
             })}
@@ -195,7 +229,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                         : 'bg-[#0E181A] border border-white/10 text-zinc-300 hover:border-[#00F5D4]/40 hover:text-white'
                     }`}
                   >
-                    <span>{filter.icon}</span>
+                    <filter.icon className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{filter.label}</span>
                     <span className="sm:hidden">{filter.shortLabel}</span>
                     <span
@@ -250,6 +284,10 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                     onClick={() => {
                       setSelectedFaultId(f.id);
                       setIsExpressChecked(false);
+                      // Auf dem Handy liegt der Preis weit unten – direkt hinscrollen
+                      if (window.matchMedia('(max-width: 1023px)').matches) {
+                        setTimeout(() => priceRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+                      }
                     }}
                     className={`text-left p-4 rounded-xl border transition-all cursor-pointer relative ${
                       isSelected
@@ -263,7 +301,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                           <span
                             className={`inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-md border ${badge.color}`}
                           >
-                            <span>{badge.icon}</span>
+                            <badge.icon className="w-3 h-3" />
                             <span>{badge.label}</span>
                           </span>
                         )}
@@ -288,7 +326,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
           </div>
 
           {/* Pricing & Customer Outcome Display Card */}
-          <div className="bg-[#050B0D] border border-[#C9743F]/30 rounded-2xl p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6">
+          <div ref={priceRef} className="scroll-mt-24 bg-[#050B0D] border border-[#C9743F]/30 rounded-2xl p-5 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6">
             <div className="lg:col-span-8 space-y-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-xs text-[#839897] uppercase tracking-wider block">
@@ -336,13 +374,14 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                 )}
               </div>
 
-              <div className="text-xs font-mono text-[#839897] flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span>✓ Verbindlicher Festpreis vor Arbeitsbeginn</span>
-                <span>•</span>
-                <span>✓ 6 Monate Garantie</span>
-                <span>•</span>
-                <span>✓ No Data – No Fee</span>
-              </div>
+              <ul className="text-[13px] text-[#A3B5B6] flex flex-col sm:flex-row sm:flex-wrap gap-x-5 gap-y-1.5">
+                {['Verbindlicher Festpreis vor Arbeitsbeginn', '6 Monate Garantie', 'No Data – No Fee'].map((t) => (
+                  <li key={t} className="flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-[#00F5D4] shrink-0" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
 
               {/* Express Toggle */}
               {currentFault.express && (

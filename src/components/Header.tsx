@@ -53,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-2 sm:top-3 z-40 mx-2 sm:mx-6 mb-4 sm:mb-6">
+    <header className="site-header sticky z-40 mx-2 sm:mx-6 mb-4 sm:mb-6">
       <div
         className={`max-w-7xl mx-auto backdrop-blur-xl border rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-3 transition-all duration-300 ${
           scrolled

@@ -65,7 +65,7 @@ export const SecretTerminalModal: React.FC<SecretTerminalModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+    <div role="dialog" aria-modal="true" aria-label="Werkstatt-Zugang" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
       <div className="bg-[#070D0E] border-2 border-[#00F5D4]/40 rounded-2xl w-full max-w-md shadow-[0_25px_70px_rgba(0,0,0,0.95)] overflow-hidden font-mono text-xs text-[#F3F7F7] relative">
         {/* Terminal Title Bar */}
         <div className="bg-[#0D181A] px-4 py-3 border-b border-[#00F5D4]/20 flex items-center justify-between">

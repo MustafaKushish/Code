@@ -177,7 +177,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-fade-in">
+    <div role="dialog" aria-modal="true" aria-label="QR-Code scannen" className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-fade-in">
       <div className="bg-[#0B1416] border-2 border-[#00F5D4] rounded-2xl w-full max-w-lg shadow-[0_20px_60px_rgba(0,0,0,0.95)] overflow-hidden relative flex flex-col">
         {/* Header */}
         <div className="p-4 bg-[#050A0C] border-b border-white/10 flex items-center justify-between">
