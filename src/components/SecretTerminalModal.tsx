@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ShieldCheck, ShieldAlert, Terminal, Lock, X, RefreshCw, Cpu, CheckCircle } from 'lucide-react';
-import { verifyAdminKey, setAdminKey } from '../services/cloudflareSync';
+import { verifyAdminKey, setAdminKey, adminKeyErrorText } from '../services/cloudflareSync';
 
 interface SecretTerminalModalProps {
   isOpen: boolean;
@@ -59,7 +59,9 @@ export const SecretTerminalModal: React.FC<SecretTerminalModalProps> = ({
         ? 'ZU VIELE FEHLVERSUCHE // ZUGANG 15 MINUTEN GESPERRT'
         : result === 'offline'
         ? 'SERVER NICHT ERREICHBAR // BITTE SPÄTER ERNEUT VERSUCHEN'
-        : 'ZUGRIFF VERWEIGERT // UNGÜLTIGER WERKSTATT-SCHLÜSSEL'
+        : result === 'invalid'
+        ? 'ZUGRIFF VERWEIGERT // UNGÜLTIGER WERKSTATT-SCHLÜSSEL'
+        : adminKeyErrorText(result).toUpperCase()
     );
     inputRef.current?.focus();
   };

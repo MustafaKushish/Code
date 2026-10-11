@@ -58,7 +58,10 @@ export interface User {
   id: string;
   name: string;
   username: string;
-  pin: string;
+  /** Nur noch für alte Konten; neue PINs liegen als pinHash + pinSalt vor */
+  pin?: string;
+  pinHash?: string;
+  pinSalt?: string;
   role: 'admin' | 'techniker' | 'buchhaltung';
   createdAt: string;
   active?: boolean;

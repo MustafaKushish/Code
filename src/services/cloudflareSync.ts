@@ -1,4 +1,4 @@
-import { Order, InventoryItem, Appointment } from '../manager/types';
+import { Order, InventoryItem, Appointment, User, WorkshopSettings } from '../manager/types';
 
 export const CLOUDFLARE_WORKER_BASE = 'https://code-techniker.mustafa-alzurgany.workers.dev';
 export const CLOUDFLARE_WORKER_URL = `${CLOUDFLARE_WORKER_BASE}/api/orders`;
@@ -36,12 +36,18 @@ function adminHeaders(extra: Record<string, string> = {}): Record<string, string
   return { ...extra, Authorization: `Bearer ${getAdminKey()}` };
 }
 
-export type AdminKeyCheck = 'ok' | 'invalid' | 'locked' | 'offline';
+export type AdminKeyCheck = 'ok' | 'invalid' | 'locked' | 'offline' | 'charset' | 'blocked-origin';
+
+// Nur diese Adressen lässt der Worker zu (siehe worker/src/index.ts, DEFAULT_ORIGINS)
+const WORKER_ORIGINS = ['https://www.code-ger.de', 'https://code-ger.de'];
 
 /**
  * Prüft einen Werkstatt-Schlüssel beim Worker
  */
 export async function verifyAdminKey(key: string): Promise<AdminKeyCheck> {
+  // Browser können Zeichen wie „–“, „€“ oder Emojis nicht im Header senden; fetch bricht dann
+  // ohne Netzwerkfehler ab und es sah bisher nach „Server nicht erreichbar“ aus.
+  if (/[^\x20-\x7E]/.test(key)) return 'charset';
   try {
     const res = await fetch(`${CLOUDFLARE_WORKER_BASE}/api/auth`, {
       headers: { Authorization: `Bearer ${key}` },
@@ -51,7 +57,24 @@ export async function verifyAdminKey(key: string): Promise<AdminKeyCheck> {
     if (res.status === 401) return 'invalid';
     return 'offline';
   } catch {
+    const local = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+    if (!local && !WORKER_ORIGINS.includes(window.location.origin)) return 'blocked-origin';
     return 'offline';
+  }
+}
+
+export function adminKeyErrorText(result: AdminKeyCheck): string {
+  switch (result) {
+    case 'locked':
+      return 'Zu viele Fehlversuche. Zugang für 15 Minuten gesperrt.';
+    case 'invalid':
+      return 'Werkstatt-Schlüssel stimmt nicht.';
+    case 'charset':
+      return 'Der Schlüssel enthält Sonderzeichen (z. B. ä, ö, ü, ß, –, €). Bitte in Cloudflare einen Schlüssel nur aus A–Z, a–z, 0–9 und - setzen.';
+    case 'blocked-origin':
+      return 'Auf dieser Adresse ist der Manager gesperrt. Bitte www.code-ger.de öffnen.';
+    default:
+      return 'Keine Verbindung zum Server. Bitte Internet prüfen.';
   }
 }
 
@@ -89,6 +112,8 @@ export async function fetchPublicOrderStatus(
 
 export const INVENTORY_SYNC_ID = 'SYNC_INVENTORY_GLOBAL';
 export const APPOINTMENTS_SYNC_ID = 'SYNC_APPOINTMENTS_GLOBAL';
+export const USERS_SYNC_ID = 'SYNC_USERS_GLOBAL';
+export const SETTINGS_SYNC_ID = 'SYNC_SETTINGS_GLOBAL';
 
 export function sanitizeOrderForWorker(o: Partial<Order>) {
   return {
@@ -124,10 +149,9 @@ export function sanitizeOrderForWorker(o: Partial<Order>) {
  */
 export async function saveOrderToCloudflare(order: Partial<Order>): Promise<boolean> {
   try {
+    // Der Worker speichert mit INSERT OR REPLACE. Vorher zu löschen hieße: bricht die
+    // Verbindung zwischen den beiden Anfragen ab, ist der Auftrag in der Cloud weg.
     const sanitized = sanitizeOrderForWorker(order);
-    if (sanitized.id) {
-      await deleteOrderFromCloudflare(sanitized.id);
-    }
     const res = await fetch(CLOUDFLARE_WORKER_URL, {
       method: 'POST',
       headers: adminHeaders({ 'Content-Type': 'application/json' }),
@@ -187,8 +211,11 @@ export async function fetchFromCloudflare(): Promise<{
   orders: Order[];
   inventory: InventoryItem[] | null;
   appointments: Appointment[] | null;
+  users: User[] | null;
+  settings: WorkshopSettings | null;
   success: boolean;
 }> {
+  const failed = { orders: [] as Order[], inventory: null, appointments: null, users: null, settings: null, success: false };
   try {
     const res = await fetch(`${CLOUDFLARE_WORKER_URL}?_t=${Date.now()}`, { headers: adminHeaders() });
     if (res.status === 401) {
@@ -197,40 +224,32 @@ export async function fetchFromCloudflare(): Promise<{
       window.dispatchEvent(new Event(ADMIN_UNAUTHORIZED_EVENT));
     }
     if (!res.ok) {
-      return { orders: [], inventory: null, appointments: null, success: false };
+      return failed;
     }
     const rawData = await res.json();
     if (!Array.isArray(rawData)) {
-      return { orders: [], inventory: null, appointments: null, success: false };
+      return failed;
     }
 
     let parsedInventory: InventoryItem[] | null = null;
     let parsedAppointments: Appointment[] | null = null;
+    let parsedUsers: User[] | null = null;
+    let parsedSettings: WorkshopSettings | null = null;
     const orders: Order[] = [];
 
     for (const item of rawData) {
-      if (item && item.id === INVENTORY_SYNC_ID) {
-        try {
-          if (item.address) {
-            const inv = JSON.parse(item.address);
-            if (Array.isArray(inv)) {
-              parsedInventory = inv;
-            }
-          }
-        } catch (e) {
-          console.warn('Fehler beim Parsen des Cloudflare-Lagerbestands:', e);
-        }
+      if (item && item.id === USERS_SYNC_ID) {
+        const list = parseSyncPayload(item.address);
+        if (Array.isArray(list) && list.length > 0) parsedUsers = list;
+      } else if (item && item.id === SETTINGS_SYNC_ID) {
+        const obj = parseSyncPayload(item.address);
+        if (obj && typeof obj === 'object' && !Array.isArray(obj)) parsedSettings = obj;
+      } else if (item && item.id === INVENTORY_SYNC_ID) {
+        const list = parseSyncPayload(item.address);
+        if (Array.isArray(list)) parsedInventory = list;
       } else if (item && item.id === APPOINTMENTS_SYNC_ID) {
-        try {
-          if (item.address) {
-            const apts = JSON.parse(item.address);
-            if (Array.isArray(apts)) {
-              parsedAppointments = apts;
-            }
-          }
-        } catch (e) {
-          console.warn('Fehler beim Parsen der Cloudflare-Termine:', e);
-        }
+        const list = parseSyncPayload(item.address);
+        if (Array.isArray(list)) parsedAppointments = list;
       } else if (item && item.id && !item.id.startsWith('SYNC_')) {
         orders.push({
           id: item.id,
@@ -265,73 +284,67 @@ export async function fetchFromCloudflare(): Promise<{
       }
     }
 
-    return { orders, inventory: parsedInventory, appointments: parsedAppointments, success: true };
+    return {
+      orders,
+      inventory: parsedInventory,
+      appointments: parsedAppointments,
+      users: parsedUsers,
+      settings: parsedSettings,
+      success: true,
+    };
   } catch (err) {
     console.warn('Fehler beim Abrufen von Cloudflare Worker:', err);
-    return { orders: [], inventory: null, appointments: null, success: false };
+    return failed;
+  }
+}
+
+function parseSyncPayload(raw: unknown): any {
+  if (typeof raw !== 'string' || !raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    console.warn('Sync-Datensatz konnte nicht gelesen werden:', e);
+    return null;
   }
 }
 
 /**
- * Save inventory list to Cloudflare Worker
+ * Lager, Termine, Mitarbeiter und Stammdaten liegen als JSON in je einem Sync-Datensatz der
+ * Auftragstabelle. Ein einziger SAVE_ORDER (INSERT OR REPLACE) ersetzt ihn in einem Schritt.
  */
-export async function saveInventoryToCloudflare(items: InventoryItem[]): Promise<boolean> {
+async function saveSyncRecord(id: string, label: string, data: unknown): Promise<boolean> {
   try {
-    // Delete old record first so D1 accepts updated payload
-    await deleteOrderFromCloudflare(INVENTORY_SYNC_ID);
-
     const payload = sanitizeOrderForWorker({
-      id: INVENTORY_SYNC_ID,
-      cust: 'SYSTEM_INVENTORY',
-      address: JSON.stringify(items),
-      device: 'INVENTORY_STORE',
+      id,
+      cust: `SYSTEM_${label}`,
+      address: JSON.stringify(data),
+      device: `${label}_STORE`,
       status: 'SYSTEM',
       paid: 'SYNC',
     });
-
     const res = await fetch(CLOUDFLARE_WORKER_URL, {
       method: 'POST',
       headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ action: 'SAVE_ORDER', order: payload }),
     });
-
     if (!res.ok) return false;
-    const data = await res.json();
-    return !!data.success;
+    const result = await res.json();
+    return !!result.success;
   } catch (err) {
-    console.warn('Fehler beim Speichern des Lagers in Cloudflare:', err);
+    console.warn(`Fehler beim Speichern (${label}) in Cloudflare:`, err);
     return false;
   }
 }
 
-/**
- * Save appointments list to Cloudflare Worker D1 database
- */
-export async function saveAppointmentsToCloudflare(items: Appointment[]): Promise<boolean> {
-  try {
-    // Delete old record first so D1 accepts updated payload
-    await deleteOrderFromCloudflare(APPOINTMENTS_SYNC_ID);
-
-    const payload = sanitizeOrderForWorker({
-      id: APPOINTMENTS_SYNC_ID,
-      cust: 'SYSTEM_APPOINTMENTS',
-      address: JSON.stringify(items),
-      device: 'APPOINTMENTS_STORE',
-      status: 'SYSTEM',
-      paid: 'SYNC',
-    });
-
-    const res = await fetch(CLOUDFLARE_WORKER_URL, {
-      method: 'POST',
-      headers: adminHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify({ action: 'SAVE_ORDER', order: payload }),
-    });
-
-    if (!res.ok) return false;
-    const data = await res.json();
-    return !!data.success;
-  } catch (err) {
-    console.warn('Fehler beim Speichern der Termine in Cloudflare:', err);
-    return false;
-  }
-}
+export const saveInventoryToCloudflare = (items: InventoryItem[]) => saveSyncRecord(INVENTORY_SYNC_ID, 'INVENTORY', items);
+export const saveAppointmentsToCloudflare = (items: Appointment[]) =>
+  saveSyncRecord(APPOINTMENTS_SYNC_ID, 'APPOINTMENTS', items);
+// Mitarbeiter nur mit PIN-Hash, nie mit Klartext-PIN
+export const saveUsersToCloudflare = (users: User[]) =>
+  saveSyncRecord(
+    USERS_SYNC_ID,
+    'USERS',
+    users.map(({ pin: _pin, ...u }) => u)
+  );
+export const saveSettingsToCloudflare = (settings: WorkshopSettings) =>
+  saveSyncRecord(SETTINGS_SYNC_ID, 'SETTINGS', settings);

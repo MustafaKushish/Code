@@ -111,6 +111,63 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const fmtEuro = (v: number) => v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '\u00a0€';
+
+  const renderStock = (item: InventoryItem, isLow: boolean) => (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => onAdjustStock(item.id, -1)}
+        className="w-9 h-9 md:w-6 md:h-6 rounded bg-white/10 hover:bg-[#FF5252]/20 hover:text-[#FF5252] flex items-center justify-center font-bold text-sm cursor-pointer transition"
+        title="1 Stück abbuchen"
+      >
+        −
+      </button>
+      <span
+        className={`font-bold px-2 py-0.5 rounded ${
+          isLow
+            ? 'bg-[#FF5252]/20 text-[#FF5252] border border-[#FF5252]/50'
+            : 'bg-[#00E676]/10 text-[#00E676]'
+        }`}
+      >
+        {item.qty} {isLow && '⚠️'}
+      </span>
+      <button
+        type="button"
+        onClick={() => onAdjustStock(item.id, 1)}
+        className="w-9 h-9 md:w-6 md:h-6 rounded bg-white/10 hover:bg-[#00E676]/20 hover:text-[#00E676] flex items-center justify-center font-bold text-sm cursor-pointer transition"
+        title="1 Stück zubuchen"
+      >
+        +
+      </button>
+    </div>
+  );
+
+  const renderDelete = (item: InventoryItem) => (
+    <button
+      type="button"
+      onClick={() => {
+        if (currentUser?.role === 'admin' || currentUser?.canDelete === true) {
+          setPartToDelete(item);
+        } else {
+          onRequestAdminAuth({
+            type: 'DELETE_PART',
+            title: 'Ersatzteil löschen',
+            description:
+              'Mitarbeiter dürfen Ersatzteile nicht ohne Bestätigung aus dem Lager löschen. Zur Freigabe dieser Löschung ist das Passwort/PIN des Administrators erforderlich.',
+            itemDetails: `Artikel: ${item.name} (ID: ${item.id}) | Bestand: ${item.qty} Stk`,
+            requiredRole: 'admin',
+            onConfirm: () => onDeletePart(item.id),
+          });
+        }
+      }}
+      className="p-2.5 md:p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-[#FF5252] transition cursor-pointer"
+      title={currentUser?.role === 'admin' ? 'Löschen' : 'Löschen (Admin-Bestätigung erforderlich)'}
+    >
+      <Trash2 className="w-4 h-4" />
+    </button>
+  );
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* 4 Stat Cards */}
@@ -335,7 +392,39 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
           </div>
         </div>
 
-        <div className="overflow-x-auto border border-white/10 rounded-xl">
+        {/* Handy: Karten statt breiter Tabelle */}
+        <div className="md:hidden space-y-2.5">
+          {filteredItems.length === 0 ? (
+            <div className="p-6 border border-white/10 rounded-xl text-center text-xs font-mono text-[#859B9E]">Keine Teile gefunden.</div>
+          ) : (
+            filteredItems.map((item) => {
+              const isLow = item.qty <= item.minQty;
+              return (
+                <article key={item.id} className="border border-white/10 rounded-xl bg-[#080E10] p-3 font-mono text-xs">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <strong className="text-white block break-words">{item.name}</strong>
+                      <div className="text-[11px] text-[#859B9E]">
+                        {item.category}
+                        {item.supplier ? ` · ${item.supplier}` : ''}
+                      </div>
+                    </div>
+                    {renderDelete(item)}
+                  </div>
+                  <div className="flex items-center justify-between gap-2 mt-2.5">
+                    {renderStock(item, isLow)}
+                    <div className="text-right text-[11px] text-[#859B9E]">
+                      <div>Min. {item.minQty} · EK {fmtEuro(item.ek)}</div>
+                      <div className="font-bold text-[#FF8D4D]">Wert {fmtEuro(item.qty * item.ek)}</div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })
+          )}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto border border-white/10 rounded-xl">
           <table className="w-full text-left font-mono text-xs border-collapse min-w-[700px]">
             <thead className="bg-[#050A0C] text-[#00F5D4] border-b border-white/10">
               <tr>
@@ -368,33 +457,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
                       </td>
                       <td className="p-3 text-gray-300">{item.category}</td>
                       <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => onAdjustStock(item.id, -1)}
-                            className="w-6 h-6 rounded bg-white/10 hover:bg-[#FF5252]/20 hover:text-[#FF5252] flex items-center justify-center font-bold text-sm cursor-pointer transition"
-                            title="1 Stück abbuchen"
-                          >
-                            −
-                          </button>
-                          <span
-                            className={`font-bold px-2 py-0.5 rounded ${
-                              isLow
-                                ? 'bg-[#FF5252]/20 text-[#FF5252] border border-[#FF5252]/50'
-                                : 'bg-[#00E676]/10 text-[#00E676]'
-                            }`}
-                          >
-                            {item.qty} {isLow && '⚠️'}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => onAdjustStock(item.id, 1)}
-                            className="w-6 h-6 rounded bg-white/10 hover:bg-[#00E676]/20 hover:text-[#00E676] flex items-center justify-center font-bold text-sm cursor-pointer transition"
-                            title="1 Stück zubuchen"
-                          >
-                            +
-                          </button>
-                        </div>
+                        {renderStock(item, isLow)}
                       </td>
                       <td className="p-3 text-gray-400">{item.minQty}</td>
                       <td className="p-3 text-white">
@@ -405,28 +468,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
                       </td>
                       <td className="p-3 text-gray-400">{item.supplier || '–'}</td>
                       <td className="p-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (currentUser?.role === 'admin' || currentUser?.canDelete === true) {
-                              setPartToDelete(item);
-                            } else {
-                              onRequestAdminAuth({
-                                type: 'DELETE_PART',
-                                title: 'Ersatzteil löschen',
-                                description:
-                                  'Mitarbeiter dürfen Ersatzteile nicht ohne Bestätigung aus dem Lager löschen. Zur Freigabe dieser Löschung ist das Passwort/PIN des Administrators erforderlich.',
-                                itemDetails: `Artikel: ${item.name} (ID: ${item.id}) | Bestand: ${item.qty} Stk`,
-                                requiredRole: 'admin',
-                                onConfirm: () => onDeletePart(item.id),
-                              });
-                            }
-                          }}
-                          className="p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-[#FF5252] transition cursor-pointer"
-                          title={currentUser?.role === 'admin' ? 'Löschen' : 'Löschen (Admin-Bestätigung erforderlich)'}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {renderDelete(item)}
                       </td>
                     </tr>
                   );

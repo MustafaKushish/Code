@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, ShieldAlert, KeyRound, AlertCircle } from 'lucide-react';
 import { User, AdminAuthRequest } from './types';
+import { verifyPin } from './pinAuth';
 
 interface AdminConfirmModalProps {
   request: AdminAuthRequest | null;
@@ -14,7 +15,7 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({ request, u
 
   if (!request) return null;
 
-  const handleAuthorize = (e: React.FormEvent) => {
+  const handleAuthorize = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pin.trim()) {
       setErrorMsg('Bitte PIN / Passwort eingeben.');
@@ -22,34 +23,32 @@ export const AdminConfirmModal: React.FC<AdminConfirmModalProps> = ({ request, u
     }
 
     const cleanPin = pin.trim();
+    const allowed = users.filter(
+      (u) =>
+        u.active !== false &&
+        (request.requiredRole === 'admin'
+          ? u.role === 'admin'
+          : u.role === 'admin' || u.role === 'buchhaltung' || u.canSettleInvoices === true)
+    );
+    let ok = false;
+    for (const u of allowed) {
+      if (await verifyPin(u, cleanPin)) {
+        ok = true;
+        break;
+      }
+    }
 
-    if (request.requiredRole === 'admin') {
-      const isAdmin = users.find(
-        (u) => u.active !== false && u.role === 'admin' && u.pin === cleanPin
+    if (ok) {
+      setErrorMsg(null);
+      setPin('');
+      request.onConfirm();
+      onClose();
+    } else {
+      setErrorMsg(
+        request.requiredRole === 'admin'
+          ? 'Ungültiger Administrator-PIN! Löschung verweigert.'
+          : 'Keine Berechtigung! Nur Administrator oder Buchhaltung können Rechnungen begleichen.'
       );
-      if (isAdmin) {
-        setErrorMsg(null);
-        setPin('');
-        request.onConfirm();
-        onClose();
-      } else {
-        setErrorMsg('Ungültiger Administrator-PIN! Löschung verweigert.');
-      }
-    } else if (request.requiredRole === 'buchhaltung_or_admin') {
-      const isAuth = users.find(
-        (u) =>
-          u.active !== false &&
-          (u.role === 'admin' || u.role === 'buchhaltung' || u.canSettleInvoices === true) &&
-          u.pin === cleanPin
-      );
-      if (isAuth) {
-        setErrorMsg(null);
-        setPin('');
-        request.onConfirm();
-        onClose();
-      } else {
-        setErrorMsg('Keine Berechtigung! Nur Administrator oder Buchhaltung können Rechnungen begleichen.');
-      }
     }
   };
 
