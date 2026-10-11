@@ -43,6 +43,9 @@ var index_default = {
       if (path === "/api/status" && request.method === "POST") {
         return await handleStatus(request, env, cors);
       }
+      if (path === "/api/stats" && request.method === "GET") {
+        return await handleStats(env, cors);
+      }
       if (path === "/api/auth" || path === "/api/orders") {
         const denied = await requireAdmin(request, env, cors);
         if (denied) return denied;
@@ -92,6 +95,16 @@ async function handleStatus(request, env, cors) {
     200,
     cors
   );
+}
+const REPAIRED_SQL = `SELECT COUNT(*) AS n FROM orders
+  WHERE id NOT LIKE '${SYNC_PREFIX}%' AND id NOT LIKE 'KVA-%'
+    AND (status = 'Abgeschlossen' OR status LIKE '5.%' OR LOWER(status) LIKE '%abgeholt%' OR LOWER(status) LIKE '%abholbereit%')`;
+async function handleStats(env, cors) {
+  const row = await env.DB.prepare(REPAIRED_SQL).first();
+  const headers = new Headers(cors);
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  headers.set("Cache-Control", "public, max-age=3600");
+  return new Response(JSON.stringify({ success: true, repaired: Number(row?.n ?? 0) }), { status: 200, headers });
 }
 function maskName(name) {
   return name.trim().split(/\s+/).filter(Boolean).map((part) => part[0] + ".").join(" ");

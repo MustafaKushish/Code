@@ -1,5 +1,8 @@
 import { DeviceCategoryKey, FaultItem } from '../types';
 
+// Alle Texte hier sind deutsche Übersetzungsschlüssel (siehe src/i18n). Wer einen Text ändert,
+// muss ihn in src/i18n/locales/*.json mit ändern – npm run i18n:check zeigt fehlende Einträge.
+
 export const CATEGORY_LABELS: Record<DeviceCategoryKey, { label: string; icon: string }> = {
   phone: { label: 'Smartphone', icon: '📱' },
   laptop_pc: { label: 'Laptop / PC', icon: '💻' },
