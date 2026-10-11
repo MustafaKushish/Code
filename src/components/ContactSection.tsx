@@ -23,7 +23,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenMailIn }) 
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {/* Box 1: Contact info */}
-          <div className="reveal bg-[#0B1315]/90 border border-white/[0.08] rounded-3xl p-6 sm:p-8 space-y-6">
+          <div className="reveal glass rounded-[2rem] p-6 sm:p-8 space-y-6">
             <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
               <h3 className="text-lg font-semibold text-white">{t('Werkstatt Neumarkt')}</h3>
               <span

@@ -2,6 +2,7 @@ import React from 'react';
 import { Check, Laptop, Gamepad2, KeyRound, HardDrive, Microscope, Smartphone, type LucideIcon } from 'lucide-react';
 import { SectionHeading } from './ui/SectionHeading';
 import { msg, useI18n } from '../i18n';
+import { trackSpotlight } from './DigitalShowcase';
 
 interface ServiceCard {
   title: string;
@@ -115,7 +116,8 @@ export const ServiceMatrix: React.FC = () => {
           {CARDS.map(({ title, text, points, tag, Icon, accent }) => (
             <div
               key={title}
-              className="reveal bg-[#0B1315]/85 hover:bg-[#0F1A1C] border border-white/[0.08] hover:border-[#00F5D4]/40 rounded-2xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+              onMouseMove={trackSpotlight}
+              className="reveal spotlight glass hover:border-[#00F5D4]/40 rounded-3xl p-6 sm:p-7 transition-all duration-300 group hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
             >
               <div
                 className={`w-12 h-12 mb-5 rounded-xl flex items-center justify-center border group-hover:scale-105 transition-transform ${ACCENT_ICON[accent]}`}
