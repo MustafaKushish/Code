@@ -2,6 +2,39 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, RotateCcw, Image as ImageIcon, Sparkles, Calendar, MessageSquare, CheckCircle, ShieldCheck } from 'lucide-react';
 import { ChatMessage, DeviceCategoryKey } from '../types';
 import { requestAiDiagnosis, validateAndFormatResponse } from '../services/aiTechnicianService';
+import { msg, useI18n } from '../i18n';
+import { whatsappLink } from '../utils/whatsapp';
+
+const WELCOME_TEXT = msg(
+  'Hallo! Ich bin der **KI-Techniker** der CODE IT-Werkstatt in Neumarkt i.d.OPf. 🔬\n\nBeschreibe mir dein Problem in eigenen Worten (z. B. *»PS5 schaltet nach 2 Sekunden mit blauem Licht ab«*, *»MacBook lädt nicht über USB-C«* oder *»DualSense zieht nach links«*).\n\n📸 **Neu:** Du kannst unten auch direkt ein Foto deines beschädigten Geräts, Ports oder Mainboards hochladen – ich analysiere die Bauteile mit tiefer Schaltplan-Logik für dich!'
+);
+const RESET_TEXT = msg(
+  'Diagnose zurückgesetzt. Womit kann dir unser Labor in Neumarkt helfen?\n\nDu kannst auch ein Foto des defekten Bauteils hochladen.'
+);
+// Ersatzantwort für Englisch, Türkisch und Arabisch, wenn die KI nicht antwortet
+const OFFLINE_REPLY = msg(
+  '1. **Kurz & verständlich (Der Hauptgrund):**\nWahrscheinlich ist ein einzelnes Bauteil auf der Platine, eine Buchse oder der Akku defekt – selten das ganze Gerät.\n\n2. **Technischer Hintergrund (Chiplevel-Beweis):**\nWir messen die Spannungsschienen, prüfen Lötstellen unter dem 40x Mikroskop und suchen Kurzschlüsse mit der Wärmebildkamera.\n\n3. **Lösung & Kosten (Neumarkt):**\nDu bekommst vor der Reparatur einen verbindlichen Festpreis. Die meisten Reparaturen liegen zwischen 49 € und 149 €, mit 6 Monaten Garantie. Abgabe in Neumarkt oder per Post aus ganz Deutschland.'
+);
+
+// Nutzertext und KI-Antworten werden als HTML angezeigt – vorher Sonderzeichen entschärfen
+const escapeHtml = (text: string) =>
+  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+const CATEGORY_PILLS: { key: DeviceCategoryKey; label: string }[] = [
+  { key: 'laptop_pc', label: msg('💻 Laptop/PC') },
+  { key: 'konsole', label: msg('🎮 Konsole') },
+  { key: 'controller', label: msg('🕹️ Controller') },
+  { key: 'schluessel', label: msg('🔑 Schlüssel') },
+  { key: 'phone', label: msg('📱 Smartphone') },
+  { key: 'daten', label: msg('💾 Datenrettung') },
+];
+
+const SUGGESTIONS: { label: string; prompt: string }[] = [
+  { label: msg('🎮 PS5 HDMI gebrochen'), prompt: msg('PS5 HDMI-Port gebrochen, zeigt kein Bild mehr am 4K Fernseher') },
+  { label: msg('☕ Laptop Wasserschaden'), prompt: msg('Laptop Wasserschaden: Kaffee über Tastatur gelaufen, schaltet nicht mehr ein') },
+  { label: msg('🕹️ DualSense Hall-Effect'), prompt: msg('PS5 Controller hat extremen Stick-Drift auf beiden Sticks. Hall-Effect Umbau möglich?') },
+  { label: msg('🔑 Autoschlüssel Akku'), prompt: msg('BMW Autoschlüssel lädt nicht mehr im Schacht und Taste wackelt') },
+];
 
 interface AiTechnicianModalProps {
   isOpen: boolean;
@@ -18,13 +51,9 @@ export const AiTechnicianModal: React.FC<AiTechnicianModalProps> = ({
   initialQuery,
   defaultCategory = 'laptop_pc',
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome',
-      role: 'model',
-      text: `Hallo! Ich bin der **KI-Techniker** der CODE IT-Werkstatt in Neumarkt i.d.OPf. 🔬\n\nBeschreibe mir dein Problem in eigenen Worten (z. B. *»PS5 schaltet nach 2 Sekunden mit blauem Licht ab«*, *»MacBook lädt nicht über USB-C«* oder *»DualSense zieht nach links«*).\n\n📸 **Neu:** Du kannst unten auch direkt ein Foto deines beschädigten Geräts, Ports oder Mainboards hochladen – ich analysiere die Bauteile mit tiefer Schaltplan-Logik für dich!`,
-    },
-  ]);
+  const { t, lang, locale } = useI18n();
+  // Begrüßungstexte werden erst beim Anzeigen übersetzt (siehe unten), damit ein Sprachwechsel greift
+  const [messages, setMessages] = useState<ChatMessage[]>([{ id: 'welcome', role: 'model', text: WELCOME_TEXT }]);
   const [input, setInput] = useState('');
   const [selectedImage, setSelectedImage] = useState<{ data: string; mimeType: string; preview: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +75,7 @@ export const AiTechnicianModal: React.FC<AiTechnicianModalProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      alert('Bitte wähle eine gültige Bilddatei aus (JPEG, PNG, WebP).');
+      alert(t('Bitte wähle eine gültige Bilddatei aus (JPEG, PNG, WebP).'));
       return;
     }
     const reader = new FileReader();
@@ -69,9 +98,9 @@ export const AiTechnicianModal: React.FC<AiTechnicianModalProps> = ({
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      text: textToSend || 'Bitte analysiere dieses Bauteilfoto.',
+      text: textToSend || t('Bitte analysiere dieses Bauteilfoto.'),
       imagePreview: selectedImage?.preview,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
     };
 
     const currentImage = selectedImage;
@@ -91,6 +120,7 @@ export const AiTechnicianModal: React.FC<AiTechnicianModalProps> = ({
 
       const result = await requestAiDiagnosis({
         message: textToSend,
+        lang,
         history,
         deviceCategory: activeCategory,
         image: currentImage ? { data: currentImage.data, mimeType: currentImage.mimeType } : undefined,
@@ -100,16 +130,18 @@ export const AiTechnicianModal: React.FC<AiTechnicianModalProps> = ({
         id: `bot-${Date.now()}`,
         role: 'model',
         text: result.reply,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, botMessage]);
     } catch {
-      const offlineReply = getOfflineDiagnosticReply(textToSend, activeCategory);
       const botMessage: ChatMessage = {
         id: `bot-${Date.now()}`,
         role: 'model',
-        text: validateAndFormatResponse(offlineReply, activeCategory),
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text:
+          lang === 'de'
+            ? validateAndFormatResponse(getOfflineDiagnosticReply(textToSend, activeCategory), activeCategory)
+            : t(OFFLINE_REPLY),
+        timestamp: new Date().toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, botMessage]);
     } finally {
@@ -164,13 +196,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
   };
 
   const handleReset = () => {
-    setMessages([
-      {
-        id: 'welcome',
-        role: 'model',
-        text: `Diagnose zurückgesetzt. Womit kann dir unser Labor in Neumarkt helfen?\n\nDu kannst auch ein Foto des defekten Bauteils hochladen.`,
-      },
-    ]);
+    setMessages([{ id: 'welcome', role: 'model', text: RESET_TEXT }]);
   };
 
   if (!isOpen) return null;
@@ -195,11 +221,11 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                 </span>
                 <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#00F5D4]/10 text-[#00F5D4] border border-[#00F5D4]/30 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
-                  HIGH THINKING AKTIV
+                  {t('HIGH THINKING AKTIV')}
                 </span>
               </div>
               <p className="text-[11px] text-[#839897] font-mono">
-                KI-Ersteinschätzung • ersetzt keine Messung am Gerät
+                {t('KI-Ersteinschätzung • ersetzt keine Messung am Gerät')}
               </p>
             </div>
           </div>
@@ -208,7 +234,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             <button
               type="button"
               onClick={handleReset}
-              title="Diagnose neu starten"
+              title={t('Diagnose neu starten')}
               className="p-1.5 rounded-lg text-[#839897] hover:text-[#00F5D4] hover:bg-white/5 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
@@ -216,7 +242,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             <button
               type="button"
               onClick={onClose}
-              aria-label="Schließen"
+              aria-label={t('Schließen')}
               className="p-1.5 rounded-lg text-[#839897] hover:text-[#C9743F] hover:bg-white/5 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -227,13 +253,13 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
         {/* Disclaimer Bar */}
         <div className="bg-[#C9743F]/10 border-b border-[#C9743F]/25 px-4 py-1.5 text-[11px] text-[#FF8D4D] font-mono flex items-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-          <span>Unverbindliche Ersteinschätzung • Verbindlicher Festpreis nach Begutachtung unter dem Mikroskop in Neumarkt.</span>
+          <span>{t('Unverbindliche Ersteinschätzung • Verbindlicher Festpreis nach Begutachtung unter dem Mikroskop in Neumarkt.')}</span>
         </div>
 
         {/* Category Pills inside Chat */}
         <div className="bg-[#070F11] border-b border-white/5 px-3 py-2 flex items-center gap-1.5 overflow-x-auto text-xs font-mono shrink-0">
-          <span className="text-[#839897] text-[10px] uppercase mr-1">Gerät:</span>
-          {(['laptop_pc', 'konsole', 'controller', 'schluessel', 'phone', 'daten'] as DeviceCategoryKey[]).map((cat) => (
+          <span className="text-[#839897] text-[10px] uppercase me-1">{t('Gerät:')}</span>
+          {CATEGORY_PILLS.map(({ key: cat, label }) => (
             <button
               key={cat}
               type="button"
@@ -244,34 +270,29 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                   : 'bg-white/5 text-[#839897] hover:text-white'
               }`}
             >
-              {cat === 'laptop_pc' && '💻 Laptop/PC'}
-              {cat === 'konsole' && '🎮 Konsole'}
-              {cat === 'controller' && '🕹️ Controller'}
-              {cat === 'schluessel' && '🔑 Schlüssel'}
-              {cat === 'phone' && '📱 Smartphone'}
-              {cat === 'daten' && '💾 Datenrettung'}
+              {t(label)}
             </button>
           ))}
         </div>
 
         {/* Chat Messages Body */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm">
-          {messages.map((msg) => (
+          {messages.map((chatMsg) => (
             <div
-              key={msg.id}
-              className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+              key={chatMsg.id}
+              className={`flex flex-col ${chatMsg.role === 'user' ? 'items-end' : 'items-start'}`}
             >
               <div
                 className={`max-w-[88%] rounded-2xl px-4 py-3 leading-relaxed ${
-                  msg.role === 'user'
+                  chatMsg.role === 'user'
                     ? 'bg-gradient-to-r from-[#C9743F] to-[#FF8D4D] text-white rounded-br-xs shadow-md'
                     : 'bg-[#101D20] border border-[#00F5D4]/25 text-[#F3F7F7] rounded-bl-xs shadow-lg'
                 }`}
               >
                 {/* Image preview in chat */}
-                {msg.imagePreview && (
+                {chatMsg.imagePreview && (
                   <div className="mb-2 rounded-lg overflow-hidden border border-white/20 max-h-48">
-                    <img src={msg.imagePreview} alt="Hochgeladenes Bauteilfoto" className="w-full h-full object-cover" />
+                    <img src={chatMsg.imagePreview} alt={t('Hochgeladenes Bauteilfoto')} className="w-full h-full object-cover" />
                   </div>
                 )}
 
@@ -279,7 +300,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                 <div
                   className="prose prose-invert prose-sm max-w-none text-xs sm:text-sm"
                   dangerouslySetInnerHTML={{
-                    __html: msg.text
+                    __html: escapeHtml(chatMsg.id === 'welcome' ? t(chatMsg.text) : chatMsg.text)
                       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                       .replace(/\*(.*?)\*/g, '<em>$1</em>')
                       .replace(/`([^`]+)`/g, '<code class="bg-black/40 px-1 py-0.5 rounded text-[#00F5D4]">$1</code>')
@@ -289,20 +310,20 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                 />
 
                 {/* Direct Action HUD attached to Bot replies */}
-                {msg.role === 'model' && msg.id !== 'welcome' && (
+                {chatMsg.role === 'model' && chatMsg.id !== 'welcome' && (
                   <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2 text-xs font-mono">
                     <a
-                      href={`https://wa.me/4917641744443?text=${encodeURIComponent(
-                        'Hallo Mustafa, ich habe mit deinem KI-Techniker auf code-ger.de gesprochen:\n\n' +
-                          msg.text.substring(0, 180) +
-                          '...\n\nWann kann ich mein Gerät zur Reparatur in Neumarkt übergeben?'
-                      )}`}
+                      href={whatsappLink(
+                        t('Hallo Mustafa, ich habe mit deinem KI-Techniker auf code-ger.de gesprochen:\n\n{text}...\n\nWann kann ich mein Gerät zur Reparatur in Neumarkt übergeben?', {
+                          text: chatMsg.text.substring(0, 180),
+                        })
+                      )}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#25D366]/20 border border-[#25D366]/50 text-[#25D366] hover:bg-[#25D366] hover:text-[#040809] transition-all font-bold"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
-                      <span>WhatsApp an Mustafa</span>
+                      <span>{t('WhatsApp an Mustafa')}</span>
                     </a>
                     <button
                       type="button"
@@ -310,7 +331,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00F5D4]/15 border border-[#00F5D4]/40 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] transition-all font-bold cursor-pointer"
                     >
                       <Calendar className="w-3.5 h-3.5" />
-                      <span>Termin an Werkbank</span>
+                      <span>{t('Termin an Werkbank')}</span>
                     </button>
                     {onOpenCheckIn && (
                       <button
@@ -319,21 +340,21 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
                           onClose();
                           onOpenCheckIn({
                             device: activeCategory,
-                            fault: msg.text.substring(0, 120),
+                            fault: chatMsg.text.substring(0, 120),
                           });
                         }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/20 text-[#839897] hover:text-white transition-all cursor-pointer"
                       >
                         <CheckCircle className="w-3.5 h-3.5 text-[#C9743F]" />
-                        <span>Digitaler Check-In</span>
+                        <span>{t('Digitaler Check-In')}</span>
                       </button>
                     )}
                   </div>
                 )}
               </div>
-              {msg.timestamp && (
+              {chatMsg.timestamp && (
                 <span className="text-[10px] font-mono text-[#839897] mt-1 px-1">
-                  {msg.timestamp}
+                  {chatMsg.timestamp}
                 </span>
               )}
             </div>
@@ -345,7 +366,7 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
               <div className="bg-[#101D20] border border-[#00F5D4]/40 rounded-2xl rounded-bl-xs px-4 py-3 flex items-center gap-3">
                 <Sparkles className="w-4 h-4 text-[#00F5D4] animate-spin" />
                 <div className="font-mono text-xs text-[#00F5D4]">
-                  KI analysiert deine Beschreibung…
+                  {t('KI analysiert deine Beschreibung…')}
                 </div>
               </div>
             </div>
@@ -355,44 +376,26 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
 
         {/* Suggestion Chips */}
         <div className="px-4 py-2 bg-[#050A0C] border-t border-white/5 flex items-center gap-1.5 overflow-x-auto shrink-0">
-          <span className="text-[10px] font-mono text-[#839897] uppercase shrink-0">Vorschläge:</span>
-          <button
-            type="button"
-            onClick={() => handleSend('PS5 HDMI-Port gebrochen, zeigt kein Bild mehr am 4K Fernseher')}
-            className="px-2.5 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/10 text-[#839897] hover:border-[#00F5D4] hover:text-[#00F5D4] whitespace-nowrap transition-colors cursor-pointer"
-          >
-            🎮 PS5 HDMI gebrochen
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSend('Laptop Wasserschaden: Kaffee über Tastatur gelaufen, schaltet nicht mehr ein')}
-            className="px-2.5 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/10 text-[#839897] hover:border-[#00F5D4] hover:text-[#00F5D4] whitespace-nowrap transition-colors cursor-pointer"
-          >
-            ☕ Laptop Wasserschaden
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSend('PS5 Controller hat extremen Stick-Drift auf beiden Sticks. Hall-Effect Umbau möglich?')}
-            className="px-2.5 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/10 text-[#839897] hover:border-[#00F5D4] hover:text-[#00F5D4] whitespace-nowrap transition-colors cursor-pointer"
-          >
-            🕹️ DualSense Hall-Effect
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSend('BMW Autoschlüssel lädt nicht mehr im Schacht und Taste wackelt')}
-            className="px-2.5 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/10 text-[#839897] hover:border-[#00F5D4] hover:text-[#00F5D4] whitespace-nowrap transition-colors cursor-pointer"
-          >
-            🔑 Autoschlüssel Akku
-          </button>
+          <span className="text-[10px] font-mono text-[#839897] uppercase shrink-0">{t('Vorschläge:')}</span>
+          {SUGGESTIONS.map(({ label, prompt }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => handleSend(t(prompt))}
+              className="px-2.5 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/10 text-[#839897] hover:border-[#00F5D4] hover:text-[#00F5D4] whitespace-nowrap transition-colors cursor-pointer"
+            >
+              {t(label)}
+            </button>
+          ))}
         </div>
 
         {/* Image Attachment Preview */}
         {selectedImage && (
           <div className="px-4 py-2 bg-[#060D0E] border-t border-[#00F5D4]/30 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src={selectedImage.preview} alt="Vorschau" className="w-10 h-10 object-cover rounded border border-[#00F5D4]/50" />
+              <img src={selectedImage.preview} alt={t('Vorschau')} className="w-10 h-10 object-cover rounded border border-[#00F5D4]/50" />
               <div className="text-xs font-mono text-[#00F5D4]">
-                Foto angehängt
+                {t('Foto angehängt')}
               </div>
             </div>
             <button
@@ -417,8 +420,8 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title="Foto vom Bauteil / Schaden anhängen"
-            aria-label="Foto anhängen"
+            title={t('Foto vom Bauteil / Schaden anhängen')}
+            aria-label={t('Foto anhängen')}
             className="p-2.5 rounded-xl border border-white/10 text-[#839897] hover:text-[#00F5D4] hover:border-[#00F5D4]/40 hover:bg-[#00F5D4]/10 transition-colors cursor-pointer"
           >
             <ImageIcon className="w-5 h-5" />
@@ -430,8 +433,8 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSend();
             }}
-            placeholder="Fehler beschreiben oder Frage stellen..."
-            aria-label="Nachricht an den KI-Techniker"
+            placeholder={t('Fehler beschreiben oder Frage stellen...')}
+            aria-label={t('Nachricht an den KI-Techniker')}
             disabled={isLoading}
             className="flex-1 bg-[#0E1A1C] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-2.5 text-sm text-white placeholder-[#839897] outline-none font-mono"
           />
@@ -439,15 +442,14 @@ Du kannst dein Gerät direkt an unserer Werkbank abgeben – reserviere dir daf�
             type="button"
             onClick={() => handleSend()}
             disabled={isLoading || (!input.trim() && !selectedImage)}
-            aria-label="Senden"
+            aria-label={t('Senden')}
             className="p-2.5 rounded-xl bg-[#C9743F] hover:bg-[#FF8D4D] text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(201,116,63,0.3)] transition-all cursor-pointer"
           >
             <Send className="w-5 h-5" />
           </button>
         </div>
         <p className="px-4 pb-3 bg-[#050A0C] text-[11px] leading-snug text-[#6F8584]">
-          Deine Beschreibung wird zur automatischen Auswertung an Google (Gemini) übermittelt. Bitte keine Namen,
-          Telefonnummern oder Passwörter eingeben. Die Antwort ist eine unverbindliche Ersteinschätzung.
+          {t('Deine Beschreibung wird zur automatischen Auswertung an Google (Gemini) übermittelt. Bitte keine Namen, Telefonnummern oder Passwörter eingeben. Die Antwort ist eine unverbindliche Ersteinschätzung.')}
         </p>
       </div>
     </div>

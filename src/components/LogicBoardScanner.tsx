@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Microscope, Flame, Activity, Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { playMultimeterBeep, playThermalToggleSound, toggleSound, isSoundEnabled } from '../utils/audio';
+import { msg, useI18n } from '../i18n';
 
 interface PinNode {
   name: string;
@@ -11,40 +12,41 @@ interface PinNode {
 }
 
 const BOARD_MODES = [
-  { id: 'key', label: 'Autoschlüssel-Elektronik', icon: '🔑' },
+  { id: 'key', label: msg('Autoschlüssel-Elektronik'), icon: '🔑' },
   { id: 'ps5', label: 'PS5 Motherboard', icon: '🎮' },
   { id: 'macbook', label: 'MacBook Logic-Board', icon: '💻' },
   { id: 'controller', label: 'DualSense Hall-Sensor', icon: '🕹️' },
 ];
 
+const TICKER_MESSAGES = [
+  msg('Labor Neumarkt: HF-Frequenzzähler 433.92 MHz aktiv • 3.02V Versorgungsspannung stabil'),
+  msg('Messung: TP_VBAT 3.02V • Ruhestrom < 1.2 µA • Panasonic VL2020 Zelle voll geladen'),
+  msg('Transponder-Spule 125 kHz: Wegfahrsperren-Induktion fehlerfrei erkannt'),
+  msg('Mikrotaster 1-3: Klickmechanik & Kontaktwiderstand 0.04 Ω perfekt'),
+  msg('Tippe auf Taster, Transponder-Spule, Akku oder Testpunkte für Live-Messwerte'),
+];
+
 export const LogicBoardScanner: React.FC = () => {
+  const { t } = useI18n();
   const [activeBoard, setActiveBoard] = useState('key');
   const [thermalMode, setThermalMode] = useState(false);
   const [probeMode, setProbeMode] = useState<'VOLT' | 'DIODE' | 'RESIST'>('VOLT');
   const [selectedNode, setSelectedNode] = useState<PinNode>({
     name: 'NXP MCU (PCF7945 / AES)',
     voltage: '3.02V VCC',
-    desc: 'Rolling-Code Generator & HF-Modulator aktiv. Krypto-Handshake zum Auto verifiziert.',
+    desc: msg('Rolling-Code Generator & HF-Modulator aktiv. Krypto-Handshake zum Auto verifiziert.'),
     status: 'OK',
     temp: '26.8 °C',
   });
-  const [tickerText, setTickerText] = useState(
-    'Labor Neumarkt: HF-Frequenzzähler 433.92 MHz aktiv • 3.02V Versorgungsspannung stabil'
-  );
+  // Lauftext: entweder eine der festen Meldungen (Index) oder eine Messung als fertiger Text
+  const [tickerText, setTickerText] = useState<string>(TICKER_MESSAGES[0]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
 
   useEffect(() => {
-    const messages = [
-      'Labor Neumarkt: HF-Frequenzzähler 433.92 MHz aktiv • 3.02V Versorgungsspannung stabil',
-      'Messung: TP_VBAT 3.02V • Ruhestrom < 1.2 µA • Panasonic VL2020 Zelle voll geladen',
-      'Transponder-Spule 125 kHz: Wegfahrsperren-Induktion fehlerfrei erkannt',
-      'Mikrotaster 1-3: Klickmechanik & Kontaktwiderstand 0.04 Ω perfekt',
-      'Tippe auf Taster, Transponder-Spule, Akku oder Testpunkte für Live-Messwerte',
-    ];
     let i = 0;
     const interval = setInterval(() => {
-      i = (i + 1) % messages.length;
-      setTickerText(messages[i]);
+      i = (i + 1) % TICKER_MESSAGES.length;
+      setTickerText(TICKER_MESSAGES[i]);
     }, 4500);
     return () => clearInterval(interval);
   }, []);
@@ -52,10 +54,10 @@ export const LogicBoardScanner: React.FC = () => {
   const handleInspect = (node: PinNode) => {
     playMultimeterBeep();
     setSelectedNode(node);
-    let measureValue = node.voltage;
-    if (probeMode === 'DIODE') measureValue = 'Dioden-Wert: 0.442V (OK)';
-    if (probeMode === 'RESIST') measureValue = node.status === 'SHORT' ? 'Widerstand: 0.2 Ω (KURZSCHLUSS)' : 'Widerstand: > 120 kΩ';
-    setTickerText(`Messpunkt [${node.name}]: ${measureValue} • ${node.desc}`);
+    let measureValue = t(node.voltage);
+    if (probeMode === 'DIODE') measureValue = t('Dioden-Wert: 0.442V (OK)');
+    if (probeMode === 'RESIST') measureValue = node.status === 'SHORT' ? t('Widerstand: 0.2 Ω (KURZSCHLUSS)') : t('Widerstand: > 120 kΩ');
+    setTickerText(t('Messpunkt [{name}]: {value} • {desc}', { name: t(node.name), value: measureValue, desc: t(node.desc) }));
   };
 
   const inspectKeyNode = (
@@ -148,7 +150,7 @@ export const LogicBoardScanner: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#C9743F]/20 pb-3 mb-4">
         <div className="flex items-center gap-2 text-xs font-mono text-[#00F5D4] tracking-wider uppercase">
           <Microscope className="w-4 h-4 text-[#00F5D4]" />
-          <span>&gt; INTERAKTIVER LOGIC-BOARD INSPEKTOR</span>
+          <span>&gt; {t('INTERAKTIVER LOGIC-BOARD INSPEKTOR')}</span>
         </div>
         <div className="flex items-center gap-2">
           {/* Sound Mute/Unmute */}
@@ -160,7 +162,7 @@ export const LogicBoardScanner: React.FC = () => {
                 ? 'bg-[#122225] border-[#4FA39B]/40 text-[#00F5D4]'
                 : 'bg-black/40 border-white/10 text-[#839897]'
             }`}
-            title={soundOn ? 'Soundeffekte aktiv' : 'Stummgeschaltet'}
+            title={soundOn ? t('Soundeffekte aktiv') : t('Stummgeschaltet')}
           >
             {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
@@ -174,10 +176,10 @@ export const LogicBoardScanner: React.FC = () => {
                 ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.4)]'
                 : 'bg-[#122225] border-[#4FA39B]/30 text-[#839897] hover:text-[#F3F7F7]'
             }`}
-            title="Wärmebild-Simulation umschalten (Kurzschluss-Suche)"
+            title={t('Wärmebild-Simulation umschalten (Kurzschluss-Suche)')}
           >
             <Flame className="w-3.5 h-3.5" />
-            <span>{thermalMode ? 'FLIR: AKTIV' : 'Wärmebild'}</span>
+            <span>{thermalMode ? t('FLIR: AKTIV') : t('Wärmebild')}</span>
           </button>
 
           {/* Multimeter Mode Selector */}
@@ -217,7 +219,7 @@ export const LogicBoardScanner: React.FC = () => {
               setActiveBoard(b.id);
               if (b.id === 'key') {
                 inspectKeyNode(
-                  'Rolling-Code Generator & HF-Modulator aktiv. Krypto-Handshake zum Auto verifiziert.',
+                  msg('Rolling-Code Generator & HF-Modulator aktiv. Krypto-Handshake zum Auto verifiziert.'),
                   'NXP MCU (PCF7945 / AES)',
                   '3.02V VCC',
                   'OK',
@@ -227,7 +229,7 @@ export const LogicBoardScanner: React.FC = () => {
                 handleInspect({
                   name: 'PS5 HDMI 2.1 & Retimer IC',
                   voltage: '5.02V',
-                  desc: '19 Pins geprüft. Keine verbogenen Kontakte mehr.',
+                  desc: msg('19 Pins geprüft. Keine verbogenen Kontakte mehr.'),
                   status: 'OK',
                   temp: '38.2 °C',
                 });
@@ -235,7 +237,7 @@ export const LogicBoardScanner: React.FC = () => {
                 handleInspect({
                   name: 'MacBook 19.5V VDD_MAIN Rail',
                   voltage: '19.54V',
-                  desc: 'Sperrkondensator C7050 getauscht. Kein Kurzschluss mehr nach Masse.',
+                  desc: msg('Sperrkondensator C7050 getauscht. Kein Kurzschluss mehr nach Masse.'),
                   status: 'OK',
                   temp: '41.0 °C',
                 });
@@ -243,7 +245,7 @@ export const LogicBoardScanner: React.FC = () => {
                 handleInspect({
                   name: 'DualSense FavocTech Hall-Sensor',
                   voltage: '3.30V',
-                  desc: 'Magnetfeld-Sensor zentriert (Fehlerquote 0.02%). Kein Schleifkontakt!',
+                  desc: msg('Magnetfeld-Sensor zentriert (Fehlerquote 0.02%). Kein Schleifkontakt!'),
                   status: 'OK',
                   temp: '28.1 °C',
                 });
@@ -256,7 +258,7 @@ export const LogicBoardScanner: React.FC = () => {
             }`}
           >
             <span>{b.icon}</span>
-            <span className="truncate">{b.label}</span>
+            <span dir="auto" className="truncate">{t(b.label)}</span>
           </button>
         ))}
       </div>
@@ -278,7 +280,7 @@ export const LogicBoardScanner: React.FC = () => {
             <div className="absolute top-[28%] left-[24%] w-24 h-24 rounded-full bg-radial from-red-500/80 via-yellow-400/40 to-transparent blur-md animate-pulse" />
             <div className="absolute top-[35%] right-[28%] w-32 h-32 rounded-full bg-radial from-amber-500/60 via-purple-600/30 to-transparent blur-lg" />
             <div className="absolute bottom-3 left-4 font-mono text-[11px] text-amber-300 bg-black/80 px-2 py-1 rounded border border-amber-400/40">
-              🔥 FLIR HOTSPOT LOKALISIERT: +79.4 °C (SMD Kurzschluss C1_VCC behoben)
+              🔥 {t('FLIR HOTSPOT LOKALISIERT: +79.4 °C (SMD Kurzschluss C1_VCC behoben)')}
             </div>
           </div>
         )}
@@ -335,9 +337,9 @@ export const LogicBoardScanner: React.FC = () => {
               strokeLinecap="round"
               onClick={() =>
                 inspectKeyNode(
-                  'Integrierte 433.92 MHz Loop-Antenne: Sendeleistung 10 mW, Reichweite bis 50m.',
-                  'HF-Loop Antenne (433.92 MHz)',
-                  '433.92 MHz HF-Träger',
+                  msg('Integrierte 433.92 MHz Loop-Antenne: Sendeleistung 10 mW, Reichweite bis 50m.'),
+                  msg('HF-Loop Antenne (433.92 MHz)'),
+                  msg('433.92 MHz HF-Träger'),
                   'OK',
                   '25.2 °C'
                 )
@@ -374,9 +376,9 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-chip"
               onClick={() =>
                 inspectKeyNode(
-                  'Transponder-Spule (125 kHz): RFID-Induktion für Wegfahrsperre ohne Batteriestrom OK',
-                  'Transponder-Spule (125 kHz)',
-                  '125 kHz AC Induktion',
+                  msg('Transponder-Spule (125 kHz): RFID-Induktion für Wegfahrsperre ohne Batteriestrom OK'),
+                  msg('Transponder-Spule (125 kHz)'),
+                  msg('125 kHz AC Induktion'),
                   'OK',
                   '23.8 °C'
                 )
@@ -399,9 +401,9 @@ export const LogicBoardScanner: React.FC = () => {
               className="live-diag-led"
               onClick={() =>
                 inspectKeyNode(
-                  'SMD Sende-LED: Bestätigt Tastendruck mit HF-Paket-Bestätigung (Blink-Impuls)',
-                  'SMD Sende-LED',
-                  '2.10V Puls',
+                  msg('SMD Sende-LED: Bestätigt Tastendruck mit HF-Paket-Bestätigung (Blink-Impuls)'),
+                  msg('SMD Sende-LED'),
+                  msg('2.10V Puls'),
                   'OK',
                   '26.4 °C'
                 )
@@ -419,8 +421,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="key-btn-pad"
               onClick={() =>
                 inspectKeyNode(
-                  'Mikrotaster 1 (LOCK): Übergangswiderstand 0.04 Ohm — Klickmechanik sauber & prellfrei',
-                  'Mikrotaster 1 (LOCK: ZU)',
+                  msg('Mikrotaster 1 (LOCK): Übergangswiderstand 0.04 Ohm — Klickmechanik sauber & prellfrei'),
+                  msg('Mikrotaster 1 (LOCK: ZU)'),
                   '3.02V Pullup',
                   'OK',
                   '22.9 °C'
@@ -441,8 +443,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="key-btn-pad"
               onClick={() =>
                 inspectKeyNode(
-                  'Mikrotaster 2 (TRUNK): SMD-Lötpads intakt — keine Leiterbahnrisse',
-                  'Mikrotaster 2 (TRUNK: HECK)',
+                  msg('Mikrotaster 2 (TRUNK): SMD-Lötpads intakt — keine Leiterbahnrisse'),
+                  msg('Mikrotaster 2 (TRUNK: HECK)'),
                   '3.02V Pullup',
                   'OK',
                   '23.1 °C'
@@ -463,8 +465,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="key-btn-pad"
               onClick={() =>
                 inspectKeyNode(
-                  'Mikrotaster 3 (UNLOCK): Taster getauscht & mit bleifreiem Silberlot versiegelt',
-                  'Mikrotaster 3 (UNLOCK: AUF)',
+                  msg('Mikrotaster 3 (UNLOCK): Taster getauscht & mit bleifreiem Silberlot versiegelt'),
+                  msg('Mikrotaster 3 (UNLOCK: AUF)'),
                   '3.02V Pullup',
                   'OK',
                   '23.0 °C'
@@ -485,7 +487,7 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-chip"
               onClick={() =>
                 inspectKeyNode(
-                  'NXP Transceiver-IC: Rolling-Code Generator & HF-Modulator aktiv. Krypto-Handshake verifiziert.',
+                  msg('NXP Transceiver-IC: Rolling-Code Generator & HF-Modulator aktiv. Krypto-Handshake verifiziert.'),
                   'NXP MCU (PCF7945 / AES)',
                   '3.02V VCC',
                   'OK',
@@ -525,9 +527,9 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-chip"
               onClick={() =>
                 inspectKeyNode(
-                  '13.56 MHz Quarzresonator: Referenztakt für HF-Trägerfrequenz synchron (13.5600 MHz stabil)',
-                  '13.56 MHz Quarzresonator',
-                  '0.8V RMS Sinus',
+                  msg('13.56 MHz Quarzresonator: Referenztakt für HF-Trägerfrequenz synchron (13.5600 MHz stabil)'),
+                  msg('13.56 MHz Quarzresonator'),
+                  msg('0.8V RMS Sinus'),
                   'OK',
                   '25.0 °C'
                 )
@@ -549,8 +551,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-chip"
               onClick={() =>
                 inspectKeyNode(
-                  'Panasonic VL2020 Akku / CR2032 Halter: 3.02V Ruhespannung [VOLL] — Ladeelektronik über Zündschloss-Spule aktiv',
-                  'Panasonic VL2020 Akku (3V)',
+                  msg('Panasonic VL2020 Akku / CR2032 Halter: 3.02V Ruhespannung [VOLL] — Ladeelektronik über Zündschloss-Spule aktiv'),
+                  msg('Panasonic VL2020 Akku (3V)'),
                   '3.02V DC',
                   'OK',
                   '24.1 °C'
@@ -582,8 +584,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-pin"
               onClick={() =>
                 inspectKeyNode(
-                  'Testpunkt TP_VBAT: 3.02 Volt gemessen — Batterieversorgung stabil unter Last',
-                  'Testpunkt TP_VBAT',
+                  msg('Testpunkt TP_VBAT: 3.02 Volt gemessen — Batterieversorgung stabil unter Last'),
+                  msg('Testpunkt TP_VBAT'),
                   '3.02V DC',
                   'OK',
                   '23.5 °C'
@@ -604,8 +606,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-pin"
               onClick={() =>
                 inspectKeyNode(
-                  'Testpunkt TP_ANT: Spektrum 433.92 MHz sauber moduliert, kein Oszillationsfehler',
-                  'Testpunkt TP_RF_OUT',
+                  msg('Testpunkt TP_ANT: Spektrum 433.92 MHz sauber moduliert, kein Oszillationsfehler'),
+                  msg('Testpunkt TP_RF_OUT'),
                   '433.92 MHz',
                   'OK',
                   '26.1 °C'
@@ -626,8 +628,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-pin"
               onClick={() =>
                 inspectKeyNode(
-                  'Testpunkt TP_GND: 0.00 Ohm Masseanbindung — kein Kriechstrom festgestellt',
-                  'Testpunkt TP_GND',
+                  msg('Testpunkt TP_GND: 0.00 Ohm Masseanbindung — kein Kriechstrom festgestellt'),
+                  msg('Testpunkt TP_GND'),
                   '0.00V GND',
                   'OK',
                   '22.4 °C'
@@ -644,8 +646,8 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-chip"
               onClick={() =>
                 inspectKeyNode(
-                  'SMD 0402 Pufferkondensator: Stabilisiert Spannungsspitzen beim Senden, ESR < 0.05 Ohm',
-                  'SMD 0402 Puffer-C',
+                  msg('SMD 0402 Pufferkondensator: Stabilisiert Spannungsspitzen beim Senden, ESR < 0.05 Ohm'),
+                  msg('SMD 0402 Puffer-C'),
                   '3.02V DC',
                   'OK',
                   '24.0 °C'
@@ -661,9 +663,9 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-chip"
               onClick={() =>
                 inspectKeyNode(
-                  'SMD HF-Filterinduktivität: Unterdrückt Oberwellen im 433-MHz Band, Gütefaktor Q=45',
-                  'HF-Filter (433 MHz)',
-                  'Filter aktiv',
+                  msg('SMD HF-Filterinduktivität: Unterdrückt Oberwellen im 433-MHz Band, Gütefaktor Q=45'),
+                  msg('HF-Filter (433 MHz)'),
+                  msg('Filter aktiv'),
                   'OK',
                   '24.2 °C'
                 )
@@ -710,7 +712,7 @@ export const LogicBoardScanner: React.FC = () => {
                 handleInspect({
                   name: activeBoard === 'ps5' ? 'PS5 APU / Southbridge BGA' : activeBoard === 'macbook' ? 'Apple Silicon M-Series SoC' : 'DualSense MCU Master',
                   voltage: activeBoard === 'ps5' ? '0.92V Core' : '1.20V Core',
-                  desc: 'BGA-Reballing mit 0.45mm bleifreien Zinnkugeln. Keine gerissenen Lötperlen.',
+                  desc: msg('BGA-Reballing mit 0.45mm bleifreien Zinnkugeln. Keine gerissenen Lötperlen.'),
                   status: 'OK',
                   temp: '42.5 °C',
                 })
@@ -733,7 +735,7 @@ export const LogicBoardScanner: React.FC = () => {
                 handleInspect({
                   name: activeBoard === 'ps5' ? 'PS5 HDMI 2.1 Interface' : 'USB-C Thunderbolt Port',
                   voltage: '5.02V VBUS',
-                  desc: 'Vergoldete Pins unter Stereomikroskop nachgelötet. Kein Wackelkontakt.',
+                  desc: msg('Vergoldete Pins unter Stereomikroskop nachgelötet. Kein Wackelkontakt.'),
                   status: 'OK',
                   temp: '29.0 °C',
                 })
@@ -757,9 +759,9 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-pin"
               onClick={() =>
                 handleInspect({
-                  name: 'Testpunkt TP_CLOCK',
+                  name: msg('Testpunkt TP_CLOCK'),
                   voltage: '3.30V Clock',
-                  desc: 'Taktgenerator fehlerfrei synchronisiert.',
+                  desc: msg('Taktgenerator fehlerfrei synchronisiert.'),
                   status: 'OK',
                   temp: '24.1 °C',
                 })
@@ -775,9 +777,9 @@ export const LogicBoardScanner: React.FC = () => {
               className="clickable-pin"
               onClick={() =>
                 handleInspect({
-                  name: 'Testpunkt TP_VDD_MAIN',
+                  name: msg('Testpunkt TP_VDD_MAIN'),
                   voltage: '12.04V Power',
-                  desc: 'Hauptspannungsschiene stabil ohne Ripple.',
+                  desc: msg('Hauptspannungsschiene stabil ohne Ripple.'),
                   status: 'OK',
                   temp: '31.2 °C',
                 })
@@ -791,9 +793,9 @@ export const LogicBoardScanner: React.FC = () => {
       <div className="mt-4 bg-[#050B0D] border border-[#4FA39B]/35 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[#00F5D4] font-bold">&gt; {selectedNode.name}</span>
+            <span className="text-[#00F5D4] font-bold">&gt; {t(selectedNode.name)}</span>
             <span className="px-2 py-0.5 rounded text-[10px] bg-[#00F5D4]/15 text-[#00F5D4] border border-[#00F5D4]/40 font-bold">
-              {selectedNode.voltage}
+              {t(selectedNode.voltage)}
             </span>
             {selectedNode.temp && (
               <span className="px-2 py-0.5 rounded text-[10px] bg-[#FF8D4D]/15 text-[#FF8D4D] border border-[#FF8D4D]/40 font-bold">
@@ -804,17 +806,17 @@ export const LogicBoardScanner: React.FC = () => {
               STATUS: {selectedNode.status}
             </span>
           </div>
-          <p className="text-zinc-300 mt-1 text-[11px] leading-relaxed">{selectedNode.desc}</p>
+          <p className="text-zinc-300 mt-1 text-[11px] leading-relaxed">{t(selectedNode.desc)}</p>
         </div>
         <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
-          <span className="text-[#839897] text-[10px]">Tippe auf Taster, Spule oder Pins für Messwerte</span>
+          <span className="text-[#839897] text-[10px]">{t('Tippe auf Taster, Spule oder Pins für Messwerte')}</span>
         </div>
       </div>
 
       {/* Terminal Live Marquee */}
       <div className="mt-2.5 bg-[#030607] border border-white/5 rounded-lg px-3 py-2 font-mono text-[11px] text-[#FF8D4D] flex items-center gap-2 overflow-hidden">
         <Activity className="w-3.5 h-3.5 text-[#00F5D4] shrink-0 animate-pulse" />
-        <span className="truncate">&gt; {tickerText}</span>
+        <span className="truncate">&gt; {t(tickerText)}</span>
       </div>
     </div>
   );

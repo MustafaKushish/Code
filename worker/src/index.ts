@@ -3,6 +3,7 @@
  *
  * Öffentlich (ohne Schlüssel):
  *   POST /api/status   { id, phone4 }  → Status genau eines Auftrags, ohne persönliche Daten
+ *   GET  /api/stats                    → Anzahl abgeschlossener Reparaturen (Zähler auf der Website)
  *
  * Nur Werkstatt (Header "Authorization: Bearer <ADMIN_KEY>"):
  *   GET  /api/auth                     → prüft den Schlüssel
@@ -66,6 +67,10 @@ export default {
     try {
       if (path === '/api/status' && request.method === 'POST') {
         return await handleStatus(request, env, cors);
+      }
+
+      if (path === '/api/stats' && request.method === 'GET') {
+        return await handleStats(env, cors);
       }
 
       if (path === '/api/auth' || path === '/api/orders') {
@@ -134,6 +139,25 @@ async function handleStatus(request: Request, env: Env, cors: Headers): Promise<
     200,
     cors,
   );
+}
+
+// ---------------------------------------------------------------------------
+// Öffentlicher Zähler „Geräte gerettet“
+// ---------------------------------------------------------------------------
+
+// Abgeschlossen sind: neuer Manager „Abgeschlossen“, alter Manager „5. Fertig & Abholbereit“ und „abgeholt“.
+// Lager/Termine (SYNC_…) und reine Kostenvoranschläge (KVA-…) zählen nicht.
+const REPAIRED_SQL = `SELECT COUNT(*) AS n FROM orders
+  WHERE id NOT LIKE '${SYNC_PREFIX}%' AND id NOT LIKE 'KVA-%'
+    AND (status = 'Abgeschlossen' OR status LIKE '5.%' OR LOWER(status) LIKE '%abgeholt%' OR LOWER(status) LIKE '%abholbereit%')`;
+
+async function handleStats(env: Env, cors: Headers): Promise<Response> {
+  const row = await env.DB.prepare(REPAIRED_SQL).first<{ n: number }>();
+  const headers = new Headers(cors);
+  headers.set('Content-Type', 'application/json; charset=utf-8');
+  // Eine Stunde zwischenspeichern: keine personenbezogenen Daten, nur eine Zahl
+  headers.set('Cache-Control', 'public, max-age=3600');
+  return new Response(JSON.stringify({ success: true, repaired: Number(row?.n ?? 0) }), { status: 200, headers });
 }
 
 function maskName(name: string): string {

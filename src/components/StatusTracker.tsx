@@ -23,6 +23,8 @@ const QrScannerModal = lazyNamed(() => import('./QrScannerModal'), 'QrScannerMod
 import { Order } from '../manager/types';
 import { UNIFIED_STEPS, getStepNumber, getStepLabel, UnifiedStep } from '../utils/orderStatus';
 import { fetchPublicOrderStatus } from '../services/cloudflareSync';
+import { msg, useI18n } from '../i18n';
+import { whatsappLink } from '../utils/whatsapp';
 
 interface DisplayTicket {
   ticketId: string;
@@ -40,20 +42,21 @@ interface DisplayTicket {
 }
 
 export const StatusTracker: React.FC = () => {
+  const { t } = useI18n();
   const [ticketInput, setTicketInput] = useState('');
   const [ticketData, setTicketData] = useState<DisplayTicket | null>({
     ticketId: 'CODE-9231',
     customerName: 'Max M.',
     phone: '0176 **** 443',
     device: 'PlayStation 5 (Disc Edition)',
-    fault: 'HDMI-Buchse herausgebrochen, Leiterbahnen beschädigt',
-    preDamages: 'Leichte Kratzer an der Faceplate',
-    status: '5. Fertig & Abholbereit',
+    fault: msg('HDMI-Buchse herausgebrochen, Leiterbahnen beschädigt'),
+    preDamages: msg('Leichte Kratzer an der Faceplate'),
+    status: msg('5. Fertig & Abholbereit'),
     currentStep: 5,
     statusDetails:
-      'OEM-HDMI-Port erfolgreich eingelötet (Silberlot). 4K/120Hz Signal stabil. 30-Minuten Lasttest bestanden. Gerät gereinigt und abholbereit versiegelt.',
-    createdAt: 'Heute, 10:15 Uhr',
-    estimatedCompletion: 'Jetzt abholbereit an der Werkbank',
+      msg('OEM-HDMI-Port erfolgreich eingelötet (Silberlot). 4K/120Hz Signal stabil. 30-Minuten Lasttest bestanden. Gerät gereinigt und abholbereit versiegelt.'),
+    createdAt: msg('Heute, 10:15 Uhr'),
+    estimatedCompletion: msg('Jetzt abholbereit an der Werkbank'),
     testedPassed: true,
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -115,20 +118,17 @@ export const StatusTracker: React.FC = () => {
             phone: matched.phone ? matched.phone.slice(0, 4) + ' ****' : '–',
             device: matched.device,
             fault: matched.faultDescription || matched.device,
-            preDamages: matched.accessories ? `Zubehör: ${matched.accessories}` : '–',
+            preDamages: matched.accessories ? t('Zubehör: {items}', { items: matched.accessories }) : '–',
             status: matched.status || getStepLabel(step),
             currentStep: step,
             statusDetails:
               step === 5
-                ? `Reparatur erfolgreich abgeschlossen (${matched.paid === 'Bezahlt' ? 'bereits bezahlt' : 'Zahlung bei Abholung'}). Gerät liegt an der Werkbank in Neumarkt bereit!`
+                ? t('Reparatur erfolgreich abgeschlossen ({payment}). Gerät liegt an der Werkbank in Neumarkt bereit!', {
+                    payment: matched.paid === 'Bezahlt' ? t('bereits bezahlt') : t('Zahlung bei Abholung'),
+                  })
                 : defaultDesc,
-            createdAt: matched.date || 'Aktueller Auftrag',
-            estimatedCompletion:
-              step === 5
-                ? 'Jetzt abholbereit'
-                : step === 4
-                ? 'Heute noch'
-                : '1–2 Werktage',
+            createdAt: matched.date || msg('Aktueller Auftrag'),
+            estimatedCompletion: completionText(step),
             testedPassed: step >= 4,
           });
           setIsLoading(false);
@@ -146,12 +146,12 @@ export const StatusTracker: React.FC = () => {
         customerName: 'Max M.',
         phone: '0176 **** 443',
         device: 'PlayStation 5 (Disc Edition)',
-        fault: 'HDMI-Buchse herausgebrochen, Leiterbahnen beschädigt',
-        status: '5. Fertig & Abholbereit',
+        fault: msg('HDMI-Buchse herausgebrochen, Leiterbahnen beschädigt'),
+        status: msg('5. Fertig & Abholbereit'),
         currentStep: 5,
-        statusDetails: 'OEM-HDMI-Port erfolgreich eingelötet (Silberlot). 4K/120Hz Signal stabil. 30-Minuten Lasttest bestanden. Gerät liegt abholbereit vor Ort.',
-        createdAt: 'Heute, 10:15 Uhr',
-        estimatedCompletion: 'Jetzt abholbereit an der Werkbank',
+        statusDetails: msg('OEM-HDMI-Port erfolgreich eingelötet (Silberlot). 4K/120Hz Signal stabil. 30-Minuten Lasttest bestanden. Gerät liegt abholbereit vor Ort.'),
+        createdAt: msg('Heute, 10:15 Uhr'),
+        estimatedCompletion: msg('Jetzt abholbereit an der Werkbank'),
         testedPassed: true,
       });
     } else if (cleanQuery === 'CODE-4412') {
@@ -160,12 +160,12 @@ export const StatusTracker: React.FC = () => {
         customerName: 'Laura B.',
         phone: '0151 **** 891',
         device: 'Lenovo ThinkPad T14 Gen 2',
-        fault: 'Flüssigkeitsschaden Kaffee, startet nicht mehr',
-        status: '3. Reparatur & Bearbeitung',
+        fault: msg('Flüssigkeitsschaden Kaffee, startet nicht mehr'),
+        status: msg('3. Reparatur & Bearbeitung'),
         currentStep: 3,
-        statusDetails: 'Kurzschluss auf 19V VDD_MAIN durch defekten SMD-Kondensator behoben. Leiterbahnrekonstruktion läuft.',
-        createdAt: 'Gestern, 14:30 Uhr',
-        estimatedCompletion: 'Morgen Vormittag',
+        statusDetails: msg('Kurzschluss auf 19V VDD_MAIN durch defekten SMD-Kondensator behoben. Leiterbahnrekonstruktion läuft.'),
+        createdAt: msg('Gestern, 14:30 Uhr'),
+        estimatedCompletion: msg('Morgen Vormittag'),
         testedPassed: false,
       });
     } else if (cleanQuery === 'CODE-7708') {
@@ -174,12 +174,12 @@ export const StatusTracker: React.FC = () => {
         customerName: 'Thomas K.',
         phone: '0170 **** 881',
         device: 'DualSense PS5 Controller',
-        fault: 'Massiver Stick-Drift auf linker Achse (Hall-Effect Umbau)',
-        status: '4. Qualitätsprüfung & Test',
+        fault: msg('Massiver Stick-Drift auf linker Achse (Hall-Effect Umbau)'),
+        status: msg('4. Qualitätsprüfung & Test'),
         currentStep: 4,
-        statusDetails: 'Hall-Effect Magnet-Stick eingelötet. Zirkularitäts-Prüfung und Deadzone-Kalibrierung im Gange.',
-        createdAt: 'Vorgestern',
-        estimatedCompletion: 'Heute Nachmittag',
+        statusDetails: msg('Hall-Effect Magnet-Stick eingelötet. Zirkularitäts-Prüfung und Deadzone-Kalibrierung im Gange.'),
+        createdAt: msg('Vorgestern'),
+        estimatedCompletion: msg('Heute Nachmittag'),
         testedPassed: true,
       });
     } else if (cleanQuery === 'CODE-1085') {
@@ -187,13 +187,13 @@ export const StatusTracker: React.FC = () => {
         ticketId: 'CODE-1085',
         customerName: 'Michael W.',
         phone: '0160 **** 219',
-        device: 'BMW Funkschlüssel (Rautenform)',
-        fault: 'Akku leer (VL2020), ZV-Taster ohne Funktion',
-        status: '1. Eingang & Registrierung',
+        device: msg('BMW Funkschlüssel (Rautenform)'),
+        fault: msg('Akku leer (VL2020), ZV-Taster ohne Funktion'),
+        status: msg('1. Eingang & Registrierung'),
         currentStep: 1,
-        statusDetails: 'Gerät digital erfasst, Sicherheits-Etikett mit QR-Code gedruckt und der Werkbank zugewiesen.',
-        createdAt: 'Heute, 11:00 Uhr',
-        estimatedCompletion: 'Heute, 16:30 Uhr',
+        statusDetails: msg('Gerät digital erfasst, Sicherheits-Etikett mit QR-Code gedruckt und der Werkbank zugewiesen.'),
+        createdAt: msg('Heute, 11:00 Uhr'),
+        estimatedCompletion: msg('Heute, 16:30 Uhr'),
         testedPassed: false,
       });
     } else if (cleanQuery === 'CODE-3042') {
@@ -202,19 +202,19 @@ export const StatusTracker: React.FC = () => {
         customerName: 'Sarah L.',
         phone: '0172 **** 441',
         device: 'Apple iPhone 14 Pro Max',
-        fault: 'Bootloop nach Speicherüberlauf (Fehler 14)',
-        status: '2. Labor-Diagnose',
+        fault: msg('Bootloop nach Speicherüberlauf (Fehler 14)'),
+        status: msg('2. Labor-Diagnose'),
         currentStep: 2,
-        statusDetails: 'Mikroskopische 40x Sichtprüfung und DFU-Recovery Analyse zur Sicherung der Benutzerdaten aktiv.',
-        createdAt: 'Heute, 09:30 Uhr',
-        estimatedCompletion: 'Morgen Vormittag',
+        statusDetails: msg('Mikroskopische 40x Sichtprüfung und DFU-Recovery Analyse zur Sicherung der Benutzerdaten aktiv.'),
+        createdAt: msg('Heute, 09:30 Uhr'),
+        estimatedCompletion: msg('Morgen Vormittag'),
         testedPassed: false,
       });
     } else {
       // 3. Echte Aufträge: nur mit Auftragsnummer + letzten 4 Ziffern der Telefonnummer
       const phone4 = phoneText.replace(/\D/g, '');
       if (phone4.length !== 4) {
-        setSearchError('Bitte zusätzlich die letzten 4 Ziffern deiner Telefonnummer eingeben (Schutz deiner Daten).');
+        setSearchError(t('Bitte zusätzlich die letzten 4 Ziffern deiner Telefonnummer eingeben (Schutz deiner Daten).'));
         setTicketData(null);
         setIsLoading(false);
         return;
@@ -226,24 +226,30 @@ export const StatusTracker: React.FC = () => {
         const defaultDesc = UNIFIED_STEPS.find((s) => s.step === step)?.defaultStatusText || '';
         setTicketData({
           ticketId: order.id,
-          customerName: order.customer || 'Kunde',
+          customerName: order.customer || t('Kunde'),
           phone: `**** ${phone4}`,
-          device: order.device || 'Werkstatt-Gerät',
-          fault: 'Diagnose & Reparatur',
+          device: order.device || msg('Werkstatt-Gerät'),
+          fault: msg('Diagnose & Reparatur'),
           status: order.status || getStepLabel(step),
           currentStep: step,
           statusDetails:
             step === 5
-              ? `Reparatur erfolgreich abgeschlossen (${order.paid === 'Bezahlt' ? 'bereits bezahlt' : 'Zahlung bei Abholung'}). Gerät liegt zur Abholung bereit!`
+              ? t('Reparatur erfolgreich abgeschlossen ({payment}). Gerät liegt zur Abholung bereit!', {
+                  payment: order.paid === 'Bezahlt' ? t('bereits bezahlt') : t('Zahlung bei Abholung'),
+                })
               : defaultDesc,
-          createdAt: order.date || 'Aktueller Auftrag',
-          estimatedCompletion: step === 5 ? 'Jetzt abholbereit' : step === 4 ? 'Heute noch' : '1–2 Werktage',
+          createdAt: order.date || msg('Aktueller Auftrag'),
+          estimatedCompletion: completionText(step),
           testedPassed: step >= 4,
         });
       } else {
+        // Meldungen des Servers sind deutsch und werden übersetzt, wenn eine Übersetzung existiert
         setSearchError(
-          error ||
-            `Auftrag "${queryText}" konnte nicht gefunden werden. Bitte prüfe Auftragsnummer und Telefonziffern oder scanne den QR-Code auf deinem Beleg.`
+          error
+            ? t(error)
+            : t('Auftrag "{id}" konnte nicht gefunden werden. Bitte prüfe Auftragsnummer und Telefonziffern oder scanne den QR-Code auf deinem Beleg.', {
+                id: queryText,
+              })
         );
         setTicketData(null);
       }
@@ -251,6 +257,10 @@ export const StatusTracker: React.FC = () => {
 
     setIsLoading(false);
   };
+
+  function completionText(step: number) {
+    return step === 5 ? msg('Jetzt abholbereit') : step === 4 ? msg('Heute noch') : msg('1–2 Werktage');
+  }
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -291,9 +301,9 @@ export const StatusTracker: React.FC = () => {
           {/* Header */}
           <SectionHeading
             index="02"
-            eyebrow="Auftragsstatus"
-            title="Wo ist mein Gerät gerade?"
-            intro="Auftragsnummer (oder QR-Code vom Abholschein) und die letzten 4 Ziffern deiner Telefonnummer eingeben – fertig."
+            eyebrow={t('Auftragsstatus')}
+            title={t('Wo ist mein Gerät gerade?')}
+            intro={t('Auftragsnummer (oder QR-Code vom Abholschein) und die letzten 4 Ziffern deiner Telefonnummer eingeben – fertig.')}
           />
 
           {/* Search Form with QR Code Scanner */}
@@ -304,8 +314,8 @@ export const StatusTracker: React.FC = () => {
                   type="text"
                   value={ticketInput}
                   onChange={(e) => setTicketInput(e.target.value)}
-                  placeholder="Auftrags-Nr."
-                  aria-label="Auftragsnummer"
+                  placeholder={t('Auftrags-Nr.')}
+                  aria-label={t('Auftragsnummer')}
                   className="w-full bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono uppercase"
                 />
               </div>
@@ -318,9 +328,9 @@ export const StatusTracker: React.FC = () => {
                 maxLength={4}
                 value={phone4Input}
                 onChange={(e) => setPhone4Input(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                placeholder="Tel. (4 Ziff.)"
-                aria-label="Letzte 4 Ziffern deiner Telefonnummer"
-                title="Die letzten 4 Ziffern der Telefonnummer, die du bei der Abgabe angegeben hast"
+                placeholder={t('Tel. (4 Ziff.)')}
+                aria-label={t('Letzte 4 Ziffern deiner Telefonnummer')}
+                title={t('Die letzten 4 Ziffern der Telefonnummer, die du bei der Abgabe angegeben hast')}
                 className="sm:w-36 bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono tracking-widest"
               />
 
@@ -329,10 +339,10 @@ export const StatusTracker: React.FC = () => {
                   type="button"
                   onClick={() => setIsScannerOpen(true)}
                   className="px-4 py-3 rounded-xl bg-[#122225] border border-[#00F5D4]/60 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] font-mono font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-                  title="QR-Code mit Kamera scannen"
+                  title={t('QR-Code mit Kamera scannen')}
                 >
                   <Camera className="w-4 h-4" />
-                  <span>QR Scannen</span>
+                  <span>{t('QR Scannen')}</span>
                 </button>
 
                 <button
@@ -341,14 +351,14 @@ export const StatusTracker: React.FC = () => {
                   className="px-5 py-3 rounded-xl bg-[#00F5D4] text-[#060B0C] font-mono font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_15px_rgba(0,245,212,0.3)] flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
                 >
                   {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                  <span>Prüfen</span>
+                  <span>{t('Prüfen')}</span>
                 </button>
               </div>
             </form>
 
             {/* Quick Demo Links */}
             <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1 text-xs font-mono">
-              <span className="text-[#839897]">Schnell-Test:</span>
+              <span className="text-[#839897]">{t('Schnell-Test:')}</span>
               <button
                 type="button"
                 onClick={() => {
@@ -357,7 +367,7 @@ export const StatusTracker: React.FC = () => {
                 }}
                 className="text-[#00E676] hover:underline font-bold cursor-pointer"
               >
-                CODE-9231 (5. Abholbereit)
+                CODE-9231 ({t('5. Abholbereit')})
               </button>
               <span className="text-white/20">•</span>
               <button
@@ -368,7 +378,7 @@ export const StatusTracker: React.FC = () => {
                 }}
                 className="text-[#FF8D4D] hover:underline cursor-pointer"
               >
-                CODE-4412 (3. Reparatur)
+                CODE-4412 ({t('3. Reparatur')})
               </button>
               <span className="text-white/20">•</span>
               <button
@@ -379,7 +389,7 @@ export const StatusTracker: React.FC = () => {
                 }}
                 className="text-[#00F5D4] hover:underline cursor-pointer"
               >
-                CODE-7708 (4. Test)
+                CODE-7708 ({t('4. Test')})
               </button>
             </div>
           </div>
@@ -400,27 +410,27 @@ export const StatusTracker: React.FC = () => {
               {/* Ticket Top Row */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
-                  <span className="font-mono text-xs text-[#839897] uppercase">Auftrags-Nr.</span>
+                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Auftrags-Nr.')}</span>
                   <div className="font-mono text-xl sm:text-2xl font-extrabold text-[#00F5D4]">
                     {ticketData.ticketId}
                   </div>
                 </div>
                 <div>
-                  <span className="font-mono text-xs text-[#839897] uppercase">Kunde / Besitzer</span>
+                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Kunde / Besitzer')}</span>
                   <div className="text-sm sm:text-base font-bold text-white">
                     {ticketData.customerName}
                   </div>
                 </div>
                 <div>
-                  <span className="font-mono text-xs text-[#839897] uppercase">Gerät</span>
+                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Gerät')}</span>
                   <div className="text-sm sm:text-base font-bold text-white">
-                    {ticketData.device}
+                    {t(ticketData.device)}
                   </div>
                 </div>
-                <div className="text-left sm:text-right">
-                  <span className="font-mono text-xs text-[#839897] uppercase">Fertigstellung</span>
+                <div className="text-start sm:text-end">
+                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Fertigstellung')}</span>
                   <div className="font-mono text-sm sm:text-base font-bold text-[#FF8D4D]">
-                    {ticketData.estimatedCompletion}
+                    {t(ticketData.estimatedCompletion)}
                   </div>
                 </div>
               </div>
@@ -429,13 +439,13 @@ export const StatusTracker: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-3 px-1">
                   <span className="text-xs font-mono text-[#00F5D4] font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <span>Werkstatt-Fortschritt:</span>
+                    <span>{t('Werkstatt-Fortschritt:')}</span>
                     <span className="text-white">
-                      Schritt {ticketData.currentStep} von 5
+                      {t('Schritt {n} von 5', { n: ticketData.currentStep })}
                     </span>
                   </span>
                   <span className="text-xs font-mono text-[#839897]">
-                    {Math.round((ticketData.currentStep / 5) * 100)} % abgeschlossen
+                    {t('{percent} % abgeschlossen', { percent: Math.round((ticketData.currentStep / 5) * 100) })}
                   </span>
                 </div>
 
@@ -446,7 +456,7 @@ export const StatusTracker: React.FC = () => {
                     return (
                       <div
                         key={st.step}
-                        className={`px-3 py-2 sm:p-3.5 rounded-xl border text-left sm:text-center transition-all flex flex-row sm:flex-col items-center sm:justify-center gap-3 sm:gap-2 ${
+                        className={`px-3 py-2 sm:p-3.5 rounded-xl border text-start sm:text-center transition-all flex flex-row sm:flex-col items-center sm:justify-center gap-3 sm:gap-2 ${
                           isCurrent
                             ? 'bg-[#00F5D4]/15 border-[#00F5D4] shadow-[0_0_20px_rgba(0,245,212,0.35)] scale-[1.02]'
                             : isPassed
@@ -484,7 +494,7 @@ export const StatusTracker: React.FC = () => {
                                 : 'text-[#839897]'
                             }`}
                           >
-                            {st.label}
+                            {t(st.label)}
                           </span>
                         </div>
                       </div>
@@ -498,20 +508,20 @@ export const StatusTracker: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
                   <div className="flex items-center gap-2 text-xs font-mono text-[#00F5D4] font-bold uppercase">
                     <span className="w-2 h-2 rounded-full bg-[#00F5D4] animate-ping" />
-                    <span>&gt; DYNAMISCHES STATUS-TERMINAL</span>
+                    <span>&gt; {t('DYNAMISCHES STATUS-TERMINAL')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400">
-                    <span>Gerätetyp:</span>
-                    <strong className="text-white">{ticketData.device}</strong>
+                    <span>{t('Gerätetyp:')}</span>
+                    <strong className="text-white">{t(ticketData.device)}</strong>
                   </div>
                 </div>
 
                 <div>
                   <span className="font-mono text-[11px] text-[#839897] uppercase block mb-1">
-                    Letzte Labor-Meldung:
+                    {t('Letzte Labor-Meldung:')}
                   </span>
                   <p className="text-xs sm:text-sm text-white font-mono leading-relaxed bg-[#060C0E] border border-white/5 rounded-xl p-3.5">
-                    {ticketData.statusDetails}
+                    {t(ticketData.statusDetails)}
                   </p>
                 </div>
 
@@ -519,14 +529,14 @@ export const StatusTracker: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Clock className="w-3.5 h-3.5 text-[#FF8D4D]" />
                     <span>
-                      Voraussichtliche Fertigstellung:{' '}
-                      <strong className="text-[#FF8D4D]">{ticketData.estimatedCompletion}</strong>
+                      {t('Voraussichtliche Fertigstellung:')}{' '}
+                      <strong className="text-[#FF8D4D]">{t(ticketData.estimatedCompletion)}</strong>
                     </span>
                   </div>
                   {ticketData.testedPassed && (
                     <div className="flex items-center gap-1.5 text-[#00E676] font-bold">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Qualitätstest: Bestanden</span>
+                      <span>{t('Qualitätstest: Bestanden')}</span>
                     </div>
                   )}
                 </div>
@@ -541,13 +551,13 @@ export const StatusTracker: React.FC = () => {
                     </div>
                     <div>
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#00E676]/30 border border-[#00E676] text-[#00E676] text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
-                        ✓ REPARATUR ERFOLGREICH BEENDET
+                        ✓ {t('REPARATUR ERFOLGREICH BEENDET')}
                       </div>
                       <h3 className="text-xl sm:text-2xl font-black text-white">
-                        Gerät liegt zur Abholung bereit!
+                        {t('Gerät liegt zur Abholung bereit!')}
                       </h3>
                       <p className="text-xs sm:text-sm text-zinc-200 mt-1 max-w-lg">
-                        Alle Arbeiten und 4K-Dauertests wurden erfolgreich abgeschlossen. Du kannst dein Gerät während der Öffnungszeiten direkt an der Werkbank abholen.
+                        {t('Alle Arbeiten und 4K-Dauertests wurden erfolgreich abgeschlossen. Du kannst dein Gerät während der Öffnungszeiten direkt an der Werkbank abholen.')}
                       </p>
                     </div>
                   </div>
@@ -556,21 +566,21 @@ export const StatusTracker: React.FC = () => {
                   <div className="bg-[#050C0E]/90 border border-white/15 rounded-xl p-4 text-xs font-mono shrink-0 space-y-2 w-full md:w-auto">
                     <div className="flex items-center gap-1.5 text-[#00F5D4] font-bold">
                       <MapPin className="w-4 h-4 text-[#00F5D4] shrink-0" />
-                      <span>Werkstatt-Standort:</span>
+                      <span>{t('Werkstatt-Standort:')}</span>
                     </div>
-                    <div className="text-white pl-5 font-semibold">
-                      92318 Neumarkt in der Oberpfalz
+                    <div className="text-white ps-5 font-semibold">
+                      {t('92318 Neumarkt in der Oberpfalz')}
                       <span className="block text-[11px] text-zinc-400 font-normal mt-0.5">
-                        (Persönliche Abholung nach kurzer Terminabsprache)
+                        {t('(Persönliche Abholung nach kurzer Terminabsprache)')}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-zinc-300 pt-1">
                       <Clock className="w-3.5 h-3.5 text-[#FF8D4D] shrink-0" />
-                      <span>Mo–Fr 10:00–18:00 Uhr | Sa 10:00–14:00 Uhr</span>
+                      <span>{t('Mo–Fr 10:00–18:00 Uhr | Sa 10:00–14:00 Uhr')}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-zinc-300">
                       <Phone className="w-3.5 h-3.5 text-[#00F5D4] shrink-0" />
-                      <span>0176 4174 4443</span>
+                      <span dir="ltr">0176 4174 4443</span>
                     </div>
                   </div>
                 </div>
@@ -579,18 +589,22 @@ export const StatusTracker: React.FC = () => {
               {/* Direct WhatsApp Contact Button */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <span className="text-xs font-mono text-[#839897]">
-                  Fragen zum Ablauf oder Abholtermin?
+                  {t('Fragen zum Ablauf oder Abholtermin?')}
                 </span>
                 <a
-                  href={`https://wa.me/4917641744443?text=${encodeURIComponent(
-                    `Hallo Mustafa, ich frage zum Auftrag ${ticketData.ticketId} (${ticketData.device}, aktueller Status: ${ticketData.status}).`
-                  )}`}
+                  href={whatsappLink(
+                    t('Hallo Mustafa, ich frage zum Auftrag {id} ({device}, aktueller Status: {status}).', {
+                      id: ticketData.ticketId,
+                      device: t(ticketData.device),
+                      status: t(ticketData.status),
+                    })
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#25D366]/20 border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-[#040809] font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>Mustafa per WhatsApp kontaktieren</span>
+                  <span>{t('Mustafa per WhatsApp kontaktieren')}</span>
                 </a>
               </div>
             </div>
