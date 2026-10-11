@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, ShieldCheck } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 // Datenschutzhinweise – beschreiben genau die Datenflüsse dieser Website.
 // Bei neuen Diensten (z. B. Analyse-Tools, Karten, Videos) hier ergänzen.
@@ -22,13 +23,14 @@ const PRIVACY_SECTIONS: { title: string; body: string[] }[] = [
     body: [
       'Wir setzen keine Cookies und keine Analyse- oder Werbedienste ein. Schriftarten werden von unserem eigenen Server geladen – es besteht keine Verbindung zu Google Fonts.',
       'Damit die Seite schneller lädt und offline teilweise verfügbar ist, speichert dein Browser Programmdateien der Seite (Service Worker). Darin sind keine personenbezogenen Daten enthalten.',
+      'Wenn du die Sprache der Website wechselst, merkt sich dein Browser diese Wahl lokal (Local Storage). Sie wird nicht an uns übertragen.',
     ],
   },
   {
     title: 'Kontakt per Telefon, E-Mail und WhatsApp',
     body: [
-      'Wenn du uns anrufst, schreibst oder den digitalen Check-in nutzt, verarbeiten wir deine Angaben (z. B. Name, Telefonnummer, Gerät, Fehlerbeschreibung) zur Bearbeitung deiner Anfrage und zur Durchführung des Reparaturauftrags (Art. 6 Abs. 1 lit. b DSGVO).',
-      'Der Check-in wird nicht auf unserer Website gespeichert, sondern als vorbereitete Nachricht in WhatsApp bzw. deinem E-Mail-Programm geöffnet. Bei WhatsApp verarbeitet zusätzlich WhatsApp Ireland Ltd. (Meta) deine Nachricht nach eigenen Datenschutzbestimmungen.',
+      'Wenn du uns anrufst, schreibst, den digitalen Check-in oder das Formular „Gerät einsenden“ nutzt, verarbeiten wir deine Angaben (z. B. Name, Telefonnummer, Gerät, Fehlerbeschreibung) zur Bearbeitung deiner Anfrage und zur Durchführung des Reparaturauftrags (Art. 6 Abs. 1 lit. b DSGVO).',
+      'Check-in und Einsende-Formular werden nicht auf unserer Website gespeichert, sondern als vorbereitete Nachricht in WhatsApp bzw. deinem E-Mail-Programm geöffnet. Bei WhatsApp verarbeitet zusätzlich WhatsApp Ireland Ltd. (Meta) deine Nachricht nach eigenen Datenschutzbestimmungen.',
     ],
   },
   {
@@ -78,6 +80,7 @@ interface LegalModalsProps {
 }
 
 export const LegalModals: React.FC<LegalModalsProps> = ({ modalType, onClose }) => {
+  const { t, lang } = useI18n();
   if (!modalType) return null;
 
   return (
@@ -91,14 +94,21 @@ export const LegalModals: React.FC<LegalModalsProps> = ({ modalType, onClose }) 
         <button
           type="button"
           onClick={onClose}
-          aria-label="Schließen"
-          className="absolute top-5 right-5 text-[#839897] hover:text-white transition-colors cursor-pointer"
+          aria-label={t('Schließen')}
+          className="absolute top-5 end-5 text-[#839897] hover:text-white transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
+        {/* Rechtstexte bleiben auf Deutsch (verbindliche Fassung) */}
+        {lang !== 'de' && (
+          <p className="mb-4 me-8 rounded-xl border border-[#00F5D4]/25 bg-[#00F5D4]/[0.06] px-3.5 py-2.5 text-xs text-[#A3B5B6]">
+            {t('Dieser Rechtstext ist nur auf Deutsch verfügbar. Die deutsche Fassung ist verbindlich.')}
+          </p>
+        )}
+
         {modalType === 'impressum' ? (
-          <div className="space-y-4 text-xs sm:text-sm text-[#839897] leading-relaxed">
+          <div lang="de" dir="ltr" className="space-y-4 text-xs sm:text-sm text-[#839897] leading-relaxed">
             <h3 className="font-mono text-base sm:text-lg font-bold text-[#00F5D4] mb-3">
               Impressum
             </h3>
@@ -138,7 +148,7 @@ export const LegalModals: React.FC<LegalModalsProps> = ({ modalType, onClose }) 
             </div>
           </div>
         ) : (
-          <div className="space-y-4 text-xs sm:text-sm text-[#839897] leading-relaxed">
+          <div lang="de" dir="ltr" className="space-y-4 text-xs sm:text-sm text-[#839897] leading-relaxed">
             <h3 className="font-mono text-base sm:text-lg font-bold text-[#00F5D4] mb-3 flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-[#00F5D4]" />
               <span>Datenschutzerklärung</span>

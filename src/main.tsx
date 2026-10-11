@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
+import { bootI18n, LanguageProvider } from './i18n';
 // Schriften lokal ausgeliefert (keine Verbindung zu Google Fonts – DSGVO)
 import '@fontsource-variable/space-grotesk';
 import '@fontsource/ibm-plex-mono/300.css';
@@ -97,9 +98,14 @@ class RootErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundar
   }
 }
 
-createRoot(document.getElementById('root')!).render(
-  <RootErrorBoundary>
-    <App />
-  </RootErrorBoundary>
-);
+// Erst die Sprache laden, dann rendern – sonst blitzt kurz der deutsche Text auf
+bootI18n().finally(() => {
+  createRoot(document.getElementById('root')!).render(
+    <RootErrorBoundary>
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
+    </RootErrorBoundary>
+  );
+});
 

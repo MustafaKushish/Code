@@ -10,7 +10,11 @@ const HOURS: Record<number, [number, number] | null> = {
   6: [600, 840],
 };
 
-const DAY_NAMES = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+import { msg } from '../i18n';
+
+type Translate = (german: string, vars?: Record<string, string | number>) => string;
+
+const DAY_NAMES = [msg('So'), msg('Mo'), msg('Di'), msg('Mi'), msg('Do'), msg('Fr'), msg('Sa')];
 
 function berlinNow(date: Date) {
   const parts = new Intl.DateTimeFormat('en-GB', {
@@ -32,22 +36,28 @@ export interface OpeningStatus {
   label: string;
 }
 
-/** z. B. { open: true, label: "Jetzt geöffnet · bis 18:00" } */
-export function getOpeningStatus(date = new Date()): OpeningStatus {
+/** z. B. { open: true, label: "Jetzt geöffnet · bis 18:00 Uhr" } – t übersetzt den Text */
+export function getOpeningStatus(t: Translate, date = new Date()): OpeningStatus {
   const { day, minutes } = berlinNow(date);
   const today = HOURS[day];
   if (today && minutes >= today[0] && minutes < today[1]) {
-    return { open: true, label: `Jetzt geöffnet · bis ${fmt(today[1])} Uhr` };
+    return { open: true, label: t('Jetzt geöffnet · bis {time} Uhr', { time: fmt(today[1]) }) };
   }
   if (today && minutes < today[0]) {
-    return { open: false, label: `Geschlossen · öffnet heute ${fmt(today[0])} Uhr` };
+    return { open: false, label: t('Geschlossen · öffnet heute {time} Uhr', { time: fmt(today[0]) }) };
   }
   for (let i = 1; i <= 7; i++) {
     const d = (day + i) % 7;
     const next = HOURS[d];
     if (next) {
-      return { open: false, label: `Geschlossen · öffnet ${i === 1 ? 'morgen' : DAY_NAMES[d]} ${fmt(next[0])} Uhr` };
+      return {
+        open: false,
+        label:
+          i === 1
+            ? t('Geschlossen · öffnet morgen {time} Uhr', { time: fmt(next[0]) })
+            : t('Geschlossen · öffnet {day} {time} Uhr', { day: t(DAY_NAMES[d]), time: fmt(next[0]) }),
+      };
     }
   }
-  return { open: false, label: 'Termin nach Vereinbarung' };
+  return { open: false, label: t('Termin nach Vereinbarung') };
 }

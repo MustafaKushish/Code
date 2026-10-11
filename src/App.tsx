@@ -19,6 +19,8 @@ import { getAdminKey, ADMIN_UNAUTHORIZED_EVENT } from './services/cloudflareSync
 import { useReveal } from './components/ui/useReveal';
 import { lazyNamed, useMountedOnce, prefetchWhenIdle } from './components/ui/lazy';
 import { installBookingLinks } from './utils/calBooking';
+import { LoanerSection } from './components/LoanerSection';
+import { useDocumentLanguage, useI18n } from './i18n';
 
 // Selten genutzte, große Teile werden erst bei Bedarf geladen (schnellerer Seitenaufbau)
 const loadAiModal = () => import('./components/AiTechnicianModal');
@@ -26,6 +28,7 @@ const loadCheckIn = () => import('./components/CheckInModal');
 const AiTechnicianModal = lazyNamed(loadAiModal, 'AiTechnicianModal');
 const CheckInModal = lazyNamed(loadCheckIn, 'CheckInModal');
 const LegalModals = lazyNamed(() => import('./components/LegalModals'), 'LegalModals');
+const MailInModal = lazyNamed(() => import('./components/MailInModal'), 'MailInModal');
 const SecretTerminalModal = lazyNamed(() => import('./components/SecretTerminalModal'), 'SecretTerminalModal');
 const WerkstattManagerApp = lazyNamed(() => import('./manager/WerkstattManagerApp'), 'WerkstattManagerApp');
 
@@ -48,16 +51,21 @@ export default function App() {
     managerRequested && getAdminKey() ? 'manager' : 'website'
   );
   useReveal();
+  const { t } = useI18n();
+  // Der Manager bleibt deutsch und links-nach-rechts, auch wenn die Website z. B. auf Arabisch steht
+  useDocumentLanguage(viewMode === 'website');
   const [currentCategory, setCurrentCategory] = useState<DeviceCategoryKey>('laptop_pc');
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [aiInitialQuery, setAiInitialQuery] = useState<string | undefined>(undefined);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+  const [isMailInOpen, setIsMailInOpen] = useState(false);
   const [checkInPreset, setCheckInPreset] = useState<{ device?: string; fault?: string } | undefined>(undefined);
   const [legalModalType, setLegalModalType] = useState<'impressum' | 'datenschutz' | null>(null);
   const [isSecretTerminalOpen, setIsSecretTerminalOpen] = useState(() => managerRequested && !getAdminKey());
 
   const aiMounted = useMountedOnce(isAiChatOpen);
   const checkInMounted = useMountedOnce(isCheckInOpen);
+  const mailInMounted = useMountedOnce(isMailInOpen);
 
   useEffect(() => {
     prefetchWhenIdle([loadAiModal, loadCheckIn]);
@@ -83,6 +91,7 @@ export default function App() {
       if (e.key === 'Escape') {
         setIsAiChatOpen(false);
         setIsCheckInOpen(false);
+        setIsMailInOpen(false);
         setLegalModalType(null);
         setIsSecretTerminalOpen(false);
       }
@@ -130,9 +139,9 @@ export default function App() {
     <div className="relative min-h-screen bg-[#060B0C] text-[#F3F7F7] selection:bg-[#4FA39B]/30 selection:text-[#00F5D4] pb-28 md:pb-0 overflow-x-clip w-full max-w-full">
       <a
         href="#inhalt"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#00F5D4] focus:text-[#04110F] focus:font-semibold"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#00F5D4] focus:text-[#04110F] focus:font-semibold"
       >
-        Zum Inhalt springen
+        {t('Zum Inhalt springen')}
       </a>
 
       {/* Background Circuit Particle Grid */}
@@ -173,6 +182,9 @@ export default function App() {
         {/* 4-Step Process Workflow */}
         <WorkflowSection />
 
+        {/* Leih-Controller während der Reparatur */}
+        <LoanerSection />
+
         {/* Reviews Section */}
         <ReviewsSection />
 
@@ -186,7 +198,7 @@ export default function App() {
         <AppointmentSection />
 
         {/* Contact & Mail-In Shipping */}
-        <ContactSection />
+        <ContactSection onOpenMailIn={() => setIsMailInOpen(true)} />
 
         </main>
 
@@ -212,6 +224,8 @@ export default function App() {
             onOpenCheckIn={handleOpenCheckInWithPreset}
           />
         )}
+
+        {mailInMounted && <MailInModal isOpen={isMailInOpen} onClose={() => setIsMailInOpen(false)} />}
 
         {checkInMounted && (
           <CheckInModal isOpen={isCheckInOpen} onClose={() => setIsCheckInOpen(false)} presetData={checkInPreset} />

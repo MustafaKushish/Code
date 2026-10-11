@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Camera, RefreshCw, AlertCircle, CheckCircle2, SwitchCamera, Upload } from 'lucide-react';
 import jsQR from 'jsqr';
 import { playMultimeterBeep } from '../utils/audio';
+import { useI18n } from '../i18n';
 
 interface QrScannerModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface QrScannerModalProps {
 }
 
 export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose, onScanSuccess }) => {
+  const { t } = useI18n();
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [scannedResult, setScannedResult] = useState<string | null>(null);
@@ -101,7 +103,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
       } catch (err: any) {
         console.warn('Camera access failed:', err);
         setCameraError(
-          'Kamerazugriff nicht möglich oder verweigert. Bitte erlaube den Zugriff auf deine Kamera im Browser oder lade ein Foto deines Etiketts hoch.'
+          t('Kamerazugriff nicht möglich oder verweigert. Bitte erlaube den Zugriff auf deine Kamera im Browser oder lade ein Foto deines Etiketts hoch.')
         );
       }
     };
@@ -162,7 +164,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
         if (code && code.data) {
           handleDetectedCode(code.data);
         } else {
-          alert('Kein lesbarer QR-Code auf diesem Foto gefunden. Bitte stelle sicher, dass der QR-Code gut ausgeleuchtet und scharf ist.');
+          alert(t('Kein lesbarer QR-Code auf diesem Foto gefunden. Bitte stelle sicher, dass der QR-Code gut ausgeleuchtet und scharf ist.'));
         }
       };
       img.src = event.target?.result as string;
@@ -177,7 +179,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
   if (!isOpen) return null;
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="QR-Code scannen" className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-fade-in">
+    <div role="dialog" aria-modal="true" aria-label={t('QR-Code scannen')} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-fade-in">
       <div className="bg-[#0B1416] border-2 border-[#00F5D4] rounded-2xl w-full max-w-lg shadow-[0_20px_60px_rgba(0,0,0,0.95)] overflow-hidden relative flex flex-col">
         {/* Header */}
         <div className="p-4 bg-[#050A0C] border-b border-white/10 flex items-center justify-between">
@@ -187,17 +189,17 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
             </div>
             <div>
               <h3 className="font-mono text-sm font-bold text-white tracking-wide">
-                QR-Code Scanner
+                {t('QR-Code Scanner')}
               </h3>
               <p className="text-[10px] font-mono text-[#839897]">
-                Auftrags-Etikett oder Reparatur-Beleg scannen
+                {t('Auftrags-Etikett oder Reparatur-Beleg scannen')}
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Schließen"
+            aria-label={t('Schließen')}
             className="p-1.5 rounded-lg text-[#839897] hover:text-[#FF8D4D] hover:bg-white/5 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -233,7 +235,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
             <div className="absolute inset-0 bg-[#00F5D4]/20 backdrop-blur-xs flex flex-col items-center justify-center gap-2 animate-fade-in">
               <CheckCircle2 className="w-14 h-14 text-[#00F5D4] animate-bounce" />
               <div className="font-mono text-base font-extrabold text-white bg-black/80 px-4 py-1.5 rounded-xl border border-[#00F5D4]">
-                ✓ {scannedResult} erkannt!
+                ✓ {t('{id} erkannt!', { id: scannedResult })}
               </div>
             </div>
           )}
@@ -252,7 +254,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
                   className="px-4 py-2 rounded-xl bg-[#00F5D4] text-[#060B0C] font-mono text-xs font-bold uppercase hover:bg-white transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Upload className="w-4 h-4" />
-                  <span>Foto vom QR-Code hochladen</span>
+                  <span>{t('Foto vom QR-Code hochladen')}</span>
                 </button>
               </div>
             </div>
@@ -275,17 +277,17 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
             className="px-3 py-1.5 rounded-lg border border-white/15 text-[#839897] hover:text-white hover:border-[#00F5D4] transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>Foto wählen</span>
+            <span>{t('Foto wählen')}</span>
           </button>
 
           <button
             type="button"
             onClick={toggleCamera}
             className="px-3 py-1.5 rounded-lg border border-white/15 text-[#839897] hover:text-white hover:border-[#00F5D4] transition-all flex items-center gap-1.5 cursor-pointer"
-            title="Kamera wechseln"
+            title={t('Kamera wechseln')}
           >
             <SwitchCamera className="w-3.5 h-3.5" />
-            <span>Kamera drehen</span>
+            <span>{t('Kamera drehen')}</span>
           </button>
 
           <button
@@ -293,7 +295,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose,
             onClick={onClose}
             className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
           >
-            Abbrechen
+            {t('Abbrechen')}
           </button>
         </div>
       </div>

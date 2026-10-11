@@ -2,6 +2,13 @@ interface Env {
   GEMINI_API_KEY?: string;
 }
 
+const LANGUAGE_NAMES: Record<string, string> = {
+  de: 'Deutsch',
+  en: 'Englisch',
+  tr: 'Türkisch',
+  ar: 'Arabisch',
+};
+
 export const onRequestPost = async (context: { request: Request; env: Env }) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -12,13 +19,20 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
 
   try {
     const body: any = await context.request.json();
-    const { deviceCategory, description, errorCodes } = body;
+    const { deviceCategory, errorCodes } = body;
+    // Die Website schickt den Text als "message"; "description" bleibt für ältere Aufrufe erlaubt
+    const description = typeof body.message === 'string' ? body.message : body.description;
+    const lang: string = LANGUAGE_NAMES[body.lang] ? body.lang : 'de';
     const apiKey = context.env.GEMINI_API_KEY;
 
     if (apiKey) {
+      const languageRule =
+        lang === 'de'
+          ? ''
+          : `\nWICHTIG: Antworte vollständig auf ${LANGUAGE_NAMES[lang]}, auch die drei Überschriften und den Schlusssatz. Preise in Euro.\n`;
       const prompt = `Du bist der leitende Mikrolöt- und Elektronik-Meister der "CODE IT-Werkstatt" in Neumarkt in der Oberpfalz.
 Analysiere die Fehlerbeschreibung präzise auf Bauteilebene.
-
+${languageRule}
 Gerätekategorie: ${deviceCategory || 'Elektronik'}
 Fehlerbeschreibung: ${description || 'Keine Angabe'}
 Fehlercodes: ${errorCodes || 'Keine'}
@@ -54,6 +68,11 @@ Schlusssatz: "Bringen Sie das Gerät gerne direkt in unserer Werkstatt in Neumar
           });
         }
       }
+    }
+
+    // Ohne KI-Antwort: andere Sprachen zeigen im Browser eine übersetzte Ersatzantwort
+    if (lang !== 'de') {
+      return new Response(JSON.stringify({ reply: '', modelUsed: 'none' }), { headers: corsHeaders });
     }
 
     // High quality technical fallback for Cloudflare Edge

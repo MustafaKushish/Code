@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Microscope, Calendar, Phone, MessageSquare, Menu, X } from 'lucide-react';
+import { msg, useI18n } from '../i18n';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { whatsappLink } from '../utils/whatsapp';
 
 const NAV_LINKS = [
-  { href: '#diagnose', label: 'Preise', index: '01' },
-  { href: '#status', label: 'Auftragsstatus', index: '02' },
-  { href: '#services', label: 'Leistungen', index: '03' },
-  { href: '#ablauf', label: 'Ablauf', index: '04' },
-  { href: '#kontakt', label: 'Kontakt', index: '09' },
+  { href: '#diagnose', label: msg('Preise'), index: '01' },
+  { href: '#status', label: msg('Auftragsstatus'), index: '02' },
+  { href: '#services', label: msg('Leistungen'), index: '03' },
+  { href: '#ablauf', label: msg('Ablauf'), index: '04' },
+  { href: '#kontakt', label: msg('Kontakt'), index: '09' },
 ];
 
 interface HeaderProps {
@@ -20,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAiChat,
   onOpenStatusTracker,
 }) => {
+  const { t } = useI18n();
   const logoClicksRef = useRef(0);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -65,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div
           onClick={handleLogoClick}
           className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer select-none shrink-0"
-          title="CODE IT-Werkstatt Neumarkt (5x klicken für Werkstatt-Manager)"
+          title="CODE IT-Werkstatt Neumarkt"
         >
           <div className="relative shrink-0">
             <svg className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-[0_0_12px_rgba(0,245,212,0.4)] transition-transform group-hover:scale-105" viewBox="0 0 500 500">
@@ -92,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
               <span className="font-mono text-lg sm:text-xl font-black tracking-widest text-white">CODE</span>
-              <span className="text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#00F5D4]/15 border border-[#00F5D4]/40 text-[#00F5D4] font-bold">
+              <span className="max-[359px]:hidden text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#00F5D4]/15 border border-[#00F5D4]/40 text-[#00F5D4] font-bold">
                 LAB
               </span>
             </div>
@@ -101,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Navigation Links (Desktop) */}
-        <nav className="hidden lg:flex items-center gap-1 text-sm text-zinc-300" aria-label="Hauptnavigation">
+        <nav className="hidden lg:flex items-center gap-1 text-sm text-zinc-300" aria-label={t('Hauptnavigation')}>
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -110,24 +114,25 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-3 py-2 rounded-lg hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1.5"
             >
               {link.href === '#status' && <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-pulse" />}
-              {link.label}
+              {t(link.label)}
             </a>
           ))}
         </nav>
 
         {/* Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          <LanguageSwitcher />
           <a
             href="tel:+4917641744443"
-            title="Jetzt in der Werkstatt anrufen"
-            aria-label="Anrufen: 0176 4174 4443"
+            title={t('Jetzt in der Werkstatt anrufen')}
+            aria-label={t('Anrufen: {phone}', { phone: '0176 4174 4443' })}
             className="hidden md:inline-flex w-9 h-9 items-center justify-center rounded-xl text-zinc-200 bg-white/5 border border-white/10 hover:border-[#00F5D4]/60 hover:text-[#00F5D4] transition-all"
           >
             <Phone className="w-4 h-4" />
           </a>
 
           <a
-            href="https://wa.me/4917641744443?text=Hallo%20Mustafa%2C%20ich%20habe%20eine%20Reparatur-Anfrage."
+            href={whatsappLink(t('Hallo Mustafa, ich habe eine Reparatur-Anfrage.'))}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-semibold text-[#25D366] bg-[#25D366]/10 border border-[#25D366]/40 hover:bg-[#25D366] hover:text-[#04140A] transition-all"
@@ -140,10 +145,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             data-booking-link="mustafa-al-zurgany-cfwhg8/code-werkstatt"
-            className="inline-flex items-center gap-1.5 h-9 px-3 sm:px-4 rounded-xl text-sm font-semibold text-[#160B04] bg-gradient-to-b from-[#FFA060] to-[#D9783E] hover:brightness-110 shadow-[0_6px_20px_rgba(217,120,62,0.35)] transition-all cursor-pointer shrink-0"
+            className="inline-flex items-center gap-1.5 h-9 px-2.5 min-[400px]:px-3 sm:px-4 rounded-xl text-sm font-semibold text-[#160B04] bg-gradient-to-b from-[#FFA060] to-[#D9783E] hover:brightness-110 shadow-[0_6px_20px_rgba(217,120,62,0.35)] transition-all cursor-pointer shrink-0"
           >
             <Calendar className="w-4 h-4" />
-            <span>Termin</span>
+            <span className="max-[399px]:sr-only">{t('Termin')}</span>
           </button>
 
           {/* Mobile Menu Toggle */}
@@ -152,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            aria-label={menuOpen ? 'Menü schließen' : 'Menü öffnen'}
+            aria-label={menuOpen ? t('Menü schließen') : t('Menü öffnen')}
             className="lg:hidden inline-flex w-9 h-9 items-center justify-center rounded-xl text-zinc-200 bg-white/5 border border-white/10 hover:border-[#00F5D4]/60 transition-all cursor-pointer"
           >
             {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -176,7 +181,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               className="flex items-center justify-between px-4 py-3 rounded-xl text-[15px] text-zinc-200 hover:bg-white/5"
             >
-              <span>{link.label}</span>
+              <span>{t(link.label)}</span>
               <span className="font-mono text-[11px] text-[#FF8D4D]">{link.index}</span>
             </a>
           ))}
@@ -189,7 +194,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-[15px] text-[#00F5D4] hover:bg-white/5 cursor-pointer"
           >
             <Microscope className="w-4 h-4" />
-            <span>KI-Techniker fragen</span>
+            <span>{t('KI-Techniker fragen')}</span>
           </button>
         </div>
       )}
