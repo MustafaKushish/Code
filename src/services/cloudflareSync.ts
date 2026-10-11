@@ -36,12 +36,18 @@ function adminHeaders(extra: Record<string, string> = {}): Record<string, string
   return { ...extra, Authorization: `Bearer ${getAdminKey()}` };
 }
 
-export type AdminKeyCheck = 'ok' | 'invalid' | 'locked' | 'offline';
+export type AdminKeyCheck = 'ok' | 'invalid' | 'locked' | 'offline' | 'charset' | 'blocked-origin';
+
+// Nur diese Adressen lässt der Worker zu (siehe worker/src/index.ts, DEFAULT_ORIGINS)
+const WORKER_ORIGINS = ['https://www.code-ger.de', 'https://code-ger.de'];
 
 /**
  * Prüft einen Werkstatt-Schlüssel beim Worker
  */
 export async function verifyAdminKey(key: string): Promise<AdminKeyCheck> {
+  // Browser können Zeichen wie „–“, „€“ oder Emojis nicht im Header senden; fetch bricht dann
+  // ohne Netzwerkfehler ab und es sah bisher nach „Server nicht erreichbar“ aus.
+  if (/[^\x20-\x7E]/.test(key)) return 'charset';
   try {
     const res = await fetch(`${CLOUDFLARE_WORKER_BASE}/api/auth`, {
       headers: { Authorization: `Bearer ${key}` },
@@ -51,7 +57,24 @@ export async function verifyAdminKey(key: string): Promise<AdminKeyCheck> {
     if (res.status === 401) return 'invalid';
     return 'offline';
   } catch {
+    const local = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+    if (!local && !WORKER_ORIGINS.includes(window.location.origin)) return 'blocked-origin';
     return 'offline';
+  }
+}
+
+export function adminKeyErrorText(result: AdminKeyCheck): string {
+  switch (result) {
+    case 'locked':
+      return 'Zu viele Fehlversuche. Zugang für 15 Minuten gesperrt.';
+    case 'invalid':
+      return 'Werkstatt-Schlüssel stimmt nicht.';
+    case 'charset':
+      return 'Der Schlüssel enthält Sonderzeichen (z. B. ä, ö, ü, ß, –, €). Bitte in Cloudflare einen Schlüssel nur aus A–Z, a–z, 0–9 und - setzen.';
+    case 'blocked-origin':
+      return 'Auf dieser Adresse ist der Manager gesperrt. Bitte www.code-ger.de öffnen.';
+    default:
+      return 'Keine Verbindung zum Server. Bitte Internet prüfen.';
   }
 }
 

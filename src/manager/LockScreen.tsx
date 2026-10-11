@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { User } from './types';
 import { verifyPin, MIN_PIN_LENGTH } from './pinAuth';
-import { verifyAdminKey } from '../services/cloudflareSync';
+import { verifyAdminKey, adminKeyErrorText } from '../services/cloudflareSync';
 
 interface LockScreenProps {
   isLocked: boolean;
@@ -129,12 +129,8 @@ export const LockScreen: React.FC<LockScreenProps> = ({ isLocked, users, onUnloc
       setResetUserId(firstAdmin?.id || '');
       setWorkshopKey('');
       switchMode('forgot-pin');
-    } else if (result === 'locked') {
-      setErrorMsg('Zu viele Fehlversuche. Bitte in 15 Minuten erneut probieren.');
-    } else if (result === 'invalid') {
-      setErrorMsg('Werkstatt-Schlüssel stimmt nicht.');
     } else {
-      setErrorMsg('Keine Verbindung zum Server. Bitte Internet prüfen.');
+      setErrorMsg(adminKeyErrorText(result));
     }
   };
 
