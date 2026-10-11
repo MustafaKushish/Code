@@ -279,3 +279,144 @@ body::before {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   CODE Digital: Glas-Optik, schwebende App-Vorschau, Laufband
+--------------------------------------------------------------------------- */
+
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.text-shine {
+  background: linear-gradient(100deg, #ffffff 0%, #00f5d4 35%, #ffb98a 65%, #ffffff 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 7s ease-in-out infinite alternate;
+}
+
+@keyframes shine {
+  to {
+    background-position: 100% center;
+  }
+}
+
+.glow-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.45;
+  pointer-events: none;
+  animation: blobDrift 14s ease-in-out infinite alternate;
+}
+
+@keyframes blobDrift {
+  to {
+    transform: translate(30px, -24px) scale(1.12);
+  }
+}
+
+.float-a {
+  animation: floatY 6s ease-in-out infinite;
+}
+.float-b {
+  animation: floatY 7.5s ease-in-out -2s infinite;
+}
+.float-c {
+  animation: floatY 5.5s ease-in-out -4s infinite;
+}
+
+@keyframes floatY {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bar-grow {
+  transform-origin: bottom;
+  animation: barGrow 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes barGrow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.toast-in {
+  animation: toastIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+.marquee {
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+  animation: marquee 38s linear infinite;
+}
+.marquee-track.reverse {
+  animation-direction: reverse;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+[dir='rtl'] .marquee-track {
+  animation-name: marqueeRtl;
+}
+
+@keyframes marqueeRtl {
+  to {
+    transform: translateX(50%);
+  }
+}
+
+/* Karten mit Licht, das der Maus folgt */
+.spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, -20%), rgba(0, 245, 212, 0.12), transparent 45%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* Verlaufsrahmen für das hervorgehobene Paket */
+.gradient-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#120d0a, #0b1315) padding-box,
+    linear-gradient(140deg, #ff8d4d, #00f5d4 60%, #ff8d4d) border-box;
+}
+
+/* Schwebende Karten, die über anderen liegen: fast deckend, damit sich Texte nicht mischen */
+.glass.glass-solid {
+  background: linear-gradient(180deg, rgba(22, 34, 36, 0.96), rgba(11, 19, 21, 0.96));
+}
