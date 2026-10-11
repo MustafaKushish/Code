@@ -242,7 +242,6 @@
   "Widerstand: 0.2 Ω (KURZSCHLUSS)": "المقاومة: 0.2 Ω (دارة قصيرة)",
   "Widerstand: > 120 kΩ": "المقاومة: > 120 kΩ",
   "Messpunkt [{name}]: {value} • {desc}": "نقطة القياس [{name}]: {value} • {desc}",
-  "INTERAKTIVER LOGIC-BOARD INSPEKTOR": "فاحص اللوحة المنطقية التفاعلي",
   "Soundeffekte aktiv": "المؤثرات الصوتية مفعّلة",
   "Stummgeschaltet": "كتم الصوت",
   "Wärmebild-Simulation umschalten (Kurzschluss-Suche)": "تبديل محاكاة التصوير الحراري (البحث عن الدارات القصيرة)",
@@ -853,5 +852,7 @@
   "Neue Online-Buchung": "حجز أونلاين جديد",
   "Termine heute": "مواعيد اليوم",
   "Umsatz diese Woche": "مبيعات هذا الأسبوع",
-  "Geräte, die wir reparieren": "الأجهزة التي نصلحها"
+  "Geräte, die wir reparieren": "الأجهزة التي نصلحها",
+  "Platinen-Inspektor": "فاحص اللوحة",
+  "Tippe auf ein Bauteil und miss nach": "اضغط على قطعة لقياسها"
 }
