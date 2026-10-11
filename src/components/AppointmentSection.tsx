@@ -15,7 +15,7 @@ export const AppointmentSection: React.FC = () => {
           intro={t('Wunsch-Slot für Übergabe oder Abholung in Neumarkt wählen – wir schauen uns den Schaden direkt gemeinsam an.')}
         />
 
-        <div className="reveal max-w-3xl mx-auto bg-[#0B1315]/90 border border-white/[0.08] rounded-3xl p-8 sm:p-12 text-center shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="reveal max-w-3xl mx-auto glass rounded-[2rem] p-8 sm:p-12 text-center shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           <div className="w-16 h-16 rounded-2xl bg-[#00F5D4]/15 border border-[#00F5D4]/40 flex items-center justify-center text-[#00F5D4] mx-auto mb-6 shadow-[0_0_20px_rgba(0,245,212,0.25)]">
             <Calendar className="w-8 h-8" />
           </div>

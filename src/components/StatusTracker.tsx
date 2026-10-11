@@ -297,7 +297,7 @@ export const StatusTracker: React.FC = () => {
   return (
     <section id="status" className="py-16 md:py-24 relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="bg-[#0A1214]/95 border border-[#00F5D4]/25 rounded-3xl px-4 py-7 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.6)]">
+        <div className="glass rounded-[2rem] px-4 py-7 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.6)]">
           {/* Header */}
           <SectionHeading
             index="02"

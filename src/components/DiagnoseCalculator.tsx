@@ -154,7 +154,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
         />
 
         {/* Diagnosis HUD Container */}
-        <div className="max-w-5xl mx-auto bg-[#0A1214]/95 border border-[#C9743F]/30 rounded-3xl px-3 py-5 sm:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto glass rounded-[2rem] px-3 py-5 sm:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-xl">
           {/* KI-Techniker Banner */}
           <button
             type="button"

@@ -20,6 +20,7 @@ import { RepairCounter } from './RepairCounter';
 import { getOpeningStatus } from '../utils/openingHours';
 import { msg, useI18n } from '../i18n';
 import { whatsappLink } from '../utils/whatsapp';
+import { Marquee } from './DigitalShowcase';
 
 const DEVICES: { key: DeviceCategoryKey; label: string; Icon: typeof Laptop }[] = [
   { key: 'laptop_pc', label: msg('Laptop'), Icon: Laptop },
@@ -27,6 +28,21 @@ const DEVICES: { key: DeviceCategoryKey; label: string; Icon: typeof Laptop }[] 
   { key: 'controller', label: msg('Controller'), Icon: Joystick },
   { key: 'schluessel', label: msg('Schlüssel'), Icon: KeyRound },
   { key: 'phone', label: msg('Handy'), Icon: Smartphone },
+];
+
+const MARQUEE = [
+  'PlayStation 5',
+  'Xbox Series X',
+  'Nintendo Switch',
+  'DualSense',
+  'MacBook',
+  'iPhone',
+  'Samsung Galaxy',
+  'Gaming-PC',
+  'ThinkPad',
+  'BMW · VW · Audi',
+  'iPad',
+  'SSD & HDD',
 ];
 
 const PROMISES = [
@@ -45,8 +61,12 @@ export const Hero: React.FC<HeroProps> = ({ onSelectCategory, onOpenAiChat }) =>
   const { t } = useI18n();
   const opening = getOpeningStatus(t);
   return (
-    <section className="pt-4 pb-14 md:pt-10 md:pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className="relative pt-4 pb-10 md:pt-10 md:pb-14">
+      <div aria-hidden="true" className="absolute -top-24 inset-x-0 bottom-0 overflow-hidden pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)]">
+        <div className="glow-blob w-[28rem] h-[28rem] bg-[#00F5D4] -top-10 -start-32 !opacity-20" />
+        <div className="glow-blob w-[24rem] h-[24rem] bg-[#FF8D4D] top-60 -end-40 !opacity-[0.12] sm:!opacity-15 [animation-delay:-7s]" />
+      </div>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column: Headlines & Call-to-Actions */}
           <div className="lg:col-span-6 space-y-5 sm:space-y-7">
@@ -71,7 +91,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectCategory, onOpenAiChat }) =>
             <div className="space-y-4">
               <h1 className="text-[2.35rem] leading-[1.05] sm:text-6xl lg:text-[4rem] font-bold tracking-tight text-balance">
                 {t('Präzision bis auf')}{' '}
-                <span className="bg-gradient-to-r from-[#00F5D4] via-[#7FE3C8] to-[#FF9D5C] bg-clip-text text-transparent">
+                <span className="text-shine">
                   {t('Bauteilebene.')}
                 </span>
               </h1>
@@ -82,7 +102,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectCategory, onOpenAiChat }) =>
             </div>
 
             {/* Quick-Action: Gerät wählen */}
-            <div className="rounded-2xl border border-white/10 bg-[#0A1214]/80 p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
+            <div className="glass rounded-3xl p-3 sm:p-4 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
               <div className="flex items-center justify-between px-1 pb-3">
                 <span className="text-sm font-semibold text-white">{t('Was ist kaputt?')}</span>
                 <span className="text-xs text-zinc-400">{t('Sofort Preisrahmen sehen ↓')}</span>
@@ -93,7 +113,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectCategory, onOpenAiChat }) =>
                     key={key}
                     type="button"
                     onClick={() => onSelectCategory(key)}
-                    className="group flex flex-col items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-1 py-3 text-xs font-medium text-zinc-200 hover:text-white hover:border-[#00F5D4]/60 hover:bg-[#00F5D4]/[0.07] transition-all active:scale-95 cursor-pointer"
+                    className="group flex flex-col items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] px-1 py-3 text-xs font-medium text-zinc-200 hover:text-white hover:border-[#00F5D4]/60 hover:bg-[#00F5D4]/[0.08] hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,245,212,0.18)] transition-all active:scale-95 cursor-pointer"
                   >
                     <Icon className="w-5 h-5 text-[#00F5D4] group-hover:scale-110 transition-transform" strokeWidth={1.75} />
                     <span>{t(label)}</span>
@@ -145,6 +165,18 @@ export const Hero: React.FC<HeroProps> = ({ onSelectCategory, onOpenAiChat }) =>
           <div className="lg:col-span-6">
             <LogicBoardScanner />
           </div>
+        </div>
+
+        {/* Laufband: Geräte, die wir reparieren */}
+        <div className="mt-12 md:mt-16" aria-label={t('Geräte, die wir reparieren')}>
+          <Marquee
+            items={MARQUEE.map((m) => (
+              <span className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-zinc-200 whitespace-nowrap">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4]" />
+                {m}
+              </span>
+            ))}
+          />
         </div>
       </div>
     </section>

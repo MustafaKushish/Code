@@ -42,7 +42,7 @@ export const PhilosophySection: React.FC = () => {
           intro={t('Ein defektes Bauteil ist selten ein Totalschaden. Reparieren spart Geld, Daten und Rohstoffe.')}
         />
 
-        <div className="reveal grid grid-cols-1 sm:grid-cols-3 rounded-2xl border border-white/[0.08] bg-[#0B1315]/80 divide-y sm:divide-y-0 sm:divide-x sm:rtl:divide-x-reverse divide-white/[0.08] mb-6 overflow-hidden">
+        <div className="reveal grid grid-cols-1 sm:grid-cols-3 rounded-3xl glass divide-y sm:divide-y-0 sm:divide-x sm:rtl:divide-x-reverse divide-white/[0.08] mb-6 overflow-hidden">
           {STATS.map((s) => (
             <div key={s.label} className="p-6 sm:p-8 text-center">
               <div className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: s.accent }}>
@@ -55,7 +55,7 @@ export const PhilosophySection: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {PRINCIPLES.map(({ title, text, Icon, color }) => (
-            <div key={title} className="reveal rounded-2xl border border-white/[0.08] bg-[#0B1315]/60 p-6">
+            <div key={title} className="reveal rounded-3xl glass p-6 transition-transform duration-300 hover:-translate-y-1">
               <Icon className="w-6 h-6 mb-4" style={{ color }} strokeWidth={1.6} />
               <h3 className="text-base font-semibold text-white mb-1.5">{t(title)}</h3>
               <p className="text-sm text-[#94A9AA] leading-relaxed">{t(text)}</p>
