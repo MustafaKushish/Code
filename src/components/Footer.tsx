@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { ClipboardCheck } from 'lucide-react';
+import { msg, useI18n } from '../i18n';
 
 interface FooterProps {
   onOpenCheckIn: () => void;
@@ -8,6 +9,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOpenSecretModal }) => {
+  const { t } = useI18n();
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -61,28 +63,28 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOp
               </svg>
               <div>
                 <span className="block text-lg font-bold text-white tracking-wider group-hover:text-[#00F5D4] transition-colors">CODE</span>
-                <span className="block text-xs text-[#839897]">IT-Werkstatt · Mustafa Al-Zurgany</span>
+                <span className="block text-xs text-[#839897]">{t('IT-Werkstatt')} · Mustafa Al-Zurgany</span>
               </div>
             </div>
             <p className="max-w-sm leading-relaxed">
-              Spezial-Werkstatt für Platinenreparatur, Mikrolöten und Datenrettung in Neumarkt in der Oberpfalz.
+              {t('Spezial-Werkstatt für Platinenreparatur, Mikrolöten und Datenrettung in Neumarkt in der Oberpfalz.')}
             </p>
-            <p className="font-mono text-[13px] text-[#E5A96A]">»Reparieren statt Neukaufen, CODE bringt's zum Laufen.«</p>
+            <p className="font-mono text-[13px] text-[#E5A96A]">{t("»Reparieren statt Neukaufen, CODE bringt's zum Laufen.«")}</p>
           </div>
 
-          <nav className="md:col-span-3" aria-label="Footer-Navigation">
-            <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00F5D4] mb-4">Seiten</h3>
+          <nav className="md:col-span-3" aria-label={t('Footer-Navigation')}>
+            <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00F5D4] mb-4">{t('Seiten')}</h3>
             <ul className="space-y-2.5">
               {[
-                ['#diagnose', 'Preise & Diagnose'],
-                ['#status', 'Auftragsstatus'],
-                ['#services', 'Leistungen'],
-                ['#b2b', 'Für Händler (B2B)'],
-                ['#faq', 'Häufige Fragen'],
+                ['#diagnose', msg('Preise & Diagnose')],
+                ['#status', msg('Auftragsstatus')],
+                ['#services', msg('Leistungen')],
+                ['#b2b', msg('Für Händler (B2B)')],
+                ['#faq', msg('Häufige Fragen')],
               ].map(([href, label]) => (
                 <li key={href}>
                   <a href={href} className="hover:text-white transition-colors">
-                    {label}
+                    {t(label)}
                   </a>
                 </li>
               ))}
@@ -90,10 +92,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOp
           </nav>
 
           <div className="md:col-span-4">
-            <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00F5D4] mb-4">Kontakt</h3>
+            <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00F5D4] mb-4">{t('Kontakt')}</h3>
             <ul className="space-y-2.5">
               <li>
-                <a href="tel:+4917641744443" className="text-white hover:text-[#00F5D4] transition-colors">
+                <a href="tel:+4917641744443" dir="ltr" className="text-white hover:text-[#00F5D4] transition-colors">
                   0176 4174 4443
                 </a>
               </li>
@@ -102,8 +104,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOp
                   mustafa.alzurgany@gmail.com
                 </a>
               </li>
-              <li>Mo–Fr 10–18 Uhr · Sa 10–14 Uhr</li>
-              <li>92318 Neumarkt i.d.OPf.</li>
+              <li>{t('Mo–Fr 10–18 Uhr · Sa 10–14 Uhr')}</li>
+              <li>{t('92318 Neumarkt i.d.OPf.')}</li>
             </ul>
             <button
               type="button"
@@ -111,19 +113,19 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOp
               className="mt-5 inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-[#00F5D4]/35 bg-[#00F5D4]/10 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#04110F] transition-all font-semibold cursor-pointer"
             >
               <ClipboardCheck className="w-4 h-4" />
-              <span>Digitaler Check-In</span>
+              <span>{t('Digitaler Check-In')}</span>
             </button>
           </div>
         </div>
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#5F7473]">
-          <p>© {new Date().getFullYear()} CODE IT-Werkstatt · Handwerk auf Bauteilebene</p>
+          <p>© {new Date().getFullYear()} CODE IT-Werkstatt · {t('Handwerk auf Bauteilebene')}</p>
           <div className="flex items-center gap-5">
             <button type="button" onClick={() => onOpenLegal('impressum')} className="hover:text-white transition-colors cursor-pointer">
-              Impressum
+              {t('Impressum')}
             </button>
             <button type="button" onClick={() => onOpenLegal('datenschutz')} className="hover:text-white transition-colors cursor-pointer">
-              Datenschutz
+              {t('Datenschutz')}
             </button>
           </div>
         </div>

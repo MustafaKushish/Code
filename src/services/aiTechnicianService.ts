@@ -5,6 +5,8 @@
 
 export interface AiDiagnosticRequest {
   message: string;
+  /** Sprache der Website; die KI antwortet in dieser Sprache */
+  lang?: 'de' | 'en' | 'tr' | 'ar';
   deviceCategory?: string;
   image?: {
     mimeType: string;
@@ -119,6 +121,7 @@ ${MANDATORY_CLOSING_SENTENCE}`;
  * Centralized caller for diagnosis API
  */
 export async function requestAiDiagnosis(request: AiDiagnosticRequest): Promise<AiDiagnosticResult> {
+  const lang = request.lang || 'de';
   try {
     const res = await fetch('/api/diagnose', {
       method: 'POST',
@@ -133,8 +136,10 @@ export async function requestAiDiagnosis(request: AiDiagnosticRequest): Promise<
     }
 
     const data = await res.json();
-    const rawReply = data.reply || '';
-    const formatted = validateAndFormatResponse(rawReply, request.deviceCategory);
+    const rawReply: string = data.reply || '';
+    // Das feste 3-Punkte-Format mit deutschen Überschriften gilt nur für Deutsch
+    const formatted = lang === 'de' ? validateAndFormatResponse(rawReply, request.deviceCategory) : rawReply.trim();
+    if (!formatted) throw new Error('Leere Antwort');
 
     return {
       reply: formatted,
@@ -142,6 +147,8 @@ export async function requestAiDiagnosis(request: AiDiagnosticRequest): Promise<
       modelUsed: data.modelUsed,
     };
   } catch (err: any) {
+    // In anderen Sprachen zeigt der KI-Dialog eine übersetzte Ersatzantwort
+    if (lang !== 'de') throw err;
     console.warn('API diagnosis request failed, using structured fallback:', err);
     // Return structured emergency fallback complying with exact format
     const fallback = validateAndFormatResponse(

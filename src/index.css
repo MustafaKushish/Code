@@ -88,6 +88,21 @@
   display: none;
 }
 
+/* Begleitschein „Gerät einsenden“ (wird direkt in <body> eingehängt) */
+#printMailInSlip {
+  display: none;
+}
+
+@media print {
+  body.print-mode-slip #root {
+    display: none !important;
+  }
+
+  body.print-mode-slip #printMailInSlip {
+    display: block !important;
+  }
+}
+
 @media print {
   @page {
     margin: 12mm;

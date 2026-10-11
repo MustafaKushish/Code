@@ -25,6 +25,8 @@ import {
 import { SectionHeading } from './ui/SectionHeading';
 import { DeviceCategoryKey, FaultItem, CategoryType } from '../types';
 import { CATEGORY_LABELS, REPAIR_DATA } from '../data/repairData';
+import { msg, useI18n } from '../i18n';
+import { whatsappLink } from '../utils/whatsapp';
 
 interface DiagnoseCalculatorProps {
   currentCategory: DeviceCategoryKey;
@@ -43,11 +45,11 @@ const DEVICE_ICONS: Record<DeviceCategoryKey, LucideIcon> = {
 };
 
 const SUB_FILTERS: { key: 'all' | CategoryType; label: string; icon: LucideIcon; shortLabel: string }[] = [
-  { key: 'all', label: 'Alle Ebenen', shortLabel: 'Alle', icon: Zap },
-  { key: 'display', label: 'Display & Optik', shortLabel: 'Display', icon: Monitor },
-  { key: 'module', label: 'Module & Akku', shortLabel: 'Module/Akku', icon: BatteryCharging },
-  { key: 'board', label: 'Platine & Mikrolöten', shortLabel: 'Platine', icon: Microscope },
-  { key: 'software', label: 'Software & Firmware', shortLabel: 'Software', icon: Cpu },
+  { key: 'all', label: msg('Alle Ebenen'), shortLabel: msg('Alle'), icon: Zap },
+  { key: 'display', label: msg('Display & Optik'), shortLabel: msg('Display'), icon: Monitor },
+  { key: 'module', label: msg('Module & Akku'), shortLabel: msg('Module/Akku'), icon: BatteryCharging },
+  { key: 'board', label: msg('Platine & Mikrolöten'), shortLabel: msg('Platine'), icon: Microscope },
+  { key: 'software', label: msg('Software & Firmware'), shortLabel: msg('Software'), icon: Cpu },
 ];
 
 const LAYER_BADGES: Record<CategoryType, { label: string; icon: LucideIcon; color: string }> = {
@@ -62,6 +64,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
   onSelectCategory,
   onOpenAiChat,
 }) => {
+  const { t, euro } = useI18n();
   const [activeSubFilter, setActiveSubFilter] = useState<'all' | CategoryType>('all');
   const [selectedFaultId, setSelectedFaultId] = useState<string>('');
   const priceRef = useRef<HTMLDivElement>(null);
@@ -77,11 +80,9 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
     if (!matchesFilter) return false;
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
-    return (
-      f.title.toLowerCase().includes(query) ||
-      f.desc.toLowerCase().includes(query) ||
-      f.steps.some((s) => s.toLowerCase().includes(query))
-    );
+    // In der gewählten Sprache und auf Deutsch suchen (Fachbegriffe tippen viele auf Deutsch)
+    const texts = [f.title, f.desc, ...f.steps];
+    return texts.some((s) => s.toLowerCase().includes(query) || t(s).toLowerCase().includes(query));
   });
 
   // Current selected fault (falls back safely)
@@ -120,16 +121,25 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
     setIsExpressChecked(false);
   };
 
-  const generateWhatsAppMessage = () => {
-    const text = `Hallo Mustafa, ich habe auf code-ger.de die 4-Ebenen-Diagnose genutzt:
-Gerät: ${CATEGORY_LABELS[currentCategory].label}
-Schadensebene: ${LAYER_BADGES[currentFault.categoryType]?.label || 'Standard'}
-Defekt: ${currentFault.title}${expressActive ? ' (+ Express-Service)' : ''}
-Geschätzter Preisrahmen: ab ${finalTotal.toFixed(2).replace('.', ',')} € (inkl. 19% MwSt.)
-Geschätzte Dauer: ${expressActive ? 'Vorrang / meist am selben Tag' : currentFault.time}
+  const categoryLabel = t(CATEGORY_LABELS[currentCategory].label);
+  const faultTitle = t(currentFault.title);
+  const durationText = expressActive ? t('Vorrang / meist am selben Tag') : t(currentFault.time);
 
-Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
-    return `https://wa.me/4917641744443?text=${encodeURIComponent(text)}`;
+  // Die Werkstatt bekommt immer den deutschen Fehlernamen mit, damit sie ihn sofort zuordnen kann
+  const generateWhatsAppMessage = () => {
+    const germanRef = faultTitle !== currentFault.title ? ` [${currentFault.title}]` : '';
+    const text = t(
+      'Hallo Mustafa, ich habe auf code-ger.de die 4-Ebenen-Diagnose genutzt:\nGerät: {device}\nSchadensebene: {layer}\nDefekt: {fault}{express}\nGeschätzter Preisrahmen: ab {price} (inkl. 19% MwSt.)\nGeschätzte Dauer: {duration}\n\nWann kann ich das Gerät zur Reparatur in Neumarkt übergeben?',
+      {
+        device: categoryLabel,
+        layer: t(LAYER_BADGES[currentFault.categoryType]?.label || 'Standard'),
+        fault: faultTitle + germanRef,
+        express: expressActive ? t(' (+ Express-Service)') : '',
+        price: euro(finalTotal),
+        duration: durationText,
+      }
+    );
+    return whatsappLink(text);
   };
 
   return (
@@ -138,9 +148,9 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
         {/* Section Heading */}
         <SectionHeading
           index="01"
-          eyebrow="Preise & Diagnose"
-          title="Was kostet meine Reparatur?"
-          intro="Gerät wählen, Schaden eingrenzen – du siehst sofort den Festpreisrahmen und was du gegenüber einem Neukauf sparst."
+          eyebrow={t('Preise & Diagnose')}
+          title={t('Was kostet meine Reparatur?')}
+          intro={t('Gerät wählen, Schaden eingrenzen – du siehst sofort den Festpreisrahmen und was du gegenüber einem Neukauf sparst.')}
         />
 
         {/* Diagnosis HUD Container */}
@@ -148,8 +158,8 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
           {/* KI-Techniker Banner */}
           <button
             type="button"
-            onClick={() => onOpenAiChat(`Mein ${CATEGORY_LABELS[currentCategory].label} hat folgendes Problem: ${currentFault.title}`)}
-            className="w-full text-left bg-gradient-to-r from-[#101D20] via-[#0E1A1C] to-[#0A1214] border border-[#4FA39B]/50 hover:border-[#00F5D4] rounded-2xl p-4 sm:p-5 mb-7 flex flex-col sm:flex-row items-start sm:items-center gap-4 transition-all duration-300 group shadow-lg cursor-pointer"
+            onClick={() => onOpenAiChat(t('Mein {device} hat folgendes Problem: {fault}', { device: categoryLabel, fault: faultTitle }))}
+            className="w-full text-start bg-gradient-to-r from-[#101D20] via-[#0E1A1C] to-[#0A1214] border border-[#4FA39B]/50 hover:border-[#00F5D4] rounded-2xl p-4 sm:p-5 mb-7 flex flex-col sm:flex-row items-start sm:items-center gap-4 transition-all duration-300 group shadow-lg cursor-pointer"
           >
             <div className="w-14 h-14 rounded-2xl bg-[#070D0E] border border-[#00F5D4]/40 flex items-center justify-center shrink-0 text-[#00F5D4] group-hover:scale-105 group-hover:shadow-[0_0_15px_rgba(0,245,212,0.4)] transition-all">
               <Bot className="w-7 h-7" />
@@ -157,17 +167,17 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
             <div className="flex-1">
               <div className="flex items-center gap-2 text-[11px] font-mono text-[#00F5D4] uppercase tracking-wider mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
-                <span>// DIGITALE ERSTEINSCHÄTZUNG</span>
+                <span>// {t('DIGITALE ERSTEINSCHÄTZUNG')}</span>
               </div>
               <h3 className="text-base sm:text-lg font-bold text-white mb-1 group-hover:text-[#00F5D4] transition-colors">
-                KI-Techniker: Schadensebene nicht eindeutig?
+                {t('KI-Techniker: Schadensebene nicht eindeutig?')}
               </h3>
               <p className="text-xs sm:text-sm text-[#839897] leading-relaxed">
-                Beschreibe dein Symptom in eigenen Worten oder lade ein Foto hoch. Unser KI-Techniker grenzt ein, ob Display, Modul, Lade-IC oder Firmware betroffen ist.
+                {t('Beschreibe dein Symptom in eigenen Worten oder lade ein Foto hoch. Unser KI-Techniker grenzt ein, ob Display, Modul, Lade-IC oder Firmware betroffen ist.')}
               </p>
             </div>
             <span className="shrink-0 text-xs font-mono font-bold px-3.5 py-2 rounded-xl bg-[#00F5D4]/15 border border-[#00F5D4]/40 text-[#00F5D4] group-hover:bg-[#00F5D4] group-hover:text-[#060B0C] transition-all">
-              &gt; JETZT MIT KI PRÜFEN
+              &gt; {t('JETZT MIT KI PRÜFEN')}
             </span>
           </button>
 
@@ -189,7 +199,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                   }`}
                 >
                   <DeviceIcon className="w-5 h-5" strokeWidth={1.75} />
-                  <span className="font-medium leading-tight">{info.label}</span>
+                  <span className="font-medium leading-tight">{t(info.label)}</span>
                 </button>
               );
             })}
@@ -200,10 +210,10 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
             <div className="flex items-center justify-between px-2 pb-2">
               <span className="text-[11px] font-mono text-[#00F5D4] uppercase tracking-wider flex items-center gap-1.5 font-bold">
                 <Layers className="w-3.5 h-3.5" />
-                <span>Schadensebene wählen:</span>
+                <span>{t('Schadensebene wählen:')}</span>
               </span>
               <span className="text-[10px] font-mono text-zinc-400">
-                {displayedFaults.length} {displayedFaults.length === 1 ? 'Eintrag' : 'Einträge'}
+                {displayedFaults.length === 1 ? t('1 Eintrag') : t('{n} Einträge', { n: displayedFaults.length })}
               </span>
             </div>
 
@@ -230,8 +240,8 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                     }`}
                   >
                     <filter.icon className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">{filter.label}</span>
-                    <span className="sm:hidden">{filter.shortLabel}</span>
+                    <span className="hidden sm:inline">{t(filter.label)}</span>
+                    <span className="sm:hidden">{t(filter.shortLabel)}</span>
                     <span
                       className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                         isActive ? 'bg-[#060B0C]/20 text-[#060B0C]' : 'bg-white/10 text-zinc-400'
@@ -247,13 +257,13 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
 
           {/* Symptom Search Bar */}
           <div className="relative mb-6">
-            <Search className="w-4 h-4 text-[#839897] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#839897] absolute start-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Symptom suchen (z. B. Display, Akku, Lade-IC, Bootloop, Flüssigkeit, HDMI)..."
-              className="w-full bg-[#060D0E] border border-[#C9743F]/25 focus:border-[#00F5D4] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-[#839897] outline-none font-mono"
+              placeholder={t('Symptom suchen (z. B. Display, Akku, Lade-IC, Bootloop, Flüssigkeit, HDMI)...')}
+              className="w-full bg-[#060D0E] border border-[#C9743F]/25 focus:border-[#00F5D4] rounded-xl ps-10 pe-4 py-2.5 text-xs text-white placeholder-[#839897] outline-none font-mono"
             />
           </div>
 
@@ -261,16 +271,16 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
             {displayedFaults.length === 0 ? (
               <div className="col-span-full py-8 text-center bg-[#070D0E] border border-dashed border-white/15 rounded-2xl p-6 font-mono text-xs text-zinc-400">
-                Keine Fehler für diese Ebene oder Suche gefunden.{' '}
+                {t('Keine Fehler für diese Ebene oder Suche gefunden.')}{' '}
                 <button
                   type="button"
                   onClick={() => {
                     setActiveSubFilter('all');
                     setSearchQuery('');
                   }}
-                  className="text-[#00F5D4] underline font-bold ml-1 cursor-pointer"
+                  className="text-[#00F5D4] underline font-bold ms-1 cursor-pointer"
                 >
-                  Alle Ebenen anzeigen
+                  {t('Alle Ebenen anzeigen')}
                 </button>
               </div>
             ) : (
@@ -289,7 +299,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                         setTimeout(() => priceRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
                       }
                     }}
-                    className={`text-left p-4 rounded-xl border transition-all cursor-pointer relative ${
+                    className={`text-start p-4 rounded-xl border transition-all cursor-pointer relative ${
                       isSelected
                         ? 'bg-[#00F5D4]/10 border-[#00F5D4] shadow-[0_0_15px_rgba(0,245,212,0.2)]'
                         : 'bg-[#0E1A1C]/60 border-[#C9743F]/20 hover:border-[#4FA39B]/40 hover:bg-[#122225]'
@@ -302,11 +312,11 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                             className={`inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-md border ${badge.color}`}
                           >
                             <badge.icon className="w-3 h-3" />
-                            <span>{badge.label}</span>
+                            <span>{t(badge.label)}</span>
                           </span>
                         )}
                         <span className="font-mono text-[11px] font-bold text-[#FF8D4D]">
-                          ab {f.targetTotal.toFixed(0)} €
+                          {t('ab {price}', { price: euro(f.targetTotal, 0) })}
                         </span>
                       </div>
                       {isSelected && (
@@ -316,9 +326,9 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                       )}
                     </div>
                     <strong className="text-sm sm:text-base font-bold text-white block mb-1">
-                      {f.title}
+                      {t(f.title)}
                     </strong>
-                    <span className="text-xs text-[#839897] leading-relaxed block">{f.desc}</span>
+                    <span className="text-xs text-[#839897] leading-relaxed block">{t(f.desc)}</span>
                   </button>
                 );
               })
@@ -330,7 +340,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
             <div className="lg:col-span-8 space-y-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-xs text-[#839897] uppercase tracking-wider block">
-                  Geschätzter Reparaturpreis (Festpreisrahmen):
+                  {t('Geschätzter Reparaturpreis (Festpreisrahmen):')}
                 </span>
                 {LAYER_BADGES[currentFault.categoryType] && (
                   <span
@@ -338,15 +348,15 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                       LAYER_BADGES[currentFault.categoryType].color
                     }`}
                   >
-                    Ebene: {LAYER_BADGES[currentFault.categoryType].label}
+                    {t('Ebene:')} {t(LAYER_BADGES[currentFault.categoryType].label)}
                   </span>
                 )}
               </div>
 
               <div className="text-3xl sm:text-5xl font-extrabold text-[#FF8D4D] tracking-tight">
-                ab {finalTotal.toFixed(2).replace('.', ',')} €{' '}
+                {t('ab {price}', { price: euro(finalTotal) })}{' '}
                 <span className="text-xs sm:text-sm font-normal font-mono text-[#839897]">
-                  inkl. 19% MwSt.{expressActive ? ' + Express' : ''}
+                  {t('inkl. 19% MwSt.')}{expressActive ? ' + Express' : ''}
                 </span>
               </div>
 
@@ -354,7 +364,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
               {savings > 0 && (
                 <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#00F5D4]/15 via-[#00F5D4]/10 to-transparent border border-[#00F5D4]/40 text-[#00F5D4] text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,245,212,0.15)]">
                   <Sparkles className="w-4 h-4 text-[#00F5D4] shrink-0 animate-pulse" />
-                  <span>Vergleich zum Neukauf: Du sparst bis zu {savings.toFixed(0)} €!</span>
+                  <span>{t('Vergleich zum Neukauf: Du sparst bis zu {amount}!', { amount: euro(savings, 0) })}</span>
                 </div>
               )}
 
@@ -363,22 +373,20 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
                   <span>
-                    Dauer:{' '}
-                    <strong className="text-white">
-                      {expressActive ? 'Vorrang / meist am selben Tag' : currentFault.time}
-                    </strong>
+                    {t('Dauer:')}{' '}
+                    <strong className="text-white">{durationText}</strong>
                   </span>
                 </div>
                 {currentFault.compare && (
-                  <div className="text-[#FF8D4D] font-semibold">💡 {currentFault.compare}</div>
+                  <div className="text-[#FF8D4D] font-semibold">💡 {t(currentFault.compare)}</div>
                 )}
               </div>
 
               <ul className="text-[13px] text-[#A3B5B6] flex flex-col sm:flex-row sm:flex-wrap gap-x-5 gap-y-1.5">
-                {['Verbindlicher Festpreis vor Arbeitsbeginn', '6 Monate Garantie', 'No Data – No Fee'].map((t) => (
-                  <li key={t} className="flex items-center gap-1.5">
+                {[msg('Verbindlicher Festpreis vor Arbeitsbeginn'), msg('6 Monate Garantie'), msg('No Data – No Fee')].map((item) => (
+                  <li key={item} className="flex items-center gap-1.5">
                     <Check className="w-3.5 h-3.5 text-[#00F5D4] shrink-0" />
-                    {t}
+                    {t(item)}
                   </li>
                 ))}
               </ul>
@@ -394,10 +402,10 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                   />
                   <span className="text-xs font-mono text-white flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-[#FF8D4D]" />
-                    <span>⚡ Express-Service • Vorrang-Bearbeitung</span>
+                    <span>⚡ {t('Express-Service • Vorrang-Bearbeitung')}</span>
                   </span>
-                  <span className="ml-auto text-xs font-mono text-[#FF8D4D] font-bold">
-                    +{currentFault.express.toFixed(0)} €
+                  <span className="ms-auto text-xs font-mono text-[#FF8D4D] font-bold">
+                    +{euro(currentFault.express, 0)}
                   </span>
                 </label>
               )}
@@ -405,7 +413,7 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
               {/* Cross-Sell Hint */}
               {currentFault.crossSell && (
                 <div className="bg-[#4FA39B]/15 border border-[#00F5D4]/30 rounded-xl px-4 py-2.5 text-xs text-[#00F5D4] leading-relaxed">
-                  💡 {currentFault.crossSell}
+                  💡 {t(currentFault.crossSell)}
                 </div>
               )}
             </div>
@@ -419,37 +427,39 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
                 className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider bg-[#25D366] text-[#040809] hover:bg-[#20ba5a] shadow-[0_0_20px_rgba(37,211,102,0.3)] transition-all"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>Dieses Problem anfragen</span>
+                <span>{t('Dieses Problem anfragen')}</span>
               </a>
 
               <button
                 type="button"
                 onClick={() =>
-                  onOpenAiChat(
-                    `Ich benötige Hilfe zu: ${currentFault.title} (${CATEGORY_LABELS[currentCategory].label})`
-                  )
+                  onOpenAiChat(t('Ich benötige Hilfe zu: {fault} ({device})', { fault: faultTitle, device: categoryLabel }))
                 }
                 className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-[#101E21] border border-[#00F5D4]/40 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] transition-all cursor-pointer"
               >
                 <Bot className="w-4 h-4" />
-                <span>KI-Techniker fragen</span>
+                <span>{t('KI-Techniker fragen')}</span>
               </button>
 
               <a
-                href={`https://wa.me/4917641744443?text=${encodeURIComponent(
-                  `Hallo Mustafa, ich benötige für meine Versicherung (Haftpflicht/Hausrat) einen schriftlichen Kostenvoranschlag (KVA) über das CODE WWS für mein Gerät: ${CATEGORY_LABELS[currentCategory].label} – ${currentFault.title}.`
-                )}`}
+                href={whatsappLink(
+                  t(
+                    'Hallo Mustafa, ich benötige für meine Versicherung (Haftpflicht/Hausrat) einen schriftlichen Kostenvoranschlag (KVA) über das CODE WWS für mein Gerät: {device} – {fault}.',
+                    { device: categoryLabel, fault: faultTitle }
+                  )
+                )}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-mono text-[11px] text-[#FF8D4D] hover:text-white border border-[#FF8D4D]/30 hover:border-[#FF8D4D] hover:bg-[#FF8D4D]/10 transition-colors"
-                title="Schriftlicher Kostenvoranschlag für Versicherungen über das Werkstattsystem CODE WWS"
+                title={t('Schriftlicher Kostenvoranschlag für Versicherungen über das Werkstattsystem CODE WWS')}
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>Schriftlichen KVA (Versicherung) anfragen</span>
+                <span>{t('Schriftlichen KVA (Versicherung) anfragen')}</span>
               </a>
 
               <div className="text-[10px] font-mono text-[#839897] leading-relaxed text-center px-1">
-                ℹ️ <strong>Hinweis:</strong> Schriftliche Kostenvoranschläge für Versicherungen (Haftpflicht / Hausrat) werden nach Labor-Prüfung über unser Werkstattsystem (CODE WWS) erstellt und bei Beauftragung zu 100 % verrechnet.
+                ℹ️ <strong>{t('Hinweis:')}</strong>{' '}
+                {t('Schriftliche Kostenvoranschläge für Versicherungen (Haftpflicht / Hausrat) werden nach Labor-Prüfung über unser Werkstattsystem (CODE WWS) erstellt und bei Beauftragung zu 100 % verrechnet.')}
               </div>
             </div>
           </div>
@@ -460,15 +470,15 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
               type="button"
               onClick={() =>
                 onOpenAiChat(
-                  `Ich bin mir nicht sicher, welche Schadensebene bei meinem ${CATEGORY_LABELS[currentCategory].label} zutrifft. Mein Problem ist: `
+                  t('Ich bin mir nicht sicher, welche Schadensebene bei meinem {device} zutrifft. Mein Problem ist: ', { device: categoryLabel })
                 )
               }
               className="w-full py-3.5 px-4 rounded-2xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-[#0C1A1D] via-[#102226] to-[#0C1A1D] border border-[#00F5D4]/40 hover:border-[#00F5D4] text-[#00F5D4] hover:bg-[#00F5D4]/10 transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-md group"
             >
               <Bot className="w-4 h-4 text-[#00F5D4] group-hover:scale-110 transition-transform" />
-              <span>Nicht sicher, welche Ebene zutrifft? KI-Techniker fragen</span>
+              <span>{t('Nicht sicher, welche Ebene zutrifft? KI-Techniker fragen')}</span>
               <span className="text-zinc-500 font-normal hidden md:inline">
-                (analysiert Schadsymptome in 5 Sekunden)
+                {t('(analysiert Schadsymptome in 5 Sekunden)')}
               </span>
             </button>
           </div>
@@ -478,11 +488,11 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
             <button
               type="button"
               onClick={() => setShowTechDetails(!showTechDetails)}
-              className="w-full px-5 py-4 flex items-center justify-between text-left font-mono text-xs text-[#00F5D4] hover:bg-white/5 transition-colors cursor-pointer"
+              className="w-full px-5 py-4 flex items-center justify-between text-start font-mono text-xs text-[#00F5D4] hover:bg-white/5 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2">
-                <span>🔧 Technische Details &amp; Labor-Ablauf anzeigen</span>
-                <span className="text-[#839897] hidden sm:inline">(Mikrolöten &amp; Netto-Kalkulation)</span>
+                <span>🔧 {t('Technische Details & Labor-Ablauf anzeigen')}</span>
+                <span className="text-[#839897] hidden sm:inline">{t('(Mikrolöten & Netto-Kalkulation)')}</span>
               </div>
               <ChevronDown
                 className={`w-4 h-4 text-[#839897] transition-transform duration-200 ${
@@ -495,13 +505,13 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
               <div className="p-5 border-t border-white/10 bg-[#040809] space-y-6 animate-fade-in">
                 <div>
                   <h4 className="font-mono text-xs text-[#00F5D4] uppercase tracking-wider mb-3">
-                    Durchgeführte Labor-Schritte unter dem 40x Stereomikroskop:
+                    {t('Durchgeführte Labor-Schritte unter dem 40x Stereomikroskop:')}
                   </h4>
                   <ul className="space-y-2">
                     {currentFault.steps.map((st, i) => (
                       <li key={i} className="text-xs sm:text-sm text-[#F3F7F7] flex items-start gap-2.5">
                         <span className="text-[#FF8D4D] font-bold font-mono">▸</span>
-                        <span>{st}</span>
+                        <span>{t(st)}</span>
                       </li>
                     ))}
                   </ul>
@@ -509,33 +519,25 @@ Wann kann ich das Gerät zur Reparatur in Neumarkt übergeben?`;
 
                 <div>
                   <h4 className="font-mono text-xs text-[#FF8D4D] uppercase tracking-wider mb-2">
-                    Kaufmännische Aufschlüsselung:
+                    {t('Kaufmännische Aufschlüsselung:')}
                   </h4>
                   <table className="w-full font-mono text-xs text-[#839897] border-collapse">
                     <tbody>
                       <tr className="border-b border-white/5 py-1.5">
-                        <td className="py-1">Mikrolöt-Arbeitszeit / Labor:</td>
-                        <td className="text-right text-white py-1">
-                          ab {laborNet.toFixed(2).replace('.', ',')} €
-                        </td>
+                        <td className="py-1">{t('Mikrolöt-Arbeitszeit / Labor:')}</td>
+                        <td className="text-end text-white py-1">{t('ab {price}', { price: euro(laborNet) })}</td>
                       </tr>
                       <tr className="border-b border-white/5 py-1.5">
-                        <td className="py-1">Ersatzteil / OEM-Material:</td>
-                        <td className="text-right text-white py-1">
-                          ab {partsNet.toFixed(2).replace('.', ',')} €
-                        </td>
+                        <td className="py-1">{t('Ersatzteil / OEM-Material:')}</td>
+                        <td className="text-end text-white py-1">{t('ab {price}', { price: euro(partsNet) })}</td>
                       </tr>
                       <tr className="border-b border-white/5 py-1.5">
-                        <td className="py-1">Zwischensumme (Netto):</td>
-                        <td className="text-right text-white py-1">
-                          ab {subtotalNet.toFixed(2).replace('.', ',')} €
-                        </td>
+                        <td className="py-1">{t('Zwischensumme (Netto):')}</td>
+                        <td className="text-end text-white py-1">{t('ab {price}', { price: euro(subtotalNet) })}</td>
                       </tr>
                       <tr>
-                        <td className="py-1">zzgl. 19 % gesetzliche MwSt.:</td>
-                        <td className="text-right text-white py-1">
-                          ab {taxNet.toFixed(2).replace('.', ',')} €
-                        </td>
+                        <td className="py-1">{t('zzgl. 19 % gesetzliche MwSt.:')}</td>
+                        <td className="text-end text-white py-1">{t('ab {price}', { price: euro(taxNet) })}</td>
                       </tr>
                     </tbody>
                   </table>
