@@ -12,6 +12,7 @@ type Spot = { x: number; y: number; fault: string; label: string };
 type Device = {
   id: string;
   label: string;
+  short: string;
   Icon: typeof Laptop;
   category: DeviceCategoryKey;
   spots: Spot[];
@@ -175,6 +176,7 @@ const DEVICES: Device[] = [
   {
     id: 'ps5',
     label: 'PlayStation 5',
+    short: 'PS5',
     Icon: Gamepad2,
     category: 'konsole',
     Art: PS5Art,
@@ -187,6 +189,7 @@ const DEVICES: Device[] = [
   {
     id: 'macbook',
     label: 'MacBook',
+    short: 'MacBook',
     Icon: Laptop,
     category: 'laptop_pc',
     Art: MacBookArt,
@@ -200,6 +203,7 @@ const DEVICES: Device[] = [
   {
     id: 'controller',
     label: 'DualSense',
+    short: msg('Controller'),
     Icon: Joystick,
     category: 'controller',
     Art: ControllerArt,
@@ -212,6 +216,7 @@ const DEVICES: Device[] = [
   {
     id: 'phone',
     label: 'Smartphone',
+    short: msg('Handy'),
     Icon: Smartphone,
     category: 'phone',
     Art: PhoneArt,
@@ -224,6 +229,7 @@ const DEVICES: Device[] = [
   {
     id: 'key',
     label: msg('Autoschlüssel'),
+    short: msg('Schlüssel'),
     Icon: KeyRound,
     category: 'schluessel',
     Art: KeyArt,
@@ -267,23 +273,25 @@ export const DeviceExplorer: React.FC<DeviceExplorerProps> = ({ onSelectCategory
     setTilt({ x: (0.5 - py) * 10, y: (px - 0.5) * 14, px: px * 100, py: py * 100 });
   };
 
+
   const Art = device.Art;
+  const selectSpot = (i: number) => setSpotIndex(i);
 
   return (
-    <div className="glass rounded-[2rem] p-4 sm:p-6 shadow-[0_30px_80px_rgba(0,0,0,0.5)] relative">
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div>
+    <div className="glass rounded-[1.75rem] sm:rounded-[2rem] p-2.5 sm:p-4 shadow-[0_40px_120px_rgba(0,0,0,0.6)] relative">
+      <div className="flex items-center justify-between gap-3 px-1.5 pt-1 pb-3">
+        <div className="min-w-0">
           <p className="text-[15px] font-semibold text-white">{t('Wo ist dein Gerät kaputt?')}</p>
           <p className="text-xs text-zinc-400">{t('Tippe auf die leuchtende Stelle')}</p>
         </div>
-        <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] text-[#00F5D4] bg-[#00F5D4]/10 border border-[#00F5D4]/25 rounded-full px-2.5 py-1">
+        <span className="hidden sm:inline-flex shrink-0 items-center gap-1.5 text-[11px] text-[#00F5D4] bg-[#00F5D4]/10 border border-[#00F5D4]/25 rounded-full px-2.5 py-1">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-pulse" />
           {t('Preis sofort')}
         </span>
       </div>
 
-      {/* Geräteauswahl */}
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none]" role="tablist">
+      {/* Geräteauswahl: alle fünf Geräte immer sichtbar */}
+      <div className="grid grid-cols-5 gap-0.5 sm:gap-1 p-1 rounded-2xl bg-black/30 border border-white/10" role="tablist">
         {DEVICES.map((d) => {
           const active = d.id === deviceId;
           return (
@@ -292,121 +300,148 @@ export const DeviceExplorer: React.FC<DeviceExplorerProps> = ({ onSelectCategory
               type="button"
               role="tab"
               aria-selected={active}
+              aria-label={t(d.label)}
               onClick={() => {
                 setDeviceId(d.id);
                 setSpotIndex(0);
               }}
-              className={`shrink-0 h-10 px-3.5 rounded-full border text-xs font-medium inline-flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`min-w-0 h-14 sm:h-11 rounded-xl text-[10px] sm:text-xs font-medium flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer ${
                 active
-                  ? 'bg-gradient-to-r from-[#00F5D4]/20 to-[#FF8D4D]/20 border-[#00F5D4]/60 text-white shadow-[0_8px_24px_rgba(0,245,212,0.18)]'
-                  : 'bg-white/[0.03] border-white/10 text-zinc-400 hover:border-white/25 hover:text-white'
+                  ? 'bg-white/[0.09] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_rgba(0,0,0,0.35)]'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              <d.Icon className={`w-4 h-4 ${active ? 'text-[#00F5D4]' : ''}`} />
-              {t(d.label)}
+              <d.Icon className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-[#00F5D4]' : ''}`} strokeWidth={1.75} />
+              <span className="truncate max-w-full max-[359px]:text-[9px] max-[359px]:tracking-tight">{t(d.short)}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Bühne mit Gerät */}
-      <div className="board-stage relative mt-3" onPointerMove={handleTilt} onPointerLeave={() => setTilt(null)}>
-        <div
-          className={`board-3d device-stage relative w-full aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 ${tilt ? '' : 'board-idle'}`}
-          style={tilt ? { transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` } : undefined}
-        >
+      <div className="mt-3 grid gap-3 md:grid-cols-[1.2fr_1fr]">
+        {/* Bühne mit Gerät */}
+        <div className="board-stage relative" onPointerMove={handleTilt} onPointerLeave={() => setTilt(null)}>
           <div
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none z-10 mix-blend-screen"
-            style={{
-              background: `radial-gradient(500px circle at ${tilt?.px ?? 30}% ${tilt?.py ?? 0}%, rgba(255,255,255,0.12), transparent 45%)`,
-            }}
-          />
-          <svg key={device.id} viewBox="0 0 400 300" className="device-in relative w-full h-full" role="img" aria-label={t(device.label)}>
-            <ellipse cx="200" cy="288" rx="150" ry="10" fill="#000" opacity="0.45" />
-            <Art />
+            className="device-stage relative w-full aspect-[16/10] md:aspect-auto md:h-full md:min-h-[340px] rounded-3xl overflow-hidden border border-white/10 transition-transform duration-300"
+            style={tilt ? { transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` } : undefined}
+          >
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none z-10 mix-blend-screen"
+              style={{
+                background: `radial-gradient(420px circle at ${tilt?.px ?? 50}% ${tilt?.py ?? 0}%, rgba(255,255,255,0.10), transparent 50%)`,
+              }}
+            />
+            <svg key={device.id} viewBox="0 0 400 300" className="device-in absolute inset-0 w-full h-full p-2" role="img" aria-label={t(device.label)}>
+              <ellipse cx="200" cy="290" rx="140" ry="8" fill="#000" opacity="0.5" />
+              <Art />
+              {device.spots.map((s, i) => {
+                const active = i === spotIndex;
+                return (
+                  <g
+                    key={s.fault}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={t(s.label)}
+                    aria-pressed={active}
+                    className="cursor-pointer focus:outline-none"
+                    onClick={() => selectSpot(i)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectSpot(i);
+                      }
+                    }}
+                  >
+                    <circle cx={s.x} cy={s.y} r="20" fill="transparent" />
+                    <circle cx={s.x} cy={s.y} r="12" className="spot-ring" fill="none" stroke={active ? '#FF8D4D' : '#00F5D4'} strokeWidth="2" />
+                    <circle
+                      cx={s.x}
+                      cy={s.y}
+                      r={active ? 7.5 : 5.5}
+                      fill={active ? '#FF8D4D' : '#00F5D4'}
+                      stroke="#04110F"
+                      strokeWidth="2"
+                      style={{ filter: `drop-shadow(0 0 6px ${active ? '#FF8D4D' : '#00F5D4'})` }}
+                    />
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+        </div>
+
+        {/* Fehlerliste mit Preisen und Detail */}
+        <div className="flex flex-col gap-2 min-w-0">
+          <ul className="grid gap-1.5">
             {device.spots.map((s, i) => {
+              const f = ALL_FAULTS[s.fault];
               const active = i === spotIndex;
               return (
-                <g
-                  key={s.fault}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={t(s.label)}
-                  aria-pressed={active}
-                  className="cursor-pointer focus:outline-none"
-                  onClick={() => setSpotIndex(i)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setSpotIndex(i);
-                    }
-                  }}
-                >
-                  <circle cx={s.x} cy={s.y} r="18" fill="transparent" />
-                  <circle cx={s.x} cy={s.y} r="12" className="spot-ring" fill="none" stroke={active ? '#FF8D4D' : '#00F5D4'} strokeWidth="2" />
-                  <circle
-                    cx={s.x}
-                    cy={s.y}
-                    r={active ? 7 : 5.5}
-                    fill={active ? '#FF8D4D' : '#00F5D4'}
-                    stroke="#04110F"
-                    strokeWidth="2"
-                    style={{ filter: `drop-shadow(0 0 6px ${active ? '#FF8D4D' : '#00F5D4'})` }}
-                  />
-                </g>
+                <li key={s.fault}>
+                  <button
+                    type="button"
+                    onClick={() => selectSpot(i)}
+                    aria-pressed={active}
+                    className={`w-full h-10 sm:h-11 px-3 rounded-xl border flex items-center gap-2.5 text-start text-[13px] transition-all cursor-pointer ${
+                      active
+                        ? 'bg-[#FF8D4D]/10 border-[#FF8D4D]/50 text-white'
+                        : 'bg-white/[0.03] border-white/10 text-zinc-300 hover:border-white/25 hover:text-white'
+                    }`}
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full shrink-0 ${active ? 'bg-[#FF8D4D] shadow-[0_0_10px_#FF8D4D]' : 'bg-[#00F5D4]/80'}`}
+                    />
+                    <span className="flex-1 min-w-0 truncate font-medium">{t(s.label)}</span>
+                    <span className="shrink-0 text-xs text-zinc-400">
+                      {t('ab')}{' '}
+                      <bdi dir="ltr" className={`font-semibold ${active ? 'text-[#FFB98A]' : 'text-zinc-200'}`}>
+                        {Math.round(f.targetTotal)} €
+                      </bdi>
+                    </span>
+                  </button>
+                </li>
               );
             })}
-          </svg>
-          {/* Beschriftung der aktiven Stelle */}
-          <div className="absolute top-3 start-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-black/50 backdrop-blur px-3 py-1 text-[11px] text-white border border-white/10">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FF8D4D]" />
-            {t(spot.label)}
-          </div>
-        </div>
-        <div aria-hidden="true" className="mx-auto -mt-1 h-6 w-[80%] rounded-[50%] bg-black/60 blur-xl" />
-      </div>
+          </ul>
 
-      {/* Ergebnis-Karte */}
-      <div key={fault.id} className="node-pop relative z-10 -mt-8 mx-1 sm:mx-5 glass glass-solid rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[14px] font-semibold text-white leading-snug">{t(fault.title)}</p>
-            <p className="text-xs text-zinc-400 mt-1 leading-relaxed line-clamp-2">{t(fault.desc)}</p>
-          </div>
-          <p className="shrink-0 text-end">
-            <span className="block text-[10px] text-zinc-400">{t('ab')}</span>
-            <span className="block text-2xl font-bold text-[#FFB98A]" dir="ltr">{price}</span>
-          </p>
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 text-[11px] text-zinc-300 bg-white/[0.05] border border-white/10 rounded-full px-2.5 py-1">
-            <Clock className="w-3.5 h-3.5 text-[#00F5D4]" />
-            {t(fault.time)}
-          </span>
-          <div className="flex gap-2 ms-auto w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => onSelectCategory(device.category)}
-              className="flex-1 sm:flex-none whitespace-nowrap inline-flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl text-xs font-semibold text-white bg-white/[0.05] border border-white/15 hover:border-[#00F5D4]/60 transition-colors cursor-pointer"
-            >
-              {t('Alle Preise')}
-              <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
-            </button>
-            <a
-              href={whatsappLink(
-                t('Hallo Mustafa, ich habe ein Problem mit meinem Gerät: {device} – {fault}. Was kostet die Reparatur?', {
-                  device: t(device.label),
-                  fault: t(fault.title),
-                })
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 sm:flex-none whitespace-nowrap inline-flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl text-xs font-semibold bg-[#25D366] text-[#04140A] hover:brightness-110 transition-all"
-            >
-              <MessageSquare className="w-3.5 h-3.5" />
-              {t('Anfragen')}
-            </a>
+          <div key={fault.id} className="node-pop flex-1 glass glass-solid rounded-2xl p-4 flex flex-col">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-[14px] font-semibold text-white leading-snug min-w-0">{t(fault.title)}</p>
+              <p className="shrink-0 text-end leading-none">
+                <span className="block text-[10px] text-zinc-400 mb-1">{t('ab')}</span>
+                <span className="block text-2xl font-bold text-[#FFB98A]" dir="ltr">{price}</span>
+              </p>
+            </div>
+            <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed line-clamp-2">{t(fault.desc)}</p>
+            <span className="mt-2.5 self-start inline-flex items-center gap-1.5 text-[11px] text-zinc-300 bg-white/[0.05] border border-white/10 rounded-full px-2.5 py-1">
+              <Clock className="w-3.5 h-3.5 text-[#00F5D4]" />
+              {t(fault.time)}
+            </span>
+            <div className="mt-auto pt-3 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => onSelectCategory(device.category)}
+                className="whitespace-nowrap inline-flex items-center justify-center gap-1.5 h-10 px-3 rounded-xl text-xs font-semibold text-white bg-white/[0.05] border border-white/15 hover:border-[#00F5D4]/60 transition-colors cursor-pointer"
+              >
+                {t('Alle Preise')}
+                <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+              </button>
+              <a
+                href={whatsappLink(
+                  t('Hallo Mustafa, ich habe ein Problem mit meinem Gerät: {device} – {fault}. Was kostet die Reparatur?', {
+                    device: t(device.label),
+                    fault: t(fault.title),
+                  })
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="whitespace-nowrap inline-flex items-center justify-center gap-1.5 h-10 px-3 rounded-xl text-xs font-semibold bg-[#25D366] text-[#04140A] hover:brightness-110 transition-all"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                {t('Anfragen')}
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -69,11 +69,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOp
             <p className="max-w-sm leading-relaxed">
               {t('Spezial-Werkstatt für Platinenreparatur, Mikrolöten und Datenrettung in Neumarkt in der Oberpfalz.')}
             </p>
-            <p className="font-mono text-[13px] text-[#E5A96A]">{t("»Reparieren statt Neukaufen, CODE bringt's zum Laufen.«")}</p>
+            <p className="text-[13px] text-[#E5A96A]">{t("»Reparieren statt Neukaufen, CODE bringt's zum Laufen.«")}</p>
           </div>
 
           <nav className="md:col-span-3" aria-label={t('Footer-Navigation')}>
-            <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00F5D4] mb-4">{t('Seiten')}</h3>
+            <h3 className="text-sm font-semibold text-white mb-4">{t('Seiten')}</h3>
             <ul className="space-y-2.5">
               {[
                 ['/#diagnose', msg('Preise & Diagnose')],
@@ -93,7 +93,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOp
           </nav>
 
           <div className="md:col-span-4">
-            <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00F5D4] mb-4">{t('Kontakt')}</h3>
+            <h3 className="text-sm font-semibold text-white mb-4">{t('Kontakt')}</h3>
             <ul className="space-y-2.5">
               <li>
                 <a href="tel:+4917641744443" dir="ltr" className="text-white hover:text-[#00F5D4] transition-colors">

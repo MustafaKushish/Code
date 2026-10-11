@@ -240,8 +240,8 @@ body::before {
 
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(28px) scale(0.985);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal.is-visible {
@@ -494,5 +494,96 @@ body::before {
   .spot-ring,
   .device-in {
     animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Showcase-Design: Aurora, Raster, Körnung, Bühne
+--------------------------------------------------------------------------- */
+.aurora {
+  position: absolute;
+  inset: -10% -20% 20%;
+  background:
+    radial-gradient(40% 50% at 20% 30%, rgba(0, 245, 212, 0.22), transparent 70%),
+    radial-gradient(35% 45% at 80% 20%, rgba(255, 141, 77, 0.16), transparent 70%),
+    radial-gradient(45% 40% at 50% 70%, rgba(77, 163, 255, 0.10), transparent 70%);
+  filter: blur(40px);
+  animation: auroraDrift 18s ease-in-out infinite alternate;
+  mask-image: linear-gradient(to bottom, black 40%, transparent);
+}
+@keyframes auroraDrift {
+  from {
+    transform: translate3d(-3%, 0, 0) rotate(-2deg);
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) rotate(2deg);
+  }
+}
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 70% 55% at 50% 25%, black, transparent 75%);
+}
+.hero-title {
+  background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.62));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-in {
+  animation: heroIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(8px);
+  }
+}
+/* Bühne kippt beim Scrollen nach vorne (--tilt läuft von 1 nach 0) */
+.showcase-tilt {
+  transform-origin: 50% 0%;
+  transform: rotateX(calc(var(--tilt, 0) * 16deg)) scale(calc(1 - var(--tilt, 0) * 0.06));
+  will-change: transform;
+}
+/* Seitenhintergrund: ruhiges Raster statt Partikel, plus Körnung */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 40% at 50% 0%, rgba(0, 245, 212, 0.06), transparent 70%),
+    radial-gradient(40% 30% at 100% 60%, rgba(255, 141, 77, 0.04), transparent 70%);
+}
+.page-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Abschnitts-Überschriften: weicher Verlauf im Titel */
+.section-title {
+  background: linear-gradient(180deg, #ffffff 35%, rgba(255, 255, 255, 0.66));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.eyebrow-pill {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora,
+  .hero-in {
+    animation: none;
+  }
+  .showcase-tilt {
+    transform: none;
   }
 }

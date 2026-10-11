@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { DeviceCategoryKey } from './types';
-import { CircuitCanvas } from './components/CircuitCanvas';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { DiagnoseCalculator } from './components/DiagnoseCalculator';
@@ -148,8 +147,8 @@ export default function App() {
         {t('Zum Inhalt springen')}
       </a>
 
-      {/* Background Circuit Particle Grid */}
-      <CircuitCanvas />
+      {/* Ruhiger Seitenhintergrund mit Körnung */}
+      <div aria-hidden="true" className="page-bg" />
 
       {/* Main Foreground Container */}
       <div className="relative z-10 flex flex-col">

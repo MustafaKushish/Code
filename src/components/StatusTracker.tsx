@@ -316,7 +316,7 @@ export const StatusTracker: React.FC = () => {
                   onChange={(e) => setTicketInput(e.target.value)}
                   placeholder={t('Auftrags-Nr.')}
                   aria-label={t('Auftragsnummer')}
-                  className="w-full bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono uppercase"
+                  className="w-full bg-[#060D0E] border border-white/10 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono uppercase"
                 />
               </div>
 
@@ -331,14 +331,14 @@ export const StatusTracker: React.FC = () => {
                 placeholder={t('Tel. (4 Ziff.)')}
                 aria-label={t('Letzte 4 Ziffern deiner Telefonnummer')}
                 title={t('Die letzten 4 Ziffern der Telefonnummer, die du bei der Abgabe angegeben hast')}
-                className="sm:w-36 bg-[#060D0E] border border-[#C9743F]/30 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono tracking-widest"
+                className="sm:w-36 bg-[#060D0E] border border-white/10 focus:border-[#00F5D4] focus:ring-1 focus:ring-[#00F5D4] rounded-xl px-4 py-3 text-sm text-white placeholder-[#839897] outline-none font-mono tracking-widest"
               />
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setIsScannerOpen(true)}
-                  className="px-4 py-3 rounded-xl bg-[#122225] border border-[#00F5D4]/60 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] font-mono font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                  className="px-4 py-3 rounded-xl bg-[#122225] border border-[#00F5D4]/60 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
                   title={t('QR-Code mit Kamera scannen')}
                 >
                   <Camera className="w-4 h-4" />
@@ -348,7 +348,7 @@ export const StatusTracker: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-5 py-3 rounded-xl bg-[#00F5D4] text-[#060B0C] font-mono font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_15px_rgba(0,245,212,0.3)] flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-3 rounded-xl bg-[#00F5D4] text-[#060B0C] font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_15px_rgba(0,245,212,0.3)] flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
                 >
                   {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                   <span>{t('Prüfen')}</span>
@@ -357,7 +357,7 @@ export const StatusTracker: React.FC = () => {
             </form>
 
             {/* Quick Demo Links */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1 text-xs font-mono">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1 text-xs">
               <span className="text-[#839897]">{t('Schnell-Test:')}</span>
               <button
                 type="button"
@@ -396,7 +396,7 @@ export const StatusTracker: React.FC = () => {
 
           {/* Error Message */}
           {searchError && (
-            <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-mono space-y-3 animate-fade-in">
+            <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs space-y-3 animate-fade-in">
               <div className="flex items-start gap-2.5">
                 <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
                 <span>{searchError}</span>
@@ -410,26 +410,26 @@ export const StatusTracker: React.FC = () => {
               {/* Ticket Top Row */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
-                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Auftrags-Nr.')}</span>
+                  <span className="text-xs text-[#839897] uppercase">{t('Auftrags-Nr.')}</span>
                   <div className="font-mono text-xl sm:text-2xl font-extrabold text-[#00F5D4]">
                     {ticketData.ticketId}
                   </div>
                 </div>
                 <div>
-                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Kunde / Besitzer')}</span>
+                  <span className="text-xs text-[#839897] uppercase">{t('Kunde / Besitzer')}</span>
                   <div className="text-sm sm:text-base font-bold text-white">
                     {ticketData.customerName}
                   </div>
                 </div>
                 <div>
-                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Gerät')}</span>
+                  <span className="text-xs text-[#839897] uppercase">{t('Gerät')}</span>
                   <div className="text-sm sm:text-base font-bold text-white">
                     {t(ticketData.device)}
                   </div>
                 </div>
                 <div className="text-start sm:text-end">
-                  <span className="font-mono text-xs text-[#839897] uppercase">{t('Fertigstellung')}</span>
-                  <div className="font-mono text-sm sm:text-base font-bold text-[#FF8D4D]">
+                  <span className="text-xs text-[#839897] uppercase">{t('Fertigstellung')}</span>
+                  <div className="text-sm sm:text-base font-bold text-[#FF8D4D]">
                     {t(ticketData.estimatedCompletion)}
                   </div>
                 </div>
@@ -438,13 +438,13 @@ export const StatusTracker: React.FC = () => {
               {/* UNIFIED 5-STEP VISUAL PROGRESS BAR */}
               <div>
                 <div className="flex items-center justify-between mb-3 px-1">
-                  <span className="text-xs font-mono text-[#00F5D4] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-xs text-[#00F5D4] font-bold uppercase tracking-wider flex items-center gap-1.5">
                     <span>{t('Werkstatt-Fortschritt:')}</span>
                     <span className="text-white">
                       {t('Schritt {n} von 5', { n: ticketData.currentStep })}
                     </span>
                   </span>
-                  <span className="text-xs font-mono text-[#839897]">
+                  <span className="text-xs text-[#839897]">
                     {t('{percent} % abgeschlossen', { percent: Math.round((ticketData.currentStep / 5) * 100) })}
                   </span>
                 </div>
@@ -486,7 +486,7 @@ export const StatusTracker: React.FC = () => {
 
                         <div className="leading-tight">
                           <span
-                            className={`text-[11px] font-mono block font-bold ${
+                            className={`text-[11px] block font-bold ${
                               isCurrent
                                 ? 'text-[#00F5D4]'
                                 : isPassed
@@ -506,26 +506,26 @@ export const StatusTracker: React.FC = () => {
               {/* DYNAMISCHES STATUS-TERMINAL */}
               <div className="bg-[#0C1719] border border-[#00F5D4]/30 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-                  <div className="flex items-center gap-2 text-xs font-mono text-[#00F5D4] font-bold uppercase">
+                  <div className="flex items-center gap-2 text-xs text-[#00F5D4] font-bold uppercase">
                     <span className="w-2 h-2 rounded-full bg-[#00F5D4] animate-ping" />
                     <span>&gt; {t('DYNAMISCHES STATUS-TERMINAL')}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400">
+                  <div className="flex items-center gap-2 text-[11px] text-zinc-400">
                     <span>{t('Gerätetyp:')}</span>
                     <strong className="text-white">{t(ticketData.device)}</strong>
                   </div>
                 </div>
 
                 <div>
-                  <span className="font-mono text-[11px] text-[#839897] uppercase block mb-1">
+                  <span className="text-[11px] text-[#839897] uppercase block mb-1">
                     {t('Letzte Labor-Meldung:')}
                   </span>
-                  <p className="text-xs sm:text-sm text-white font-mono leading-relaxed bg-[#060C0E] border border-white/5 rounded-xl p-3.5">
+                  <p className="text-xs sm:text-sm text-white leading-relaxed bg-[#060C0E] border border-white/5 rounded-xl p-3.5">
                     {t(ticketData.statusDetails)}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-zinc-400 pt-1">
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-400 pt-1">
                   <div className="flex items-center gap-2">
                     <Clock className="w-3.5 h-3.5 text-[#FF8D4D]" />
                     <span>
@@ -550,7 +550,7 @@ export const StatusTracker: React.FC = () => {
                       <PackageCheck className="w-8 h-8 stroke-[2.5]" />
                     </div>
                     <div>
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#00E676]/30 border border-[#00E676] text-[#00E676] text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#00E676]/30 border border-[#00E676] text-[#00E676] text-[10px] font-bold uppercase tracking-wider mb-1">
                         ✓ {t('REPARATUR ERFOLGREICH BEENDET')}
                       </div>
                       <h3 className="text-xl sm:text-2xl font-black text-white">
@@ -563,7 +563,7 @@ export const StatusTracker: React.FC = () => {
                   </div>
 
                   {/* Werkstatt-Adresse & Öffnungszeiten Box */}
-                  <div className="bg-[#050C0E]/90 border border-white/15 rounded-xl p-4 text-xs font-mono shrink-0 space-y-2 w-full md:w-auto">
+                  <div className="bg-[#050C0E]/90 border border-white/15 rounded-xl p-4 text-xs shrink-0 space-y-2 w-full md:w-auto">
                     <div className="flex items-center gap-1.5 text-[#00F5D4] font-bold">
                       <MapPin className="w-4 h-4 text-[#00F5D4] shrink-0" />
                       <span>{t('Werkstatt-Standort:')}</span>
@@ -588,7 +588,7 @@ export const StatusTracker: React.FC = () => {
 
               {/* Direct WhatsApp Contact Button */}
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <span className="text-xs font-mono text-[#839897]">
+                <span className="text-xs text-[#839897]">
                   {t('Fragen zum Ablauf oder Abholtermin?')}
                 </span>
                 <a
@@ -601,7 +601,7 @@ export const StatusTracker: React.FC = () => {
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#25D366]/20 border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-[#040809] font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#25D366]/20 border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-[#040809] text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>{t('Mustafa per WhatsApp kontaktieren')}</span>
