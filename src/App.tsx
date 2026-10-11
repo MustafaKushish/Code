@@ -20,6 +20,7 @@ import { useReveal } from './components/ui/useReveal';
 import { lazyNamed, useMountedOnce, prefetchWhenIdle } from './components/ui/lazy';
 import { installBookingLinks } from './utils/calBooking';
 import { LoanerSection } from './components/LoanerSection';
+import { DigitalTeaser } from './components/DigitalTeaser';
 import { useDocumentLanguage, useI18n } from './i18n';
 
 // Selten genutzte, große Teile werden erst bei Bedarf geladen (schnellerer Seitenaufbau)
@@ -30,6 +31,7 @@ const CheckInModal = lazyNamed(loadCheckIn, 'CheckInModal');
 const LegalModals = lazyNamed(() => import('./components/LegalModals'), 'LegalModals');
 const MailInModal = lazyNamed(() => import('./components/MailInModal'), 'MailInModal');
 const SecretTerminalModal = lazyNamed(() => import('./components/SecretTerminalModal'), 'SecretTerminalModal');
+const DigitalPage = lazyNamed(() => import('./components/DigitalPage'), 'DigitalPage');
 const WerkstattManagerApp = lazyNamed(() => import('./manager/WerkstattManagerApp'), 'WerkstattManagerApp');
 
 const ManagerLoading = () => (
@@ -46,6 +48,8 @@ export default function App() {
     const search = window.location.search.toLowerCase();
     return path.includes('manager') || search.includes('manager=1') || search.includes('view=manager');
   })();
+  // /digital: Unterseite für Websites & Geschäftssysteme (CODE Digital)
+  const isDigitalPage = typeof window !== 'undefined' && /^\/digital\/?$/i.test(window.location.pathname);
   // Der Manager öffnet sich nur mit einem vom Worker bestätigten Werkstatt-Schlüssel
   const [viewMode, setViewMode] = useState<'website' | 'manager'>(() =>
     managerRequested && getAdminKey() ? 'manager' : 'website'
@@ -149,6 +153,12 @@ export default function App() {
 
       {/* Main Foreground Container */}
       <div className="relative z-10 flex flex-col">
+        {isDigitalPage ? (
+          <Suspense fallback={<div className="min-h-screen" />}>
+            <DigitalPage />
+          </Suspense>
+        ) : (
+        <>
         {/* Navigation HUD */}
         <Header
           onOpenSecretModal={() => setIsSecretTerminalOpen(true)}
@@ -179,6 +189,9 @@ export default function App() {
         {/* B2B Partner Portal */}
         <B2BSection />
 
+        {/* Hinweis auf CODE Digital (Websites & Systeme) */}
+        <DigitalTeaser />
+
         {/* 4-Step Process Workflow */}
         <WorkflowSection />
 
@@ -201,6 +214,8 @@ export default function App() {
         <ContactSection onOpenMailIn={() => setIsMailInOpen(true)} />
 
         </main>
+        </>
+        )}
 
         {/* Footer with 5-click secret manager trigger on bottom-left logo */}
         <Footer
@@ -211,7 +226,7 @@ export default function App() {
       </div>
 
       {/* Sticky Mobile Bar & Floating Desktop AI Trigger */}
-      <MobileBottomBar onOpenAiChat={() => handleOpenAiChat()} />
+      {!isDigitalPage && <MobileBottomBar onOpenAiChat={() => handleOpenAiChat()} />}
 
       {/* Dialoge: Code wird erst beim ersten Öffnen geladen und bleibt danach gemountet */}
       <Suspense fallback={null}>
