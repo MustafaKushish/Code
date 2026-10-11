@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   UserCheck,
   Settings,
@@ -33,13 +33,8 @@ import {
   AdminAuthRequest,
   TaxReportPayload,
 } from './types';
-import {
-  DEFAULT_USERS,
-  DEFAULT_WORKSHOP_SETTINGS,
-  DEFAULT_INVENTORY,
-  INITIAL_DEMO_ORDERS,
-  DEFAULT_APPOINTMENTS,
-} from './defaultData';
+import { DEFAULT_USERS, DEFAULT_WORKSHOP_SETTINGS } from './defaultData';
+import { withPin, hasLegacyPin, migrateLegacyPins, publicUser } from './pinAuth';
 import { LockScreen } from './LockScreen';
 import { DashboardView } from './DashboardView';
 import { CalculatorView } from './CalculatorView';
@@ -66,8 +61,47 @@ import {
   fetchFromCloudflare,
   saveInventoryToCloudflare,
   saveAppointmentsToCloudflare,
-  CLOUDFLARE_WORKER_URL,
+  saveUsersToCloudflare,
+  saveSettingsToCloudflare,
 } from '../services/cloudflareSync';
+
+// Felder, die der Worker in D1 speichert. Alles andere (Fotos, Unterschrift, Fehlerbeschreibung,
+// Techniker, Kalkulationsdetails) gibt es nur lokal und darf beim Abgleich nicht verloren gehen.
+const CLOUD_ORDER_FIELDS = [
+  'date', 'serviceDate', 'isoDate', 'cust', 'phone', 'address', 'device', 'serial', 'payMethod',
+  'isB2B', 'b2bDiscountPercent', 'b2bDiscountVal', 'rawSubtotalNet', 'min', 'partEK', 'partVKNet',
+  'netto', 'taxRate', 'taxAmount', 'brutto', 'profit', 'status', 'paid',
+] as const;
+
+const UNSYNCED_ORDERS_KEY = 'code_unsynced_orders';
+
+function readUnsyncedIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(UNSYNCED_ORDERS_KEY);
+    return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function mergeCloudOrders(local: Order[], cloud: Order[], unsynced: Set<string>): Order[] {
+  const localById = new Map(local.map((o) => [o.id, o]));
+  const cloudIds = new Set(cloud.map((o) => o.id));
+  const merged = cloud.map((c) => {
+    const l = localById.get(c.id);
+    if (!l) return c;
+    const next: Order = { ...l };
+    for (const f of CLOUD_ORDER_FIELDS) (next as any)[f] = (c as any)[f];
+    return next;
+  });
+  // Lokal angelegte Aufträge, deren Upload noch aussteht, bleiben erhalten
+  const pending = local.filter((o) => unsynced.has(o.id) && !cloudIds.has(o.id));
+  return [...pending, ...merged];
+}
+
+function sameJson(a: unknown, b: unknown) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
 
 interface WerkstattManagerAppProps {
   onBackToWebsite: () => void;
@@ -109,12 +143,12 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
       const stored = sessionStorage.getItem('code_active_user');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed && parsed.id) return parsed;
+        if (parsed && parsed.id) return publicUser(parsed);
       }
     } catch {
       // ignore
     }
-    return DEFAULT_USERS[0];
+    return null;
   });
 
   // Lockscreen state
@@ -139,9 +173,9 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
   const [orders, setOrders] = useState<Order[]>(() => {
     try {
       const stored = localStorage.getItem('code_orders_v2');
-      return stored ? JSON.parse(stored) : INITIAL_DEMO_ORDERS;
+      return stored ? JSON.parse(stored) : [];
     } catch {
-      return INITIAL_DEMO_ORDERS;
+      return [];
     }
   });
 
@@ -149,9 +183,9 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
     try {
       const stored = localStorage.getItem('code_appointments_v1');
-      return stored ? JSON.parse(stored) : DEFAULT_APPOINTMENTS;
+      return stored ? JSON.parse(stored) : [];
     } catch {
-      return DEFAULT_APPOINTMENTS;
+      return [];
     }
   });
 
@@ -159,9 +193,9 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
   const [inventory, setInventory] = useState<InventoryItem[]>(() => {
     try {
       const stored = localStorage.getItem('code_inventory_v1');
-      return stored ? JSON.parse(stored) : DEFAULT_INVENTORY;
+      return stored ? JSON.parse(stored) : [];
     } catch {
-      return DEFAULT_INVENTORY;
+      return [];
     }
   });
 
@@ -203,47 +237,129 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
     localStorage.setItem('code_appointments_v1', JSON.stringify(appointments));
   }, [appointments]);
 
+  // Klartext-PINs aus älteren Versionen einmalig in Hashes umwandeln
+  useEffect(() => {
+    if (!hasLegacyPin(users)) return;
+    migrateLegacyPins(users)
+      .then((migrated) => setUsers(migrated))
+      .catch((err) => console.warn('PINs konnten nicht umgestellt werden:', err));
+  }, [users]);
+
+  // Neueste Werte für den Hintergrund-Abgleich (Intervall-Callbacks sehen sonst alte Stände)
+  const ordersRef = useRef(orders);
+  const usersRef = useRef(users);
+  const settingsRef = useRef(workshopSettings);
+  ordersRef.current = orders;
+  usersRef.current = users;
+  settingsRef.current = workshopSettings;
+
+  // Laufende Uploads: Solange einer läuft, wird ein Abgleich nicht übernommen, damit eine gerade
+  // gemachte Änderung nicht kurz von einem älteren Cloud-Stand überschrieben wird.
+  const pendingWrites = useRef(0);
+  const writeSeq = useRef(0);
+  const unsyncedOrders = useRef<Set<string>>(readUnsyncedIds());
+
+  const trackWrite = <T,>(promise: Promise<T>): Promise<T> => {
+    pendingWrites.current += 1;
+    writeSeq.current += 1;
+    return promise.finally(() => {
+      pendingWrites.current -= 1;
+    });
+  };
+
+  const persistUnsynced = () => {
+    try {
+      localStorage.setItem(UNSYNCED_ORDERS_KEY, JSON.stringify([...unsyncedOrders.current]));
+    } catch {
+      // ignore
+    }
+  };
+
+  const pushOrder = (order: Order) =>
+    trackWrite(saveOrderToCloudflare(order)).then((ok) => {
+      if (ok) unsyncedOrders.current.delete(order.id);
+      else unsyncedOrders.current.add(order.id);
+      persistUnsynced();
+      setWorkerConnected(ok);
+      return ok;
+    });
+
+  const pushInventory = (items: InventoryItem[]) => trackWrite(saveInventoryToCloudflare(items));
+  const pushAppointments = (items: Appointment[]) => trackWrite(saveAppointmentsToCloudflare(items));
+
+  const commitUsers = async (next: User[]) => {
+    const hashed = hasLegacyPin(next) ? await migrateLegacyPins(next) : next;
+    setUsers(hashed);
+    trackWrite(saveUsersToCloudflare(hashed));
+  };
+
+  const commitSettings = (next: WorkshopSettings) => {
+    setWorkshopSettings(next);
+    trackWrite(saveSettingsToCloudflare(next));
+  };
+
   // Cloudflare Worker Sync (https://code-techniker.mustafa-alzurgany.workers.dev/api/orders)
   const [workerConnected, setWorkerConnected] = useState(true);
+  const syncRunning = useRef(false);
 
-  // Silent Background Sync: Compares data and avoids any unnecessary re-renders or UI flickering
   const syncWithCloudflareWorker = async () => {
+    if (syncRunning.current) return;
+    syncRunning.current = true;
     try {
+      // Aufträge, deren Upload fehlgeschlagen ist, zuerst erneut senden
+      for (const id of [...unsyncedOrders.current]) {
+        const order = ordersRef.current.find((o) => o.id === id);
+        if (order) await pushOrder(order);
+        else {
+          unsyncedOrders.current.delete(id);
+          persistUnsynced();
+        }
+      }
+
+      const seqAtStart = writeSeq.current;
       const result = await fetchFromCloudflare();
-      if (result.success) {
-        setWorkerConnected(true);
-
-        // 1. ORDERS SYNC: Cloudflare D1 database is the single source of truth
-        if (result.orders.length > 0) {
-          setOrders((prev) => {
-            const prevSig = prev.map((o) => `${o.id}_${o.status}_${o.paid}_${o.cust}_${o.brutto}`).join('|');
-            const nextSig = result.orders.map((o) => `${o.id}_${o.status}_${o.paid}_${o.cust}_${o.brutto}`).join('|');
-            return prevSig === nextSig ? prev : result.orders;
-          });
-        }
-
-        // 2. INVENTORY SYNC: Cloudflare D1 (accepts [] as valid empty inventory)
-        if (result.inventory !== null && Array.isArray(result.inventory)) {
-          setInventory((prev) => {
-            const prevStr = JSON.stringify(prev);
-            const nextStr = JSON.stringify(result.inventory);
-            return prevStr === nextStr ? prev : result.inventory!;
-          });
-        }
-
-        // 3. APPOINTMENTS SYNC: Cloudflare D1 (accepts [] as valid empty appointments)
-        if (result.appointments !== null && Array.isArray(result.appointments)) {
-          setAppointments((prev) => {
-            const prevStr = JSON.stringify(prev);
-            const nextStr = JSON.stringify(result.appointments);
-            return prevStr === nextStr ? prev : result.appointments!;
-          });
-        }
-      } else {
+      if (!result.success) {
         setWorkerConnected(false);
+        return;
+      }
+      setWorkerConnected(true);
+      if (pendingWrites.current > 0 || writeSeq.current !== seqAtStart) return;
+
+      // 1. Aufträge: Cloud bestimmt Status, Preise und welche Aufträge existieren,
+      //    lokale Zusatzdaten (Fotos, Unterschrift, Fehlerbeschreibung) bleiben erhalten
+      if (result.orders.length > 0) {
+        setOrders((prev) => {
+          const next = mergeCloudOrders(prev, result.orders, unsyncedOrders.current);
+          return sameJson(prev, next) ? prev : next;
+        });
+      }
+
+      // 2./3. Lager und Termine ([] ist ein gültiger, leerer Stand)
+      if (result.inventory) {
+        setInventory((prev) => (sameJson(prev, result.inventory) ? prev : result.inventory!));
+      }
+      if (result.appointments) {
+        setAppointments((prev) => (sameJson(prev, result.appointments) ? prev : result.appointments!));
+      }
+
+      // 4. Mitarbeiter und Stammdaten: gleiche PINs auf allen Geräten.
+      //    Gibt es sie in der Cloud noch nicht, lädt dieses Gerät seinen Stand hoch.
+      if (result.users) {
+        setUsers((prev) => (sameJson(prev, result.users) ? prev : result.users!));
+      } else {
+        await commitUsers(usersRef.current);
+      }
+      if (result.settings) {
+        setWorkshopSettings((prev) =>
+          sameJson(prev, result.settings) ? prev : { ...DEFAULT_WORKSHOP_SETTINGS, ...result.settings }
+        );
+      } else {
+        trackWrite(saveSettingsToCloudflare(settingsRef.current));
       }
     } catch {
       setWorkerConnected(false);
+    } finally {
+      syncRunning.current = false;
     }
   };
 
@@ -273,8 +389,9 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
 
   // Auth unlock
   const handleUnlock = (user: User) => {
-    setActiveUser(user);
-    sessionStorage.setItem('code_active_user', JSON.stringify(user));
+    const safeUser = publicUser(user);
+    setActiveUser(safeUser);
+    sessionStorage.setItem('code_active_user', JSON.stringify(safeUser));
     sessionStorage.setItem('code_wws_unlocked', 'true');
     setIsLocked(false);
   };
@@ -394,49 +511,38 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
 
     // Deduct stock if a spare part was linked
     if (linkedPartId) {
-      setInventory((prev) => {
-        const nextInv = prev.map((item) =>
-          item.id === linkedPartId ? { ...item, qty: Math.max(0, item.qty - 1) } : item
-        );
-        saveInventoryToCloudflare(nextInv);
-        return nextInv;
-      });
+      adjustStock([{ id: linkedPartId, delta: -1 }]);
     }
 
     setOrders((prev) => [newOrder, ...prev.filter((o) => o.id !== id)]);
     setActiveTab('orders');
 
     // Immediately save complete order to Cloudflare Worker D1
-    saveOrderToCloudflare(newOrder);
+    pushOrder(newOrder);
   };
 
   const handleChangeOrderStatus = (id: string, status: string) => {
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
 
     // Remote update on Cloudflare Worker D1
-    updateOrderStatusInCloudflare(id, status);
+    trackWrite(updateOrderStatusInCloudflare(id, status));
   };
 
   const handleTogglePaid = (id: string) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id === id) {
-          const next = o.paid === 'Bezahlt' ? 'Offen' : 'Bezahlt';
-          const updated = { ...o, paid: next };
-          // Remote save to Cloudflare D1
-          saveOrderToCloudflare(updated);
-          return updated;
-        }
-        return o;
-      })
-    );
+    const order = orders.find((o) => o.id === id);
+    if (!order) return;
+    const updated = { ...order, paid: order.paid === 'Bezahlt' ? 'Offen' : 'Bezahlt' };
+    setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
+    pushOrder(updated);
   };
 
   const handleDeleteOrder = (id: string) => {
     setOrders((prev) => prev.filter((o) => o.id !== id));
+    unsyncedOrders.current.delete(id);
+    persistUnsynced();
 
     // Remote delete on Cloudflare Worker D1
-    deleteOrderFromCloudflare(id);
+    trackWrite(deleteOrderFromCloudflare(id));
   };
 
   // Inventory actions: Saved locally + live to Cloudflare Worker D1
@@ -454,83 +560,67 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
       nextInv = [...inventory, { ...part, id }];
     }
     setInventory(nextInv);
-    saveInventoryToCloudflare(nextInv);
+    pushInventory(nextInv);
   };
 
-  const handleAdjustStock = (id: string, delta: number) => {
-    const nextInv = inventory.map((item) =>
-      item.id === id ? { ...item, qty: Math.max(0, item.qty + delta) } : item
-    );
+  // Mehrere Bestandsänderungen in einem Schritt, damit keine die andere überschreibt
+  const adjustStock = (changes: { id: string; delta: number }[]) => {
+    const nextInv = inventory.map((item) => {
+      const delta = changes.filter((c) => c.id === item.id).reduce((sum, c) => sum + c.delta, 0);
+      return delta ? { ...item, qty: Math.max(0, item.qty + delta) } : item;
+    });
     setInventory(nextInv);
-    saveInventoryToCloudflare(nextInv);
+    pushInventory(nextInv);
   };
+
+  const handleAdjustStock = (id: string, delta: number) => adjustStock([{ id, delta }]);
 
   const handleDeletePart = (id: string) => {
     const nextInv = inventory.filter((p) => p.id !== id);
     setInventory(nextInv);
-    saveInventoryToCloudflare(nextInv);
+    pushInventory(nextInv);
   };
 
   const handleClearAllInventory = () => {
     setInventory([]);
-    saveInventoryToCloudflare([]);
+    pushInventory([]);
   };
 
   // Appointment Handlers
-  const handleAddAppointment = (apt: Appointment) => {
-    setAppointments((prev) => {
-      const next = [apt, ...prev];
-      saveAppointmentsToCloudflare(next);
-      return next;
-    });
+  const updateAppointments = (next: Appointment[]) => {
+    setAppointments(next);
+    pushAppointments(next);
   };
 
-  const handleUpdateAppointment = (apt: Appointment) => {
-    setAppointments((prev) => {
-      const next = prev.map((a) => (a.id === apt.id ? apt : a));
-      saveAppointmentsToCloudflare(next);
-      return next;
-    });
-  };
+  const handleAddAppointment = (apt: Appointment) => updateAppointments([apt, ...appointments]);
 
-  const handleDeleteAppointment = (id: string) => {
-    setAppointments((prev) => {
-      const next = prev.filter((a) => a.id !== id);
-      saveAppointmentsToCloudflare(next);
-      return next;
-    });
-  };
+  const handleUpdateAppointment = (apt: Appointment) =>
+    updateAppointments(appointments.map((a) => (a.id === apt.id ? apt : a)));
 
-  const handleClearAllAppointments = () => {
-    setAppointments([]);
-    saveAppointmentsToCloudflare([]);
-  };
+  const handleDeleteAppointment = (id: string) => updateAppointments(appointments.filter((a) => a.id !== id));
+
+  const handleClearAllAppointments = () => updateAppointments([]);
 
   const handleClearAllOrders = async () => {
-    for (const o of orders) {
-      await deleteOrderFromCloudflare(o.id);
-    }
+    const ids = orders.map((o) => o.id);
     setOrders([]);
-  };
-
-  const handleRestoreDemoData = async () => {
-    setOrders(INITIAL_DEMO_ORDERS);
-    setInventory(DEFAULT_INVENTORY);
-    setAppointments(DEFAULT_APPOINTMENTS);
-    for (const o of INITIAL_DEMO_ORDERS) {
-      await saveOrderToCloudflare(o);
+    unsyncedOrders.current.clear();
+    persistUnsynced();
+    for (const id of ids) {
+      await trackWrite(deleteOrderFromCloudflare(id));
     }
-    await saveInventoryToCloudflare(DEFAULT_INVENTORY);
-    await saveAppointmentsToCloudflare(DEFAULT_APPOINTMENTS);
   };
 
   const handleConvertAppointmentToOrder = (apt: Appointment) => {
-    const nextNum = Math.floor(1000 + Math.random() * 9000);
-    const newOrderId = `CODE-${nextNum}`;
+    let newOrderId = '';
+    do {
+      newOrderId = `CODE-${Math.floor(1000 + Math.random() * 9000)}`;
+    } while (orders.some((o) => o.id === newOrderId));
 
     // Calculate parts EK if matched and deduct from stock
     let partEK = 0;
     let linkedPartId: string | undefined = undefined;
+    const stockChanges: { id: string; delta: number }[] = [];
     if (apt.requiredParts && apt.requiredParts.length > 0) {
       for (const p of apt.requiredParts) {
         const match = inventory.find(
@@ -539,10 +629,11 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
         if (match) {
           partEK += (match.ek || 0) * (p.qtyNeeded || 1);
           linkedPartId = match.id;
-          handleAdjustStock(match.id, -(p.qtyNeeded || 1));
+          stockChanges.push({ id: match.id, delta: -(p.qtyNeeded || 1) });
         }
       }
     }
+    if (stockChanges.length > 0) adjustStock(stockChanges);
 
     const hourlyRate = workshopSettings.defaultHourlyRate || 85;
     const durationMin = apt.estimatedDurationMinutes || 45;
@@ -584,14 +675,14 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
     };
 
     setOrders((prev) => [newOrder, ...prev]);
-    saveOrderToCloudflare(newOrder);
+    pushOrder(newOrder);
 
     // Mark appointment with converted order ID
-    setAppointments((prev) => {
-      const next = prev.map((a) => (a.id === apt.id ? { ...a, convertedOrderId: newOrderId, status: 'in_bearbeitung' as const } : a));
-      saveAppointmentsToCloudflare(next);
-      return next;
-    });
+    updateAppointments(
+      appointments.map((a) =>
+        a.id === apt.id ? { ...a, convertedOrderId: newOrderId, status: 'in_bearbeitung' as const } : a
+      )
+    );
 
     // Switch to orders view so technician sees it immediately
     setActiveTab('orders');
@@ -617,27 +708,24 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
   };
 
   // Users Handlers
-  const handleAddUser = (user: Omit<User, 'id' | 'createdAt'>) => {
+  const handleAddUser = async (user: Omit<User, 'id' | 'createdAt'>, pin: string) => {
     const today = new Date().toLocaleDateString('de-DE');
-    const newUser: User = {
-      ...user,
-      id: 'U-' + Date.now().toString().slice(-6),
-      createdAt: today,
-    };
-    setUsers((prev) => [...prev, newUser]);
+    const newUser = await withPin(
+      { ...user, id: 'U-' + Date.now().toString().slice(-6), createdAt: today },
+      pin
+    );
+    await commitUsers([...users, newUser]);
   };
 
-  const handleUpdateUserPin = (userId: string, newPin: string) => {
-    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, pin: newPin } : u)));
-    if (activeUser?.id === userId) {
-      const updated = { ...activeUser, pin: newPin };
-      setActiveUser(updated);
-      sessionStorage.setItem('code_active_user', JSON.stringify(updated));
-    }
+  const handleUpdateUserPin = async (userId: string, newPin: string) => {
+    const target = users.find((u) => u.id === userId);
+    if (!target) return;
+    const updated = await withPin(target, newPin);
+    await commitUsers(users.map((u) => (u.id === userId ? updated : u)));
   };
 
   const handleToggleUserActive = (userId: string) => {
-    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, active: !u.active } : u)));
+    commitUsers(users.map((u) => (u.id === userId ? { ...u, active: !u.active } : u)));
   };
 
   const handleDeleteUser = (userId: string) => {
@@ -645,7 +733,7 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
       alert('Der letzte Administrator kann nicht gelöscht werden!');
       return;
     }
-    setUsers((prev) => prev.filter((u) => u.id !== userId));
+    commitUsers(users.filter((u) => u.id !== userId));
   };
 
   // Export CSV
@@ -675,13 +763,14 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
         isLocked={isLocked}
         users={users}
         onUnlock={handleUnlock}
+        onResetPin={handleUpdateUserPin}
         onClose={onBackToWebsite}
       />
 
       <div className="max-w-[1360px] mx-auto w-full px-3.5 sm:px-6 pt-4 sm:pt-6 pb-12 flex-1">
         {/* Header HUD */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-2 border-[#C9743F]/25 pb-4 mb-6">
-          <div className="flex items-center gap-3.5">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 border-b-2 border-[#C9743F]/25 pb-3 md:pb-4 mb-4 md:mb-6">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             {/* Back to Customer Website Button */}
             <button
               type="button"
@@ -693,24 +782,24 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
               <span className="hidden sm:inline">Kunden-Website</span>
             </button>
 
-            <div className="w-12 h-12 rounded-xl bg-[#10191A] border-2 border-[#C9743F] flex items-center justify-center font-mono font-black text-xl text-[#00F5D4] shadow-lg shadow-[#00F5D4]/10">
+            <div className="hidden sm:flex w-12 h-12 rounded-xl bg-[#10191A] border-2 border-[#C9743F] items-center justify-center font-mono font-black text-xl text-[#00F5D4] shadow-lg shadow-[#00F5D4]/10">
               &lt;/&gt;
             </div>
             <div>
               <h1 className="font-mono text-xl sm:text-2xl font-black tracking-wider text-white flex items-center gap-1.5">
                 CODE<span className="text-[#FF8D4D]">.CALC</span>
               </h1>
-              <div className="text-[11px] font-mono tracking-widest text-[#00F5D4] uppercase">
+              <div className="hidden sm:block text-[11px] font-mono tracking-widest text-[#00F5D4] uppercase">
                 // WERKSTATT-KALKULATION, LAGER &amp; BENUTZER
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             {/* Logged in Badge */}
             {activeUser && (
               <div
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold border ${
+                className={`inline-flex items-center justify-center gap-1.5 min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono font-bold border ${
                   activeUser.role === 'admin'
                     ? 'bg-[#C9743F]/15 border-[#C9743F] text-[#FF8D4D]'
                     : 'bg-[#00F5D4]/15 border-[#00F5D4] text-[#00F5D4]'
@@ -718,8 +807,8 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
                 title={`Angemeldet als ${activeUser.name} (${activeUser.role})`}
               >
                 <UserCheck className="w-3.5 h-3.5" />
-                <span className="max-w-[120px] truncate">{activeUser.name}</span>
-                <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-black/40">
+                <span className="hidden sm:inline max-w-[120px] truncate">{activeUser.name}</span>
+                <span className="hidden sm:inline text-[9px] uppercase px-1 py-0.2 rounded bg-black/40">
                   {activeUser.role}
                 </span>
               </div>
@@ -729,22 +818,24 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
             <button
               type="button"
               onClick={() => setIsSettingsOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00F5D4]/15 border border-[#00F5D4] text-[#00F5D4] hover:bg-[#00F5D4] hover:text-black transition cursor-pointer shadow-md"
+              className="inline-flex items-center justify-center gap-1.5 min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#00F5D4]/15 border border-[#00F5D4] text-[#00F5D4] hover:bg-[#00F5D4] hover:text-black transition cursor-pointer shadow-md"
+              aria-label="Einstellungen und Konten"
               title="Benutzerverwaltung &amp; Einstellungen öffnen"
             >
               <Settings className="w-3.5 h-3.5" />
-              <span>Einstellungen &amp; Konten</span>
+              <span className="hidden sm:inline">Einstellungen &amp; Konten</span>
             </button>
 
             {/* Logout */}
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FF5252]/15 border border-[#FF5252] text-[#FF5252] hover:bg-[#FF5252] hover:text-white transition cursor-pointer shadow-sm shadow-[#FF5252]/10"
+              className="inline-flex items-center justify-center gap-1.5 min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FF5252]/15 border border-[#FF5252] text-[#FF5252] hover:bg-[#FF5252] hover:text-white transition cursor-pointer shadow-sm shadow-[#FF5252]/10"
               title="Sperren / Abmelden"
+              aria-label="Abmelden"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Abmelden</span>
+              <span className="hidden sm:inline">Abmelden</span>
             </button>
 
             {/* PWA Button */}
@@ -754,7 +845,8 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
             <button
               type="button"
               onClick={() => syncWithCloudflareWorker()}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold border transition cursor-pointer ${
+              aria-label={workerConnected ? 'Cloud verbunden, jetzt abgleichen' : 'Offline, neu verbinden'}
+              className={`inline-flex items-center gap-1.5 min-h-10 sm:min-h-0 px-3 py-1 rounded-full text-xs font-mono font-semibold border transition cursor-pointer ${
                 workerConnected
                   ? 'bg-[#00F5D4]/10 border-[#00F5D4]/30 text-[#00F5D4] hover:bg-[#00F5D4]/20'
                   : 'bg-[#FF8D4D]/15 border-[#FF8D4D]/40 text-[#FF8D4D] hover:bg-[#FF8D4D]/25'
@@ -770,7 +862,8 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
                   workerConnected ? 'bg-[#00F5D4] animate-pulse' : 'bg-[#FF8D4D]'
                 }`}
               />
-              <span>{workerConnected ? 'Live Cloud' : 'Offline (Neu verbinden)'}</span>
+              <span className="sm:hidden">{workerConnected ? '' : 'Offline'}</span>
+              <span className="hidden sm:inline">{workerConnected ? 'Live Cloud' : 'Offline (Neu verbinden)'}</span>
             </button>
 
             {/* Tools & Export Dropdown (Clean, aufgeräumt & professionell) */}
@@ -778,11 +871,12 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
               <button
                 type="button"
                 onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#101D20] border border-[#00F5D4]/40 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-black transition cursor-pointer shadow-sm"
+                className="inline-flex items-center justify-center gap-1.5 min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#101D20] border border-[#00F5D4]/40 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-black transition cursor-pointer shadow-sm"
                 title="Steuerberater-Export, Backups & CSV"
+                aria-label="Export und Tools"
               >
                 <FolderArchive className="w-3.5 h-3.5" />
-                <span>Export &amp; Tools</span>
+                <span className="hidden sm:inline">Export &amp; Tools</span>
                 <ChevronDown className={`w-3 h-3 transition-transform ${isToolsMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -820,7 +914,7 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
                       const dataBlob = new Blob(
                         [
                           JSON.stringify(
-                            { orders, inventory, users, workshopSettings },
+                            { orders, inventory, appointments, users, workshopSettings },
                             null,
                             2
                           ),
@@ -854,15 +948,21 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
                         reader.onload = (event) => {
                           try {
                             const imported = JSON.parse(event.target?.result as string);
-                            if (Array.isArray(imported)) {
-                              setOrders(imported);
-                              alert('Aufträge erfolgreich wiederhergestellt!');
-                            } else if (imported.orders || imported.inventory || imported.users) {
-                              if (Array.isArray(imported.orders)) setOrders(imported.orders);
-                              if (Array.isArray(imported.inventory)) setInventory(imported.inventory);
-                              if (Array.isArray(imported.users)) setUsers(imported.users);
-                              if (imported.workshopSettings) setWorkshopSettings(imported.workshopSettings);
-                              alert('Vollständiges Backup (Aufträge, Lager & Benutzer) wiederhergestellt!');
+                            const data = Array.isArray(imported) ? { orders: imported } : imported;
+                            if (data.orders || data.inventory || data.users || data.appointments) {
+                              // Backup auch in die Cloud schreiben, sonst holt der nächste Abgleich den alten Stand zurück
+                              if (Array.isArray(data.orders)) {
+                                setOrders(data.orders);
+                                data.orders.forEach((o: Order) => pushOrder(o));
+                              }
+                              if (Array.isArray(data.inventory)) {
+                                setInventory(data.inventory);
+                                pushInventory(data.inventory);
+                              }
+                              if (Array.isArray(data.appointments)) updateAppointments(data.appointments);
+                              if (Array.isArray(data.users) && data.users.length > 0) commitUsers(data.users);
+                              if (data.workshopSettings) commitSettings({ ...DEFAULT_WORKSHOP_SETTINGS, ...data.workshopSettings });
+                              alert('Backup wiederhergestellt und in die Cloud übertragen.');
                             } else {
                               alert('Ungültiges Datenformat!');
                             }
@@ -1054,7 +1154,7 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
               onDeleteAppointment={handleDeleteAppointment}
               onConvertToOrder={handleConvertAppointmentToOrder}
               onOpenSupplierModal={() => setIsSupplierOpen(true)}
-              onClearAllAppointments={handleClearAllAppointments}
+              onClearAllAppointments={activeUser?.role === 'admin' ? handleClearAllAppointments : undefined}
             />
           )}
 
@@ -1067,7 +1167,7 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
               onDeletePart={handleDeletePart}
               onRequestAdminAuth={(req) => setAdminRequest(req)}
               onOpenSupplierOrder={() => setIsSupplierOpen(true)}
-              onClearAllInventory={handleClearAllInventory}
+              onClearAllInventory={activeUser?.role === 'admin' ? handleClearAllInventory : undefined}
             />
           )}
 
@@ -1110,11 +1210,10 @@ export const WerkstattManagerApp: React.FC<WerkstattManagerAppProps> = ({ onBack
         onToggleUserActive={handleToggleUserActive}
         onDeleteUser={handleDeleteUser}
         workshopSettings={workshopSettings}
-        onSaveWorkshopSettings={(s) => setWorkshopSettings(s)}
+        onSaveWorkshopSettings={commitSettings}
         onClearAllAppointments={handleClearAllAppointments}
         onClearAllInventory={handleClearAllInventory}
         onClearAllOrders={handleClearAllOrders}
-        onRestoreDemoData={handleRestoreDemoData}
       />
 
       <TaxModal

@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   Scan,
 } from 'lucide-react';
+import { getStepNumber } from '../utils/orderStatus';
 import { Order, InventoryItem, User } from './types';
 import { WeeklyRevenueChart } from './WeeklyRevenueChart';
 
@@ -42,10 +43,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const transferSum = todayOrders.filter((o) => o.payMethod?.toLowerCase().includes('überweisung') || o.payMethod?.toLowerCase().includes('rechnung')).reduce((acc, o) => acc + o.brutto, 0);
 
   // Status groupings
-  const openOrders = orders.filter((o) => o.status !== 'Abgeschlossen');
-  const stageEingang = openOrders.filter((o) => o.status === 'Eingegangen');
-  const stageArbeit = openOrders.filter((o) => o.status === 'In Arbeit');
-  const stageTest = openOrders.filter((o) => o.status === 'Fertig / Test');
+  // Status über die 5 Werkstatt-Schritte auswerten (alte Texte wie „In Arbeit“ werden mit erkannt)
+  const openOrders = orders.filter((o) => getStepNumber(o.status) < 5);
+  const stageEingang = openOrders.filter((o) => getStepNumber(o.status) <= 2);
+  const stageArbeit = openOrders.filter((o) => getStepNumber(o.status) === 3);
+  const stageTest = openOrders.filter((o) => getStepNumber(o.status) === 4);
 
   // Open unpaid
   const unpaidOrders = orders.filter((o) => o.paid === 'Offen');
@@ -378,9 +380,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </div>
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                          order.status === 'Fertig / Test'
+                          getStepNumber(order.status) >= 4
                             ? 'bg-[#00F5D4]/15 text-[#00F5D4] border border-[#00F5D4]/30'
-                            : order.status === 'In Arbeit'
+                            : getStepNumber(order.status) === 3
                             ? 'bg-[#C9743F]/20 text-[#FF8D4D] border border-[#C9743F]/30'
                             : 'bg-[#FFD600]/15 text-[#FFD600] border border-[#FFD600]/30'
                         }`}

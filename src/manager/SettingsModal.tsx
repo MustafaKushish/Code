@@ -11,14 +11,15 @@ import {
   Save,
 } from 'lucide-react';
 import { User, WorkshopSettings } from './types';
+import { MIN_PIN_LENGTH } from './pinAuth';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUser: User | null;
   users: User[];
-  onAddUser: (user: Omit<User, 'id' | 'createdAt'>) => void;
-  onUpdateUserPin: (userId: string, newPin: string) => void;
+  onAddUser: (user: Omit<User, 'id' | 'createdAt'>, pin: string) => Promise<void>;
+  onUpdateUserPin: (userId: string, newPin: string) => Promise<void>;
   onToggleUserActive: (userId: string) => void;
   onDeleteUser: (userId: string) => void;
   workshopSettings: WorkshopSettings;
@@ -26,7 +27,12 @@ interface SettingsModalProps {
   onClearAllAppointments?: () => void;
   onClearAllInventory?: () => void;
   onClearAllOrders?: () => void;
-  onRestoreDemoData?: () => void;
+}
+
+// Löschen auf allen Geräten: nur nach getippter Bestätigung, nicht mit einem Klick
+function confirmDangerous(what: string): boolean {
+  const answer = prompt(`Damit werden ${what} auf allen Geräten gelöscht.\nZum Bestätigen LÖSCHEN eingeben:`);
+  return answer?.trim().toUpperCase() === 'LÖSCHEN';
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -43,7 +49,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClearAllAppointments,
   onClearAllInventory,
   onClearAllOrders,
-  onRestoreDemoData,
 }) => {
   const [activeTab, setActiveTab] = useState<'users' | 'profile' | 'database'>('users');
 
@@ -71,22 +76,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const isAdmin = currentUser?.role === 'admin';
 
-  const handleCreateUser = (e: React.FormEvent) => {
+  const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !pin.trim()) {
-      alert('Bitte Namen und ein sicheres Kennwort/PIN eingeben.');
+    if (!name.trim() || pin.trim().length < MIN_PIN_LENGTH) {
+      alert(`Bitte Namen und eine PIN mit mindestens ${MIN_PIN_LENGTH} Zeichen eingeben.`);
       return;
     }
     const cleanUsername = username.trim() || name.toLowerCase().replace(/[^a-z0-9]/g, '');
-    onAddUser({
-      name: name.trim(),
-      username: cleanUsername,
-      role,
-      pin: pin.trim(),
-      active: true,
-      canSettleInvoices: role === 'admin' || role === 'buchhaltung',
-      canDelete: role === 'admin',
-    });
+    if (users.some((u) => u.username.toLowerCase() === cleanUsername.toLowerCase())) {
+      alert('Diesen Benutzernamen gibt es schon.');
+      return;
+    }
+    await onAddUser(
+      {
+        name: name.trim(),
+        username: cleanUsername,
+        role,
+        active: true,
+        canSettleInvoices: role === 'admin' || role === 'buchhaltung',
+        canDelete: role === 'admin',
+      },
+      pin.trim()
+    );
     setName('');
     setUsername('');
     setPin('');
@@ -95,12 +106,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setTimeout(() => setShowSuccess(false), 3000);
   };
 
-  const handleSavePin = (userId: string) => {
-    if (!newPinInput.trim()) {
-      alert('Bitte das neue Kennwort/PIN eingeben.');
+  const handleSavePin = async (userId: string) => {
+    if (newPinInput.trim().length < MIN_PIN_LENGTH) {
+      alert(`Die neue PIN braucht mindestens ${MIN_PIN_LENGTH} Zeichen.`);
       return;
     }
-    onUpdateUserPin(userId, newPinInput.trim());
+    await onUpdateUserPin(userId, newPinInput.trim());
     setEditingUserId(null);
     setNewPinInput('');
     alert('Kennwort/PIN wurde erfolgreich aktualisiert.');
@@ -161,17 +172,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             >
               🏢 Werkstatt-Profil
             </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('database')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition cursor-pointer ${
-                activeTab === 'database'
-                  ? 'bg-[#00F5D4]/20 text-[#00F5D4] border border-[#00F5D4]/40'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              ☁️ Cloud &amp; Demo-Daten
-            </button>
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('database')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition cursor-pointer ${
+                  activeTab === 'database'
+                    ? 'bg-[#00F5D4]/20 text-[#00F5D4] border border-[#00F5D4]/40'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                ☁️ Cloud &amp; Daten
+              </button>
+            )}
           </div>
         </div>
 
@@ -530,7 +543,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         )}
 
         {/* Tab 3: Cloud Database & Demo Data */}
-        {activeTab === 'database' && (
+        {activeTab === 'database' && isAdmin && (
           <div className="space-y-5">
             <div className="bg-[#040809] border border-[#00F5D4]/30 rounded-xl p-4 sm:p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
@@ -546,7 +559,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               <p className="text-xs font-mono text-zinc-400 leading-relaxed">
-                Deine Aufträge, Lagerbestände und Reparatur-Termine werden in Echtzeit mit deinem Cloudflare Worker synchronisiert. Wenn du deine eigenen echten Werkstattdaten eingeben möchtest, kannst du hier die Demo-Einträge mit einem Klick rückstandslos entfernen.
+                Aufträge, Lager, Termine, Mitarbeiter-Konten und Stammdaten werden mit deinem Cloudflare Worker synchronisiert und sind auf jedem Werkstatt-Gerät gleich. Löschen gilt für alle Geräte und lässt sich nicht rückgängig machen. Sichere vorher ein JSON-Backup unter „Export &amp; Tools“.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
@@ -561,7 +574,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm('Wirklich alle Demo-Termine leeren?')) {
+                      if (confirmDangerous('alle Termine')) {
                         onClearAllAppointments?.();
                         alert('Alle Termine wurden erfolgreich geleert.');
                       }
@@ -584,7 +597,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm('Wirklich alle Demo-Lagerteile leeren?')) {
+                      if (confirmDangerous('alle Lagerteile')) {
                         onClearAllInventory?.();
                         alert('Lagerbestand wurde erfolgreich geleert.');
                       }
@@ -607,7 +620,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm('Wirklich alle Demo-Aufträge aus Cloudflare löschen?')) {
+                      if (confirmDangerous('alle Aufträge')) {
                         onClearAllOrders?.();
                         alert('Aufträge wurden erfolgreich geleert.');
                       }
@@ -618,25 +631,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span>Aufträge leeren</span>
                   </button>
                 </div>
-              </div>
-
-              {/* Restore Demo Data Option */}
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[11px] font-mono text-zinc-500">
-                  Möchtest du später die Test-Datensätze erneut ausprobieren?
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm('Möchtest du die Werkstatt-Demo-Daten (Aufträge, Lager und Termine) wiederherstellen?')) {
-                      onRestoreDemoData?.();
-                      alert('Demo-Daten wurden erfolgreich wiederhergestellt und synchronisiert.');
-                    }
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white font-mono text-xs font-bold transition cursor-pointer"
-                >
-                  🔄 Demo-Daten wiederherstellen
-                </button>
               </div>
             </div>
           </div>
