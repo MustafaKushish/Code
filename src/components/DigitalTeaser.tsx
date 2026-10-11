@@ -1,10 +1,11 @@
 import React from 'react';
-import { ArrowRight, Globe, LayoutDashboard, LifeBuoy } from 'lucide-react';
+import { ArrowRight, Globe, LayoutDashboard, LifeBuoy, Receipt } from 'lucide-react';
 import { msg, useI18n } from '../i18n';
 
 const ITEMS = [
   { icon: Globe, label: msg('Websites') },
   { icon: LayoutDashboard, label: msg('Geschäftssysteme') },
+  { icon: Receipt, label: msg('Kassensysteme') },
   { icon: LifeBuoy, label: msg('IT-Betreuung') },
 ];
 

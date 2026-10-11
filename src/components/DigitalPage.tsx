@@ -15,6 +15,8 @@ import {
   MessageSquare,
   Monitor,
   Package,
+  Receipt,
+  KeyRound,
   QrCode,
   Search,
   Send,
@@ -41,6 +43,11 @@ const OFFERS = [
     text: msg('Dein eigenes Programm für Aufträge, Kunden, Termine, Rechnungen und Lager. Läuft im Browser und als App auf Handy und Tablet.'),
   },
   {
+    icon: Receipt,
+    title: msg('Kassensystem'),
+    text: msg('Kasse für Laden, Café oder Imbiss mit Bon, Tagesabschluss und Anbindung an eine zertifizierte TSE. Auf Tablet, PC oder Kassen-Hardware.'),
+  },
+  {
     icon: LifeBuoy,
     title: msg('IT-Betreuung'),
     text: msg('Hosting, Domain, E-Mail, Updates und Backups. Wenn etwas hängt, hast du einen festen Ansprechpartner vor Ort.'),
@@ -58,6 +65,8 @@ const MODULES = [
   { icon: ClipboardList, label: msg('Auftrags- & Kundenverwaltung') },
   { icon: FileText, label: msg('Angebote & Rechnungen als PDF') },
   { icon: Package, label: msg('Lager & Bestellungen') },
+  { icon: Receipt, label: msg('Kasse mit Bon & Tagesabschluss') },
+  { icon: KeyRound, label: msg('Eigene Zugangsdaten & Rechte für Mitarbeiter') },
   { icon: QrCode, label: msg('Status-Abfrage für deine Kunden') },
   { icon: Languages, label: msg('Mehrsprachige Website') },
   { icon: Bot, label: msg('KI-Assistent im Chat') },
@@ -78,6 +87,7 @@ const REFERENCE_POINTS = [
 const PACKAGES = [
   {
     name: 'Start',
+    price: 490,
     tagline: msg('Professionell sichtbar werden'),
     features: [
       msg('Website mit bis zu 5 Seiten'),
@@ -89,6 +99,7 @@ const PACKAGES = [
   },
   {
     name: 'Business',
+    price: 990,
     tagline: msg('Mehr Kunden, weniger Telefon'),
     highlight: true,
     features: [
@@ -101,15 +112,21 @@ const PACKAGES = [
   },
   {
     name: 'System',
+    price: 2490,
     tagline: msg('Dein Geschäft digital steuern'),
     features: [
       msg('Alles aus Business'),
       msg('Eigenes Verwaltungssystem nach Maß'),
       msg('Aufträge, Kunden, Rechnungen & Lager'),
-      msg('Zugänge für Mitarbeiter'),
+      msg('Eigene Zugangsdaten & Rechte für Mitarbeiter'),
       msg('Als App auf Handy & Tablet, mit Einweisung'),
     ],
   },
+];
+
+const EXTRAS = [
+  { title: msg('Kassensystem'), text: msg('Einrichtung mit TSE, ohne Hardware'), price: 990, monthly: false },
+  { title: msg('Betreuung'), text: msg('Hosting, Updates, Backups & kleine Änderungen'), price: 29, monthly: true },
 ];
 
 const INDUSTRIES = [
@@ -128,7 +145,9 @@ const STEPS = [
   { title: msg('Start & Betreuung'), text: msg('Wir stellen alles online, zeigen dir das System und bleiben danach ansprechbar.') },
 ];
 
-const NEEDS = [msg('Website'), msg('Geschäftssystem'), msg('IT-Betreuung'), msg('Hardware & Einrichtung')];
+const NEEDS = [msg('Website'), msg('Geschäftssystem'), msg('Kassensystem'), msg('IT-Betreuung'), msg('Hardware & Einrichtung')];
+
+const formatEuro = (n: number) => `${n.toLocaleString('de-DE')} €`;
 
 const DigitalHeader: React.FC = () => {
   const { t } = useI18n();
@@ -321,7 +340,7 @@ export const DigitalPage: React.FC = () => {
         <section id="leistungen" className="py-12 md:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionHeading index="01" eyebrow={t('Leistungen')} title={t('Alles aus einer Hand')} intro={t('Von der ersten Website bis zum kompletten System, und wenn ein Gerät kaputtgeht, reparieren wir es selbst.')} />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {OFFERS.map(({ icon: Icon, title, text }) => (
                 <div key={title} className="reveal rounded-2xl border border-white/10 bg-[#0B1315]/80 p-6">
                   <span className="inline-flex w-11 h-11 items-center justify-center rounded-xl bg-[#00F5D4]/10 border border-[#00F5D4]/25 text-[#00F5D4] mb-4">
@@ -393,7 +412,7 @@ export const DigitalPage: React.FC = () => {
         {/* Pakete */}
         <section id="pakete" className="py-12 md:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <SectionHeading index="04" eyebrow={t('Pakete')} title={t('Drei Wege zum Start')} intro={t('Jedes Projekt bekommt nach dem Erstgespräch einen Festpreis. Auf Wunsch betreuen wir alles auch danach weiter.')} />
+            <SectionHeading index="04" eyebrow={t('Pakete')} title={t('Drei Wege zum Start')} intro={t('Klare Einstiegspreise. Nach dem Erstgespräch bekommst du einen Festpreis für genau dein Projekt.')} />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {PACKAGES.map((p) => (
                 <div
@@ -417,7 +436,11 @@ export const DigitalPage: React.FC = () => {
                       </li>
                     ))}
                   </ul>
-                  <p className="text-sm font-semibold text-white mb-4">{t('Festpreis nach Erstgespräch')}</p>
+                  <p className="mb-4">
+                    <span className="text-sm text-[#94A9AA]">{t('ab')} </span>
+                    <span className="text-2xl font-bold text-white">{formatEuro(p.price)}</span>
+                    <span className="block text-xs text-[#5F7473] mt-1">{t('einmalig, Festpreis nach Erstgespräch')}</span>
+                  </p>
                   <a
                     href={whatsappLink(`Hallo Mustafa, ich interessiere mich für das Paket „${p.name}“ von CODE Digital.`)}
                     target="_blank"
@@ -429,6 +452,21 @@ export const DigitalPage: React.FC = () => {
                     <MessageSquare className="w-4 h-4" />
                     <span>{t('Paket anfragen')}</span>
                   </a>
+                </div>
+              ))}
+            </div>
+            <div className="reveal mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {EXTRAS.map((x) => (
+                <div key={x.title} className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-4">
+                  <div>
+                    <p className="text-[15px] font-semibold text-white">{t(x.title)}</p>
+                    <p className="text-xs text-[#94A9AA] mt-0.5">{t(x.text)}</p>
+                  </div>
+                  <p className="text-end shrink-0">
+                    <span className="text-xs text-[#94A9AA]">{t('ab')} </span>
+                    <span className="text-lg font-bold text-white">{formatEuro(x.price)}</span>
+                    {x.monthly && <span className="block text-xs text-[#94A9AA]">{t('pro Monat')}</span>}
+                  </p>
                 </div>
               ))}
             </div>
