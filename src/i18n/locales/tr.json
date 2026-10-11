@@ -242,7 +242,6 @@
   "Widerstand: 0.2 Ω (KURZSCHLUSS)": "Direnç: 0.2 Ω (KISA DEVRE)",
   "Widerstand: > 120 kΩ": "Direnç: > 120 kΩ",
   "Messpunkt [{name}]: {value} • {desc}": "Ölçüm noktası [{name}]: {value} • {desc}",
-  "INTERAKTIVER LOGIC-BOARD INSPEKTOR": "ETKİLEŞİMLİ LOGIC-BOARD İNCELEYİCİ",
   "Soundeffekte aktiv": "Ses efektleri açık",
   "Stummgeschaltet": "Sessiz",
   "Wärmebild-Simulation umschalten (Kurzschluss-Suche)": "Termal görüntü simülasyonunu aç/kapat (kısa devre arama)",
@@ -853,5 +852,7 @@
   "Neue Online-Buchung": "Yeni online randevu",
   "Termine heute": "Bugünkü randevular",
   "Umsatz diese Woche": "Bu haftaki ciro",
-  "Geräte, die wir reparieren": "Tamir ettiğimiz cihazlar"
+  "Geräte, die wir reparieren": "Tamir ettiğimiz cihazlar",
+  "Platinen-Inspektor": "Kart inceleyici",
+  "Tippe auf ein Bauteil und miss nach": "Ölçmek için bir parçaya dokun"
 }

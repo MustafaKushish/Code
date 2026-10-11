@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Microscope, Flame, Activity, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Microscope, Flame, Activity, Volume2, VolumeX, Sparkles, KeyRound, Gamepad2, Laptop, Joystick, Thermometer, Zap } from 'lucide-react';
 import { playMultimeterBeep, playThermalToggleSound, toggleSound, isSoundEnabled } from '../utils/audio';
 import { msg, useI18n } from '../i18n';
 
@@ -12,10 +12,10 @@ interface PinNode {
 }
 
 const BOARD_MODES = [
-  { id: 'key', label: msg('Autoschlüssel-Elektronik'), icon: '🔑' },
-  { id: 'ps5', label: 'PS5 Motherboard', icon: '🎮' },
-  { id: 'macbook', label: 'MacBook Logic-Board', icon: '💻' },
-  { id: 'controller', label: 'DualSense Hall-Sensor', icon: '🕹️' },
+  { id: 'key', label: msg('Autoschlüssel-Elektronik'), Icon: KeyRound },
+  { id: 'ps5', label: 'PS5 Motherboard', Icon: Gamepad2 },
+  { id: 'macbook', label: 'MacBook Logic-Board', Icon: Laptop },
+  { id: 'controller', label: 'DualSense Hall-Sensor', Icon: Joystick },
 ];
 
 const TICKER_MESSAGES = [
@@ -41,6 +41,18 @@ export const LogicBoardScanner: React.FC = () => {
   // Lauftext: entweder eine der festen Meldungen (Index) oder eine Messung als fertiger Text
   const [tickerText, setTickerText] = useState<string>(TICKER_MESSAGES[0]);
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
+  // 3D-Kippen der Platine: folgt Maus oder Finger, ohne Bewegung schwingt sie leicht
+  const [tilt, setTilt] = useState<{ x: number; y: number; px: number; py: number } | null>(null);
+  const reducedMotion = useRef(
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  );
+  const handleTilt = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (reducedMotion.current) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    setTilt({ x: (0.5 - py) * 14, y: (px - 0.5) * 18, px: px * 100, py: py * 100 });
+  };
 
   useEffect(() => {
     let i = 0;
@@ -87,7 +99,7 @@ export const LogicBoardScanner: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#0B1416]/95 border border-[#C9743F]/35 rounded-2xl p-4 sm:p-6 shadow-2xl relative overflow-hidden backdrop-blur-xl">
+    <div className="glass rounded-[2rem] p-4 sm:p-6 shadow-[0_30px_80px_rgba(0,0,0,0.5)] relative">
       {/* Embedded CSS for SVG animations */}
       <style>{`
         @keyframes electronFlow {
@@ -147,20 +159,25 @@ export const LogicBoardScanner: React.FC = () => {
       `}</style>
 
       {/* HUD Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#C9743F]/20 pb-3 mb-4">
-        <div className="flex items-center gap-2 text-xs font-mono text-[#00F5D4] tracking-wider uppercase">
-          <Microscope className="w-4 h-4 text-[#00F5D4]" />
-          <span>&gt; {t('INTERAKTIVER LOGIC-BOARD INSPEKTOR')}</span>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3">
+          <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#00F5D4]/25 to-[#FF8D4D]/15 border border-white/10 flex items-center justify-center">
+            <Microscope className="w-5 h-5 text-[#00F5D4]" />
+          </span>
+          <span>
+            <span className="block text-[15px] font-semibold text-white">{t('Platinen-Inspektor')}</span>
+            <span className="block text-xs text-zinc-400">{t('Tippe auf ein Bauteil und miss nach')}</span>
+          </span>
         </div>
         <div className="flex items-center gap-2">
           {/* Sound Mute/Unmute */}
           <button
             type="button"
             onClick={handleSoundToggle}
-            className={`p-1.5 rounded border transition-colors cursor-pointer ${
+            className={`w-8 h-8 inline-flex items-center justify-center rounded-full border transition-colors cursor-pointer ${
               soundOn
-                ? 'bg-[#122225] border-[#4FA39B]/40 text-[#00F5D4]'
-                : 'bg-black/40 border-white/10 text-[#839897]'
+                ? 'bg-[#00F5D4]/10 border-[#00F5D4]/40 text-[#00F5D4]'
+                : 'bg-white/[0.04] border-white/10 text-[#839897]'
             }`}
             title={soundOn ? t('Soundeffekte aktiv') : t('Stummgeschaltet')}
           >
@@ -171,10 +188,10 @@ export const LogicBoardScanner: React.FC = () => {
           <button
             type="button"
             onClick={handleThermalToggle}
-            className={`px-3 py-1 text-xs font-mono rounded border flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`h-8 px-3 text-xs font-medium rounded-full border flex items-center gap-1.5 transition-all cursor-pointer ${
               thermalMode
-                ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.4)]'
-                : 'bg-[#122225] border-[#4FA39B]/30 text-[#839897] hover:text-[#F3F7F7]'
+                ? 'bg-gradient-to-r from-[#7B2CFF]/40 via-[#FF3D3D]/40 to-[#FFC24D]/40 border-[#FFB98A]/60 text-white shadow-[0_0_18px_rgba(255,120,60,0.45)]'
+                : 'bg-white/[0.04] border-white/10 text-zinc-300 hover:text-white'
             }`}
             title={t('Wärmebild-Simulation umschalten (Kurzschluss-Suche)')}
           >
@@ -183,25 +200,25 @@ export const LogicBoardScanner: React.FC = () => {
           </button>
 
           {/* Multimeter Mode Selector */}
-          <div className="hidden sm:flex items-center bg-[#070E10] border border-[#C9743F]/30 rounded p-0.5 text-[11px] font-mono">
+          <div className="hidden sm:flex items-center bg-white/[0.04] border border-white/10 rounded-full p-0.5 text-[11px] font-medium">
             <button
               type="button"
               onClick={() => setProbeMode('VOLT')}
-              className={`px-2 py-0.5 rounded cursor-pointer ${probeMode === 'VOLT' ? 'bg-[#00F5D4] text-[#060B0C] font-bold' : 'text-[#839897]'}`}
+              className={`px-2.5 py-1 rounded-full transition-colors cursor-pointer ${probeMode === 'VOLT' ? 'bg-[#00F5D4] text-[#060B0C] font-bold' : 'text-zinc-400 hover:text-white'}`}
             >
               Volt (V)
             </button>
             <button
               type="button"
               onClick={() => setProbeMode('DIODE')}
-              className={`px-2 py-0.5 rounded cursor-pointer ${probeMode === 'DIODE' ? 'bg-[#00F5D4] text-[#060B0C] font-bold' : 'text-[#839897]'}`}
+              className={`px-2.5 py-1 rounded-full transition-colors cursor-pointer ${probeMode === 'DIODE' ? 'bg-[#00F5D4] text-[#060B0C] font-bold' : 'text-zinc-400 hover:text-white'}`}
             >
               Diode
             </button>
             <button
               type="button"
               onClick={() => setProbeMode('RESIST')}
-              className={`px-2 py-0.5 rounded cursor-pointer ${probeMode === 'RESIST' ? 'bg-[#00F5D4] text-[#060B0C] font-bold' : 'text-[#839897]'}`}
+              className={`px-2.5 py-1 rounded-full transition-colors cursor-pointer ${probeMode === 'RESIST' ? 'bg-[#00F5D4] text-[#060B0C] font-bold' : 'text-zinc-400 hover:text-white'}`}
             >
               Ohm (Ω)
             </button>
@@ -251,37 +268,56 @@ export const LogicBoardScanner: React.FC = () => {
                 });
               }
             }}
-            className={`py-2 px-2.5 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`h-10 px-3 rounded-full border text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeBoard === b.id
-                ? 'bg-[#C9743F]/25 border-[#FF8D4D] text-[#FFF] shadow-[0_0_12px_rgba(201,116,63,0.35)]'
-                : 'bg-[#0E1A1C] border-[#C9743F]/20 text-[#839897] hover:border-[#4FA39B]/50 hover:text-white'
+                ? 'bg-gradient-to-r from-[#00F5D4]/20 to-[#FF8D4D]/20 border-[#00F5D4]/60 text-white shadow-[0_8px_24px_rgba(0,245,212,0.18)]'
+                : 'bg-white/[0.03] border-white/10 text-zinc-400 hover:border-white/25 hover:text-white'
             }`}
           >
-            <span>{b.icon}</span>
+            <b.Icon className={`w-4 h-4 shrink-0 ${activeBoard === b.id ? 'text-[#00F5D4]' : ''}`} />
             <span dir="auto" className="truncate">{t(b.label)}</span>
           </button>
         ))}
       </div>
 
-      {/* Logic Board Visual Container */}
+      {/* Logic Board Visual Container: 3D-Platine */}
       <div
-        className={`logic-board-visual w-full aspect-[16/10] rounded-xl relative overflow-hidden border transition-all duration-500 shadow-inner ${
-          thermalMode
-            ? 'bg-gradient-to-br from-[#120024] via-[#350228] to-[#040608] border-amber-500/50'
-            : 'bg-[#060B0C] border-[#C9743F]/40'
-        }`}
+        className="board-stage relative py-2"
+        onPointerMove={handleTilt}
+        onPointerLeave={() => setTilt(null)}
       >
+      <div
+        className={`logic-board-visual board-3d w-full aspect-[16/10] rounded-2xl relative overflow-hidden border ${
+          tilt ? '' : 'board-idle'
+        } ${
+          thermalMode
+            ? 'bg-gradient-to-br from-[#120024] via-[#350228] to-[#040608] border-[#FFB98A]/40'
+            : 'bg-[#060B0C] border-[#00F5D4]/25'
+        }`}
+        style={tilt ? { transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.02)` } : undefined}
+      >
+        {/* Glanz, der mit dem Kippen mitwandert */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none z-30 mix-blend-screen transition-[background] duration-150"
+          style={{
+            background: `radial-gradient(600px circle at ${tilt?.px ?? 30}% ${tilt?.py ?? 0}%, rgba(255,255,255,0.14), transparent 45%)`,
+          }}
+        />
         {/* Animated Laser Scanline */}
-        <div className="scan-line absolute inset-x-0 h-1/3 bg-gradient-to-b from-transparent via-[#00F5D4]/20 to-transparent pointer-events-none z-10 animate-scan" aria-hidden="true" />
+        <div className="scan-line absolute inset-x-0 h-1/3 bg-gradient-to-b from-transparent via-[#00F5D4]/10 to-transparent pointer-events-none z-10 animate-scan" aria-hidden="true" />
 
         {/* FLIR Thermal Hotspots Overlay */}
         {thermalMode && (
           <div className="absolute inset-0 pointer-events-none z-20">
-            <div className="absolute top-[28%] left-[24%] w-24 h-24 rounded-full bg-radial from-red-500/80 via-yellow-400/40 to-transparent blur-md animate-pulse" />
-            <div className="absolute top-[35%] right-[28%] w-32 h-32 rounded-full bg-radial from-amber-500/60 via-purple-600/30 to-transparent blur-lg" />
-            <div className="absolute bottom-3 left-4 font-mono text-[11px] text-amber-300 bg-black/80 px-2 py-1 rounded border border-amber-400/40">
-              🔥 {t('FLIR HOTSPOT LOKALISIERT: +79.4 °C (SMD Kurzschluss C1_VCC behoben)')}
+            <div className="absolute inset-0 mix-blend-color bg-[radial-gradient(circle_at_30%_38%,#ffef5a_0%,#ff3d3d_14%,#b0127a_32%,#3a0d8f_55%,#08102e_80%)] opacity-80" />
+            <div className="absolute top-[24%] left-[20%] w-28 h-28 rounded-full bg-[radial-gradient(circle,#fff6b0_0%,#ffb03b_30%,#ff3d3d_55%,transparent_72%)] blur-md animate-pulse" />
+            <div className="absolute top-[35%] right-[26%] w-36 h-36 rounded-full bg-[radial-gradient(circle,#ff8a3d_0%,#b0127a_45%,transparent_72%)] blur-lg opacity-70" />
+            <div className="absolute bottom-3 start-3 end-3 sm:end-auto glass glass-solid rounded-xl px-3 py-2 text-[11px] text-white flex items-center gap-2">
+              <Thermometer className="w-3.5 h-3.5 text-[#FF8D4D] shrink-0" />
+              <span>{t('FLIR HOTSPOT LOKALISIERT: +79.4 °C (SMD Kurzschluss C1_VCC behoben)')}</span>
             </div>
+            <div className="absolute top-3 end-3 w-2 h-20 rounded-full bg-gradient-to-b from-[#fff6b0] via-[#ff3d3d] to-[#3a0d8f] border border-white/20" />
           </div>
         )}
 
@@ -788,35 +824,41 @@ export const LogicBoardScanner: React.FC = () => {
           </svg>
         )}
       </div>
+      {/* Schatten unter der schwebenden Platine */}
+      <div aria-hidden="true" className="mx-auto -mt-1 h-6 w-[85%] rounded-[50%] bg-black/60 blur-xl" />
+      </div>
 
       {/* Selected Node Details Box */}
-      <div className="mt-4 bg-[#050B0D] border border-[#4FA39B]/35 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[#00F5D4] font-bold">&gt; {t(selectedNode.name)}</span>
-            <span className="px-2 py-0.5 rounded text-[10px] bg-[#00F5D4]/15 text-[#00F5D4] border border-[#00F5D4]/40 font-bold">
-              {t(selectedNode.voltage)}
-            </span>
-            {selectedNode.temp && (
-              <span className="px-2 py-0.5 rounded text-[10px] bg-[#FF8D4D]/15 text-[#FF8D4D] border border-[#FF8D4D]/40 font-bold">
-                {selectedNode.temp}
-              </span>
-            )}
-            <span className="px-2 py-0.5 rounded text-[10px] bg-[#00E676]/15 text-[#00E676] border border-[#00E676]/40 font-bold">
-              STATUS: {selectedNode.status}
-            </span>
+      <div key={selectedNode.name} className="node-pop relative z-10 -mt-8 mx-2 sm:mx-6 glass glass-solid rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-white truncate" dir="auto">{t(selectedNode.name)}</p>
+            <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{t(selectedNode.desc)}</p>
           </div>
-          <p className="text-zinc-300 mt-1 text-[11px] leading-relaxed">{t(selectedNode.desc)}</p>
+          <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-[#00E676]/12 border border-[#00E676]/35 px-2.5 py-1 text-[10px] font-semibold text-[#5CF59A]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00E676] animate-pulse" />
+            {selectedNode.status}
+          </span>
         </div>
-        <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
-          <span className="text-[#839897] text-[10px]">{t('Tippe auf Taster, Spule oder Pins für Messwerte')}</span>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#00F5D4]/10 border border-[#00F5D4]/25 px-3 py-1.5 text-sm font-bold text-[#00F5D4] font-mono" dir="ltr">
+            <Zap className="w-3.5 h-3.5" />
+            {t(selectedNode.voltage)}
+          </span>
+          {selectedNode.temp && (
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#FF8D4D]/10 border border-[#FF8D4D]/25 px-3 py-1.5 text-sm font-bold text-[#FFB98A] font-mono" dir="ltr">
+              <Thermometer className="w-3.5 h-3.5" />
+              {selectedNode.temp}
+            </span>
+          )}
+          <span className="hidden sm:inline text-[11px] text-zinc-500 ms-auto">{t('Tippe auf Taster, Spule oder Pins für Messwerte')}</span>
         </div>
       </div>
 
       {/* Terminal Live Marquee */}
-      <div className="mt-2.5 bg-[#030607] border border-white/5 rounded-lg px-3 py-2 font-mono text-[11px] text-[#FF8D4D] flex items-center gap-2 overflow-hidden">
+      <div className="mt-3 rounded-full bg-white/[0.03] border border-white/10 px-4 py-2 text-[11px] text-zinc-300 flex items-center gap-2 overflow-hidden">
         <Activity className="w-3.5 h-3.5 text-[#00F5D4] shrink-0 animate-pulse" />
-        <span className="truncate">&gt; {t(tickerText)}</span>
+        <span className="truncate">{t(tickerText)}</span>
       </div>
     </div>
   );

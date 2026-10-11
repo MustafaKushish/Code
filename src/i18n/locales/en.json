@@ -242,7 +242,6 @@
   "Widerstand: 0.2 Ω (KURZSCHLUSS)": "Resistance: 0.2 Ω (SHORT CIRCUIT)",
   "Widerstand: > 120 kΩ": "Resistance: > 120 kΩ",
   "Messpunkt [{name}]: {value} • {desc}": "Test point [{name}]: {value} • {desc}",
-  "INTERAKTIVER LOGIC-BOARD INSPEKTOR": "INTERACTIVE LOGIC BOARD INSPECTOR",
   "Soundeffekte aktiv": "Sound effects on",
   "Stummgeschaltet": "Muted",
   "Wärmebild-Simulation umschalten (Kurzschluss-Suche)": "Toggle thermal imaging simulation (short circuit search)",
@@ -853,5 +852,7 @@
   "Neue Online-Buchung": "New online booking",
   "Termine heute": "Today's appointments",
   "Umsatz diese Woche": "Revenue this week",
-  "Geräte, die wir reparieren": "Devices we repair"
+  "Geräte, die wir reparieren": "Devices we repair",
+  "Platinen-Inspektor": "Board inspector",
+  "Tippe auf ein Bauteil und miss nach": "Tap a component to measure it"
 }

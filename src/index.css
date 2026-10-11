@@ -420,3 +420,42 @@ body::before {
 .glass.glass-solid {
   background: linear-gradient(180deg, rgba(22, 34, 36, 0.96), rgba(11, 19, 21, 0.96));
 }
+
+/* Logic-Board als schwebende 3D-Platine */
+.board-stage {
+  perspective: 1100px;
+}
+.board-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:
+    0 1px 0 rgba(0, 245, 212, 0.25),
+    0 3px 0 #0b2a26,
+    0 6px 0 #071c19,
+    0 30px 60px rgba(0, 0, 0, 0.55),
+    0 0 50px rgba(0, 245, 212, 0.08);
+}
+.board-3d .pcb-svg {
+  filter: saturate(1.2) contrast(1.05);
+}
+.board-idle {
+  animation: boardSway 9s ease-in-out infinite;
+}
+@keyframes boardSway {
+  0%,
+  100% {
+    transform: rotateX(6deg) rotateY(-6deg);
+  }
+  50% {
+    transform: rotateX(3deg) rotateY(6deg);
+  }
+}
+.node-pop {
+  animation: nodePop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes nodePop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
