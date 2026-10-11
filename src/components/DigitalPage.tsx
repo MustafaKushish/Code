@@ -27,6 +27,7 @@ import { msg, useI18n } from '../i18n';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { SectionHeading } from './ui/SectionHeading';
 import { whatsappLink } from '../utils/whatsapp';
+import { HeroMockup, Marquee, trackSpotlight } from './DigitalShowcase';
 
 // CODE Digital: Websites, Geschäftssysteme und IT-Betreuung für lokale Unternehmen.
 // Eigene Unterseite unter /digital, damit die Reparatur-Startseite übersichtlich bleibt.
@@ -296,14 +297,15 @@ export const DigitalPage: React.FC = () => {
       <DigitalHeader />
       <main id="inhalt" tabIndex={-1} className="outline-none">
         {/* Hero */}
-        <section className="pt-8 pb-14 md:pt-16 md:pb-20">
+        <section className="relative pt-6 pb-14 md:pt-14 md:pb-24">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="reveal max-w-3xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            <div className="reveal max-w-2xl">
               <div className="inline-flex items-center gap-2 text-xs font-medium text-[#FFB98A] px-3 py-1.5 rounded-full border border-[#FF8D4D]/30 bg-[#FF8D4D]/10 mb-5">
                 <Store className="w-4 h-4" />
                 {t('Für Geschäfte in Neumarkt und Umgebung')}
               </div>
-              <h1 className="text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-6xl font-bold tracking-tight text-white text-balance">
+              <h1 className="text-shine text-[2.3rem] leading-[1.05] sm:text-5xl lg:text-[3.6rem] font-bold tracking-tight text-balance">
                 {t('Website und System, die dein Geschäft zum Laufen bringen.')}
               </h1>
               <p className="mt-5 text-base sm:text-lg text-[#94A9AA] leading-relaxed max-w-2xl">
@@ -312,7 +314,7 @@ export const DigitalPage: React.FC = () => {
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <a
                   href="#anfrage"
-                  className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl text-[15px] font-semibold bg-[#00F5D4] text-[#04110F] hover:bg-white transition-colors"
+                  className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl text-[15px] font-semibold bg-[#00F5D4] text-[#04110F] hover:bg-white shadow-[0_10px_40px_rgba(0,245,212,0.35)] hover:-translate-y-0.5 transition-all"
                 >
                   <span>{t('Kostenloses Erstgespräch')}</span>
                   <ArrowRight className="w-4 h-4 rtl:rotate-180" />
@@ -333,6 +335,10 @@ export const DigitalPage: React.FC = () => {
                 ))}
               </ul>
             </div>
+            <div className="reveal">
+              <HeroMockup />
+            </div>
+            </div>
           </div>
         </section>
 
@@ -340,10 +346,16 @@ export const DigitalPage: React.FC = () => {
         <section id="leistungen" className="py-12 md:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionHeading index="01" eyebrow={t('Leistungen')} title={t('Alles aus einer Hand')} intro={t('Von der ersten Website bis zum kompletten System, und wenn ein Gerät kaputtgeht, reparieren wir es selbst.')} />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {OFFERS.map(({ icon: Icon, title, text }) => (
-                <div key={title} className="reveal rounded-2xl border border-white/10 bg-[#0B1315]/80 p-6">
-                  <span className="inline-flex w-11 h-11 items-center justify-center rounded-xl bg-[#00F5D4]/10 border border-[#00F5D4]/25 text-[#00F5D4] mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+              {OFFERS.map(({ icon: Icon, title, text }, i) => (
+                <div
+                  key={title}
+                  onMouseMove={trackSpotlight}
+                  className={`reveal spotlight glass rounded-3xl p-6 sm:p-7 transition-transform duration-300 hover:-translate-y-1 ${
+                    i < 2 ? 'lg:col-span-3' : 'lg:col-span-2'
+                  } ${i === 0 ? 'sm:col-span-2 lg:col-span-3' : ''}`}
+                >
+                  <span className="inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#00F5D4]/25 to-[#FF8D4D]/15 border border-white/10 text-[#00F5D4] mb-5">
                     <Icon className="w-5 h-5" />
                   </span>
                   <h3 className="text-lg font-semibold text-white mb-2">{t(title)}</h3>
@@ -358,12 +370,18 @@ export const DigitalPage: React.FC = () => {
         <section id="bausteine" className="py-12 md:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionHeading index="02" eyebrow={t('Bausteine')} title={t('Du nimmst nur, was du brauchst')} intro={t('Jedes System wird aus diesen Bausteinen zusammengesetzt und an deine Abläufe angepasst.')} />
-            <div className="reveal grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 gap-3">
-              {MODULES.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3.5">
-                  <Icon className="w-5 h-5 text-[#FF8D4D] shrink-0" />
-                  <span className="text-[15px] text-zinc-200">{t(label)}</span>
-                </div>
+            <div className="reveal space-y-3">
+              {[MODULES.slice(0, 7), MODULES.slice(7)].map((row, r) => (
+                <Marquee
+                  key={r}
+                  reverse={r === 1}
+                  items={row.map(({ icon: Icon, label }) => (
+                    <div className="glass flex items-center gap-3 rounded-2xl px-5 py-3.5 whitespace-nowrap">
+                      <Icon className="w-5 h-5 text-[#FF8D4D] shrink-0" />
+                      <span className="text-[15px] text-zinc-100">{t(label)}</span>
+                    </div>
+                  ))}
+                />
               ))}
             </div>
           </div>
@@ -418,7 +436,7 @@ export const DigitalPage: React.FC = () => {
                 <div
                   key={p.name}
                   className={`reveal relative flex flex-col rounded-2xl border p-6 sm:p-7 ${
-                    p.highlight ? 'border-[#FF8D4D]/50 bg-gradient-to-b from-[#1A120D] to-[#0B1315]' : 'border-white/10 bg-[#0B1315]/80'
+                    p.highlight ? 'gradient-border md:-translate-y-3 shadow-[0_30px_80px_rgba(255,141,77,0.18)]' : 'glass'
                   }`}
                 >
                   {p.highlight && (
