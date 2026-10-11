@@ -218,9 +218,11 @@ export const AppointmentsView: React.FC<AppointmentsViewProps> = ({
         <div>
           <div className="flex items-center gap-2 font-mono text-xs text-[#00F5D4] uppercase tracking-wider mb-1">
             <CalendarIcon className="w-4 h-4 text-[#00F5D4]" />
-            <span>// WERKSTATT-TERMINAL • TERMINPLANUNG &amp; VORBEREITUNG</span>
+            <span>
+              <span className="hidden sm:inline">// WERKSTATT-TERMINAL • </span>TERMINPLANUNG &amp; VORBEREITUNG
+            </span>
           </div>
-          <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-zinc-400">
             <span>
               Heute: <strong className="text-white">{todayCount} Termine</strong>
             </span>
@@ -241,42 +243,45 @@ export const AppointmentsView: React.FC<AppointmentsViewProps> = ({
         {/* View Mode Switcher & Add Button */}
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
           {/* Segmented Control */}
-          <div className="inline-flex items-center bg-[#040809] border border-white/10 p-1 rounded-xl font-mono text-xs">
+          <div className="grid grid-cols-3 w-full sm:w-auto sm:inline-flex items-center bg-[#040809] border border-white/10 p-1 rounded-xl font-mono text-xs">
             <button
               type="button"
               onClick={() => setViewMode('day_dispatch')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2 sm:px-3 py-2 sm:py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
                 viewMode === 'day_dispatch'
                   ? 'bg-[#00F5D4] text-[#040809] shadow-sm'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
               <Clock className="w-3.5 h-3.5" />
-              <span>Tages-Dispatch</span>
+              <span className="sm:hidden">Tag</span>
+              <span className="hidden sm:inline">Tages-Dispatch</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('week_overview')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2 sm:px-3 py-2 sm:py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
                 viewMode === 'week_overview'
                   ? 'bg-[#00F5D4] text-[#040809] shadow-sm'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Wochenplan</span>
+              <span className="sm:hidden">Woche</span>
+              <span className="hidden sm:inline">Wochenplan</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('parts_list')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2 sm:px-3 py-2 sm:py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
                 viewMode === 'parts_list'
                   ? 'bg-[#00F5D4] text-[#040809] shadow-sm'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
               <Package className="w-3.5 h-3.5" />
-              <span>Teile-Bedarf</span>
+              <span className="sm:hidden">Teile</span>
+              <span className="hidden sm:inline">Teile-Bedarf</span>
               {missingPartsCount > 0 && (
                 <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse ml-0.5" />
               )}
@@ -293,7 +298,7 @@ export const AppointmentsView: React.FC<AppointmentsViewProps> = ({
             className="px-3.5 py-2 rounded-xl bg-[#C9743F] hover:bg-[#FF8D4D] text-white font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(201,116,63,0.35)] cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Neuer Termin</span>
+            <span>Neuer Termin</span>
           </button>
 
           {/* Clear all appointments button */}
@@ -316,8 +321,8 @@ export const AppointmentsView: React.FC<AppointmentsViewProps> = ({
       </div>
 
       {/* 2. Interactive Week Strip (Always visible for fast date navigation) */}
-      <div className="bg-[#080E10] border border-white/10 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-md">
-        <div className="flex items-center gap-1.5">
+      <div className="bg-[#080E10] border border-white/10 rounded-2xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-2 shadow-md">
+        <div className="flex items-center justify-between sm:justify-start gap-1.5">
           <button
             type="button"
             onClick={() => shiftWeek(-7)}
@@ -348,7 +353,7 @@ export const AppointmentsView: React.FC<AppointmentsViewProps> = ({
         </div>
 
         {/* The 6 Day Tiles (Monday to Saturday) */}
-        <div className="grid grid-cols-6 gap-1.5 sm:gap-2 flex-1 max-w-3xl">
+        <div className="grid grid-cols-6 gap-1 sm:gap-2 flex-1 max-w-3xl">
           {currentWeekDays.map((d) => {
             const isSelected = d.dateStr === selectedDate;
             const count = appointments.filter((a) => a.date === d.dateStr && a.status !== 'storniert').length;
@@ -364,7 +369,8 @@ export const AppointmentsView: React.FC<AppointmentsViewProps> = ({
                   setSelectedDate(d.dateStr);
                   if (viewMode === 'parts_list') setViewMode('day_dispatch');
                 }}
-                className={`py-2 px-1 sm:px-3 rounded-xl border font-mono text-center transition cursor-pointer relative ${
+                aria-label={`${d.dayName} ${d.formattedDay}: ${count} ${count === 1 ? 'Termin' : 'Termine'}`}
+                className={`min-w-0 py-2 px-0.5 sm:px-3 rounded-xl border font-mono text-center transition cursor-pointer relative ${
                   isSelected
                     ? 'bg-[#00F5D4]/15 border-[#00F5D4] text-white shadow-[0_0_15px_rgba(0,245,212,0.25)]'
                     : d.isToday
@@ -378,7 +384,8 @@ export const AppointmentsView: React.FC<AppointmentsViewProps> = ({
                 </div>
                 <div className="text-xs font-black mt-0.5 flex items-center justify-center gap-1">
                   <span className={count > 0 ? (isSelected ? 'text-[#00F5D4]' : 'text-white') : 'text-zinc-600'}>
-                    {count} {count === 1 ? 'Termin' : 'Termine'}
+                    {count}
+                    <span className="hidden lg:inline"> {count === 1 ? 'Termin' : 'Termine'}</span>
                   </span>
                   {hasMissing && (
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" title="Ersatzteil fehlt!" />

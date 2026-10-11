@@ -60,11 +60,11 @@ export const PWAInstallButton: React.FC = () => {
       <button
         type="button"
         onClick={handleInstallClick}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-gradient-to-r from-[#C9743F] to-[#FF8D4D] text-white hover:brightness-110 shadow-lg shadow-[#C9743F]/25 transition-all cursor-pointer animate-pulse"
+        className="inline-flex items-center justify-center gap-1.5 min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-gradient-to-r from-[#C9743F] to-[#FF8D4D] text-white hover:brightness-110 shadow-lg shadow-[#C9743F]/25 transition-all cursor-pointer animate-pulse"
         title="CODE WWS als eigenständige Desktop- oder Smartphone-App installieren"
       >
         <Download className="w-3.5 h-3.5" />
-        <span>App installieren</span>
+        <span className="hidden sm:inline">App installieren</span>
       </button>
     );
   }
@@ -75,10 +75,10 @@ export const PWAInstallButton: React.FC = () => {
         <button
           type="button"
           onClick={() => setShowIOSModal(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold border border-[#00F5D4] bg-[#00F5D4]/10 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-black transition-all cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono font-bold border border-[#00F5D4] bg-[#00F5D4]/10 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-black transition-all cursor-pointer"
         >
           <Download className="w-3.5 h-3.5" />
-          <span>Auf iOS installieren</span>
+          <span className="hidden sm:inline">Auf iOS installieren</span>
         </button>
 
         {showIOSModal && (
@@ -146,11 +146,11 @@ export const PWAInstallButton: React.FC = () => {
     <button
       type="button"
       onClick={() => setShowIOSModal(true)}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold border border-[#C9743F]/60 bg-[#C9743F]/15 text-white hover:bg-[#C9743F] hover:text-black transition-all cursor-pointer"
+      className="inline-flex items-center justify-center gap-1.5 min-w-10 min-h-10 sm:min-w-0 sm:min-h-0 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono font-bold border border-[#C9743F]/60 bg-[#C9743F]/15 text-white hover:bg-[#C9743F] hover:text-black transition-all cursor-pointer"
       title="App-Installationsanleitung"
     >
       <Download className="w-3.5 h-3.5 text-[#00F5D4]" />
-      <span>App installieren</span>
+      <span className="hidden sm:inline">App installieren</span>
       {showIOSModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="w-full max-w-sm rounded-xl bg-[#0B1416] border border-[#00F5D4] p-6 shadow-2xl relative text-left">
