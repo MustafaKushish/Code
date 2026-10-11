@@ -55,7 +55,7 @@ const SUB_FILTERS: { key: 'all' | CategoryType; label: string; icon: LucideIcon;
 const LAYER_BADGES: Record<CategoryType, { label: string; icon: LucideIcon; color: string }> = {
   display: { label: 'Display & Optik', icon: Monitor, color: 'border-blue-400/40 text-blue-300 bg-blue-500/10' },
   module: { label: 'Module & Akku', icon: BatteryCharging, color: 'border-amber-400/40 text-amber-300 bg-amber-500/10' },
-  board: { label: 'Platine & Mikrolöten', icon: Microscope, color: 'border-[#C9743F]/50 text-[#FF8D4D] bg-[#C9743F]/10' },
+  board: { label: 'Platine & Mikrolöten', icon: Microscope, color: 'border-white/10 text-[#FF8D4D] bg-[#C9743F]/10' },
   software: { label: 'Software & Firmware', icon: Cpu, color: 'border-[#00F5D4]/40 text-[#00F5D4] bg-[#00F5D4]/10' },
 };
 
@@ -165,9 +165,9 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
               <Bot className="w-7 h-7" />
             </div>
             <div className="flex-1">
-              <div className="flex items-center gap-2 text-[11px] font-mono text-[#00F5D4] uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-2 text-[11px] text-[#00F5D4] uppercase tracking-wider mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
-                <span>// {t('DIGITALE ERSTEINSCHÄTZUNG')}</span>
+                <span>{t('DIGITALE ERSTEINSCHÄTZUNG')}</span>
               </div>
               <h3 className="text-base sm:text-lg font-bold text-white mb-1 group-hover:text-[#00F5D4] transition-colors">
                 {t('KI-Techniker: Schadensebene nicht eindeutig?')}
@@ -176,8 +176,8 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                 {t('Beschreibe dein Symptom in eigenen Worten oder lade ein Foto hoch. Unser KI-Techniker grenzt ein, ob Display, Modul, Lade-IC oder Firmware betroffen ist.')}
               </p>
             </div>
-            <span className="shrink-0 text-xs font-mono font-bold px-3.5 py-2 rounded-xl bg-[#00F5D4]/15 border border-[#00F5D4]/40 text-[#00F5D4] group-hover:bg-[#00F5D4] group-hover:text-[#060B0C] transition-all">
-              &gt; {t('JETZT MIT KI PRÜFEN')}
+            <span className="shrink-0 text-xs font-bold px-3.5 py-2 rounded-xl bg-[#00F5D4]/15 border border-[#00F5D4]/40 text-[#00F5D4] group-hover:bg-[#00F5D4] group-hover:text-[#060B0C] transition-all">
+              {t('JETZT MIT KI PRÜFEN')}
             </span>
           </button>
 
@@ -195,7 +195,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                   className={`py-3 px-1.5 rounded-xl border text-center text-xs sm:text-[13px] flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                     isActive
                       ? 'bg-[#C9743F]/25 border-[#FF8D4D] text-white shadow-[0_0_15px_rgba(201,116,63,0.35)] -translate-y-0.5'
-                      : 'bg-[#0E1A1C]/90 border-[#C9743F]/20 text-[#839897] hover:border-[#4FA39B]/50 hover:text-white'
+                      : 'bg-[#0E1A1C]/90 border-white/10 text-[#839897] hover:border-[#4FA39B]/50 hover:text-white'
                   }`}
                 >
                   <DeviceIcon className="w-5 h-5" strokeWidth={1.75} />
@@ -208,11 +208,11 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
           {/* 2. Sub-Filter-Leiste (Das 4-Ebenen-System) */}
           <div className="mb-6 bg-[#070D0F] border border-white/10 rounded-2xl p-2 sm:p-2.5">
             <div className="flex items-center justify-between px-2 pb-2">
-              <span className="text-[11px] font-mono text-[#00F5D4] uppercase tracking-wider flex items-center gap-1.5 font-bold">
+              <span className="text-[11px] text-[#00F5D4] uppercase tracking-wider flex items-center gap-1.5 font-bold">
                 <Layers className="w-3.5 h-3.5" />
                 <span>{t('Schadensebene wählen:')}</span>
               </span>
-              <span className="text-[10px] font-mono text-zinc-400">
+              <span className="text-[10px] text-zinc-400">
                 {displayedFaults.length === 1 ? t('1 Eintrag') : t('{n} Einträge', { n: displayedFaults.length })}
               </span>
             </div>
@@ -233,7 +233,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                     key={filter.key}
                     type="button"
                     onClick={() => handleSubFilterClick(filter.key)}
-                    className={`px-3 py-2 rounded-xl font-mono text-xs flex items-center gap-2 transition-all cursor-pointer ${
+                    className={`px-3 py-2 rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer ${
                       isActive
                         ? 'bg-[#00F5D4] text-[#060B0C] font-bold shadow-[0_0_12px_rgba(0,245,212,0.35)] scale-[1.02]'
                         : 'bg-[#0E181A] border border-white/10 text-zinc-300 hover:border-[#00F5D4]/40 hover:text-white'
@@ -263,14 +263,14 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('Symptom suchen (z. B. Display, Akku, Lade-IC, Bootloop, Flüssigkeit, HDMI)...')}
-              className="w-full bg-[#060D0E] border border-[#C9743F]/25 focus:border-[#00F5D4] rounded-xl ps-10 pe-4 py-2.5 text-xs text-white placeholder-[#839897] outline-none font-mono"
+              className="w-full bg-[#060D0E] border border-white/10 focus:border-[#00F5D4] rounded-xl ps-10 pe-4 py-2.5 text-xs text-white placeholder-[#839897] outline-none"
             />
           </div>
 
           {/* Fault Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
             {displayedFaults.length === 0 ? (
-              <div className="col-span-full py-8 text-center bg-[#070D0E] border border-dashed border-white/15 rounded-2xl p-6 font-mono text-xs text-zinc-400">
+              <div className="col-span-full py-8 text-center bg-[#070D0E] border border-dashed border-white/15 rounded-2xl p-6 text-xs text-zinc-400">
                 {t('Keine Fehler für diese Ebene oder Suche gefunden.')}{' '}
                 <button
                   type="button"
@@ -302,20 +302,20 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                     className={`text-start p-4 rounded-xl border transition-all cursor-pointer relative ${
                       isSelected
                         ? 'bg-[#00F5D4]/10 border-[#00F5D4] shadow-[0_0_15px_rgba(0,245,212,0.2)]'
-                        : 'bg-[#0E1A1C]/60 border-[#C9743F]/20 hover:border-[#4FA39B]/40 hover:bg-[#122225]'
+                        : 'bg-[#0E1A1C]/60 border-white/10 hover:border-[#4FA39B]/40 hover:bg-[#122225]'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         {badge && (
                           <span
-                            className={`inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-md border ${badge.color}`}
+                            className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md border ${badge.color}`}
                           >
                             <badge.icon className="w-3 h-3" />
                             <span>{t(badge.label)}</span>
                           </span>
                         )}
-                        <span className="font-mono text-[11px] font-bold text-[#FF8D4D]">
+                        <span className="text-[11px] font-bold text-[#FF8D4D]">
                           {t('ab {price}', { price: euro(f.targetTotal, 0) })}
                         </span>
                       </div>
@@ -336,15 +336,15 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
           </div>
 
           {/* Pricing & Customer Outcome Display Card */}
-          <div ref={priceRef} className="scroll-mt-24 bg-[#050B0D] border border-[#C9743F]/30 rounded-2xl p-5 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6">
+          <div ref={priceRef} className="scroll-mt-24 bg-[#050B0D] border border-white/10 rounded-2xl p-5 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mb-6">
             <div className="lg:col-span-8 space-y-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-xs text-[#839897] uppercase tracking-wider block">
+                <span className="text-xs text-[#839897] uppercase tracking-wider block">
                   {t('Geschätzter Reparaturpreis (Festpreisrahmen):')}
                 </span>
                 {LAYER_BADGES[currentFault.categoryType] && (
                   <span
-                    className={`font-mono text-[10px] px-2 py-0.5 rounded border ${
+                    className={`text-[10px] px-2 py-0.5 rounded border ${
                       LAYER_BADGES[currentFault.categoryType].color
                     }`}
                   >
@@ -355,21 +355,21 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
 
               <div className="text-3xl sm:text-5xl font-extrabold text-[#FF8D4D] tracking-tight">
                 {t('ab {price}', { price: euro(finalTotal) })}{' '}
-                <span className="text-xs sm:text-sm font-normal font-mono text-[#839897]">
+                <span className="text-xs sm:text-sm font-normal text-[#839897]">
                   {t('inkl. 19% MwSt.')}{expressActive ? ' + Express' : ''}
                 </span>
               </div>
 
               {/* Dynamic Savings Display (Ersparnis-Visualisierung) */}
               {savings > 0 && (
-                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#00F5D4]/15 via-[#00F5D4]/10 to-transparent border border-[#00F5D4]/40 text-[#00F5D4] text-xs font-mono font-bold shadow-[0_0_15px_rgba(0,245,212,0.15)]">
+                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#00F5D4]/15 via-[#00F5D4]/10 to-transparent border border-[#00F5D4]/40 text-[#00F5D4] text-xs font-bold shadow-[0_0_15px_rgba(0,245,212,0.15)]">
                   <Sparkles className="w-4 h-4 text-[#00F5D4] shrink-0 animate-pulse" />
                   <span>{t('Vergleich zum Neukauf: Du sparst bis zu {amount}!', { amount: euro(savings, 0) })}</span>
                 </div>
               )}
 
               {/* Meta Tags */}
-              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-[#00F5D4]">
+              <div className="flex flex-wrap items-center gap-4 text-xs text-[#00F5D4]">
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
                   <span>
@@ -400,11 +400,11 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                     onChange={(e) => setIsExpressChecked(e.target.checked)}
                     className="w-4 h-4 accent-[#FF8D4D] rounded cursor-pointer"
                   />
-                  <span className="text-xs font-mono text-white flex items-center gap-1.5">
+                  <span className="text-xs text-white flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-[#FF8D4D]" />
                     <span>⚡ {t('Express-Service • Vorrang-Bearbeitung')}</span>
                   </span>
-                  <span className="ms-auto text-xs font-mono text-[#FF8D4D] font-bold">
+                  <span className="ms-auto text-xs text-[#FF8D4D] font-bold">
                     +{euro(currentFault.express, 0)}
                   </span>
                 </label>
@@ -424,7 +424,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                 href={generateWhatsAppMessage()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider bg-[#25D366] text-[#040809] hover:bg-[#20ba5a] shadow-[0_0_20px_rgba(37,211,102,0.3)] transition-all"
+                className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold bg-[#25D366] text-[#040809] hover:bg-[#20ba5a] shadow-[0_0_20px_rgba(37,211,102,0.3)] transition-all"
               >
                 <MessageSquare className="w-4 h-4" />
                 <span>{t('Dieses Problem anfragen')}</span>
@@ -435,7 +435,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                 onClick={() =>
                   onOpenAiChat(t('Ich benötige Hilfe zu: {fault} ({device})', { fault: faultTitle, device: categoryLabel }))
                 }
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-[#101E21] border border-[#00F5D4]/40 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] transition-all cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#101E21] border border-[#00F5D4]/40 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-[#060B0C] transition-all cursor-pointer"
               >
                 <Bot className="w-4 h-4" />
                 <span>{t('KI-Techniker fragen')}</span>
@@ -450,14 +450,14 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-mono text-[11px] text-[#FF8D4D] hover:text-white border border-[#FF8D4D]/30 hover:border-[#FF8D4D] hover:bg-[#FF8D4D]/10 transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-[11px] text-[#FF8D4D] hover:text-white border border-[#FF8D4D]/30 hover:border-[#FF8D4D] hover:bg-[#FF8D4D]/10 transition-colors"
                 title={t('Schriftlicher Kostenvoranschlag für Versicherungen über das Werkstattsystem CODE WWS')}
               >
                 <FileText className="w-3.5 h-3.5" />
                 <span>{t('Schriftlichen KVA (Versicherung) anfragen')}</span>
               </a>
 
-              <div className="text-[10px] font-mono text-[#839897] leading-relaxed text-center px-1">
+              <div className="text-[10px] text-[#839897] leading-relaxed text-center px-1">
                 ℹ️ <strong>{t('Hinweis:')}</strong>{' '}
                 {t('Schriftliche Kostenvoranschläge für Versicherungen (Haftpflicht / Hausrat) werden nach Labor-Prüfung über unser Werkstattsystem (CODE WWS) erstellt und bei Beauftragung zu 100 % verrechnet.')}
               </div>
@@ -473,7 +473,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                   t('Ich bin mir nicht sicher, welche Schadensebene bei meinem {device} zutrifft. Mein Problem ist: ', { device: categoryLabel })
                 )
               }
-              className="w-full py-3.5 px-4 rounded-2xl font-mono text-xs sm:text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-[#0C1A1D] via-[#102226] to-[#0C1A1D] border border-[#00F5D4]/40 hover:border-[#00F5D4] text-[#00F5D4] hover:bg-[#00F5D4]/10 transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-md group"
+              className="w-full py-3.5 px-4 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-[#0C1A1D] via-[#102226] to-[#0C1A1D] border border-[#00F5D4]/40 hover:border-[#00F5D4] text-[#00F5D4] hover:bg-[#00F5D4]/10 transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-md group"
             >
               <Bot className="w-4 h-4 text-[#00F5D4] group-hover:scale-110 transition-transform" />
               <span>{t('Nicht sicher, welche Ebene zutrifft? KI-Techniker fragen')}</span>
@@ -488,7 +488,7 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
             <button
               type="button"
               onClick={() => setShowTechDetails(!showTechDetails)}
-              className="w-full px-5 py-4 flex items-center justify-between text-start font-mono text-xs text-[#00F5D4] hover:bg-white/5 transition-colors cursor-pointer"
+              className="w-full px-5 py-4 flex items-center justify-between text-start text-xs text-[#00F5D4] hover:bg-white/5 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <span>🔧 {t('Technische Details & Labor-Ablauf anzeigen')}</span>
@@ -504,13 +504,13 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
             {showTechDetails && (
               <div className="p-5 border-t border-white/10 bg-[#040809] space-y-6 animate-fade-in">
                 <div>
-                  <h4 className="font-mono text-xs text-[#00F5D4] uppercase tracking-wider mb-3">
+                  <h4 className="text-xs text-[#00F5D4] uppercase tracking-wider mb-3">
                     {t('Durchgeführte Labor-Schritte unter dem 40x Stereomikroskop:')}
                   </h4>
                   <ul className="space-y-2">
                     {currentFault.steps.map((st, i) => (
                       <li key={i} className="text-xs sm:text-sm text-[#F3F7F7] flex items-start gap-2.5">
-                        <span className="text-[#FF8D4D] font-bold font-mono">▸</span>
+                        <span className="text-[#FF8D4D] font-bold">▸</span>
                         <span>{t(st)}</span>
                       </li>
                     ))}
@@ -518,10 +518,10 @@ export const DiagnoseCalculator: React.FC<DiagnoseCalculatorProps> = ({
                 </div>
 
                 <div>
-                  <h4 className="font-mono text-xs text-[#FF8D4D] uppercase tracking-wider mb-2">
+                  <h4 className="text-xs text-[#FF8D4D] uppercase tracking-wider mb-2">
                     {t('Kaufmännische Aufschlüsselung:')}
                   </h4>
-                  <table className="w-full font-mono text-xs text-[#839897] border-collapse">
+                  <table className="w-full text-xs text-[#839897] border-collapse">
                     <tbody>
                       <tr className="border-b border-white/5 py-1.5">
                         <td className="py-1">{t('Mikrolöt-Arbeitszeit / Labor:')}</td>
