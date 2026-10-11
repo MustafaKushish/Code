@@ -76,11 +76,12 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCheckIn, onOpenLegal, onOp
             <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00F5D4] mb-4">{t('Seiten')}</h3>
             <ul className="space-y-2.5">
               {[
-                ['#diagnose', msg('Preise & Diagnose')],
-                ['#status', msg('Auftragsstatus')],
-                ['#services', msg('Leistungen')],
-                ['#b2b', msg('Für Händler (B2B)')],
-                ['#faq', msg('Häufige Fragen')],
+                ['/#diagnose', msg('Preise & Diagnose')],
+                ['/#status', msg('Auftragsstatus')],
+                ['/#services', msg('Leistungen')],
+                ['/#b2b', msg('Für Händler (B2B)')],
+                ['/#faq', msg('Häufige Fragen')],
+                ['/digital', msg('Websites & Systeme')],
               ].map(([href, label]) => (
                 <li key={href}>
                   <a href={href} className="hover:text-white transition-colors">

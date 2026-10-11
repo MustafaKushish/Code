@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: '#services', label: msg('Leistungen'), index: '03' },
   { href: '#ablauf', label: msg('Ablauf'), index: '04' },
   { href: '#kontakt', label: msg('Kontakt'), index: '09' },
+  { href: '/digital', label: msg('Für Unternehmen'), index: '10' },
 ];
 
 interface HeaderProps {
