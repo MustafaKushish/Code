@@ -15,7 +15,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { DeviceCategoryKey } from '../types';
-import { LogicBoardScanner } from './LogicBoardScanner';
+import { DeviceExplorer } from './DeviceExplorer';
 import { RepairCounter } from './RepairCounter';
 import { getOpeningStatus } from '../utils/openingHours';
 import { msg, useI18n } from '../i18n';
@@ -163,7 +163,7 @@ export const Hero: React.FC<HeroProps> = ({ onSelectCategory, onOpenAiChat }) =>
 
           {/* Right Column: Logic Board Visualizer */}
           <div className="lg:col-span-6">
-            <LogicBoardScanner />
+            <DeviceExplorer onSelectCategory={onSelectCategory} />
           </div>
         </div>
 
